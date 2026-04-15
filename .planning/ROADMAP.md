@@ -69,7 +69,7 @@ Plans:
 
 Plans:
 - [x] 03-01-PLAN.md -- WXT project scaffold, CryptoBox module (X25519+ChaCha20 interop with CryptoKit), types, and storage wrappers
-- [ ] 03-02-PLAN.md -- Service worker (WebSocket, keepalive, message routing) and popup UI (QR pairing, status indicator, Request Code)
+- [x] 03-02-PLAN.md -- Service worker (WebSocket, keepalive, message routing) and popup UI (QR pairing, status indicator, Request Code)
 - [ ] 03-03-PLAN.md -- Code display with countdown ring, clipboard copy with 30s auto-clear, end-to-end verification
 
 ### Phase 4: Auto-Fill + Domain Matching

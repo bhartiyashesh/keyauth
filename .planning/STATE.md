@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-04-15T19:47:43.935Z"
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-04-15T19:57:23.295Z"
 last_activity: 2026-04-15
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 10
-  completed_plans: 8
-  percent: 80
+  completed_plans: 9
+  percent: 90
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-14)
 ## Current Position
 
 Phase: 03 (chrome-extension-core) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-04-15
 
@@ -59,6 +59,7 @@ Progress: [██████████] 100%
 | Phase 02 P01 | 8min | 3 tasks | 4 files |
 | Phase 02 P02 | 5min | 2 tasks | 6 files |
 | Phase 03 P01 | 6min | 2 tasks | 15 files |
+| Phase 03 P02 | 5min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -91,6 +92,9 @@ Recent decisions affecting current work:
 - [Phase 03]: Used x25519.utils.randomSecretKey() for noble-curves v2 (v1 had randomPrivateKey)
 - [Phase 03]: Noble v2 ESM imports require .js suffix on subpath exports
 - [Phase 03]: MessageEnvelope.v typed as literal 1 for strict relay protocol conformance
+- [Phase 03]: defineBackground used as WXT auto-imported global (not from wxt/sandbox)
+- [Phase 03]: QR payload JSON matches iOS PairingQRPayload: { roomId, relayURL, publicKey }
+- [Phase 03]: Service worker owns WebSocket; popup communicates via chrome.runtime.sendMessage only
 
 ### Pending Todos
 
@@ -103,6 +107,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-15T19:47:43.931Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-04-15T19:57:23.292Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None
