@@ -34,7 +34,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md -- Scaffold relay project, types, logger, and RoomManager with tests
-- [ ] 01-02-PLAN.md -- APNs client wrapper and message handler routing with tests
+- [x] 01-02-PLAN.md -- APNs client wrapper and message handler routing with tests
 - [ ] 01-03-PLAN.md -- Server entry point, health endpoint, WebSocket wiring, and local verification
 
 ### Phase 2: iOS Relay Client + Pairing
