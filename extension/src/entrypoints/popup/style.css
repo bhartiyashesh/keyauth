@@ -1,5 +1,174 @@
+/* Base */
 body {
   width: 320px;
   margin: 0;
   font-family: system-ui, -apple-system, sans-serif;
+  background: #ffffff;
+  color: #1a1a1a;
+}
+
+/* Popup layout */
+.popup {
+  min-height: 200px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.popup-header {
+  text-align: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.popup-header h1 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.popup-body {
+  padding: 16px;
+}
+
+/* Pairing view */
+.pairing-view {
+  text-align: center;
+}
+
+.pairing-label {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 12px;
+}
+
+.qr-container {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.ttl-countdown {
+  font-size: 13px;
+  color: #999;
+  margin: 12px 0 0;
+}
+
+/* Connected view */
+.connected-view {
+  text-align: center;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.status-text {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Buttons */
+.btn-primary {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #ffffff;
+  background-color: #3b82f6;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-danger {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 6px;
+  font-size: 13px;
+  color: #ef4444;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  text-decoration: underline;
+}
+
+/* Loading */
+.loading-text {
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+}
+
+/* Code placeholder (Plan 03 builds full CodeView) */
+.code-placeholder {
+  text-align: center;
+}
+
+.code-placeholder p {
+  font-size: 14px;
+  color: #22c55e;
+  margin: 0 0 16px;
+}
+
+/* Status dot pulse animation */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.status-dot--pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #1a1a1a;
+    color: #e5e5e5;
+  }
+
+  .popup-header {
+    border-bottom-color: #333;
+  }
+
+  .pairing-label {
+    color: #999;
+  }
+
+  .status-text {
+    color: #999;
+  }
+
+  .qr-container svg {
+    background: #ffffff;
+    padding: 8px;
+    border-radius: 8px;
+  }
+
+  .btn-primary {
+    background-color: #2563eb;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background-color: #3b82f6;
+  }
 }
