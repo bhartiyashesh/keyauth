@@ -63,11 +63,11 @@ One-click TOTP code delivery from phone to browser — secrets never leave the p
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| TLS-only relay (no E2E) | Simplicity — user owns the relay, codes expire in 30s, E2E can be added later | — Pending |
+| E2E encrypted relay (tweetnacl X25519) | Zero-knowledge relay — codes encrypted end-to-end, server sees only opaque blobs. Upgraded from TLS-only during Phase 1 discussion | — Pending |
 | WebSocket relay, not Bluetooth | Chrome extensions can't use Web Bluetooth API; relay works across networks | — Pending |
 | Click-to-request, not auto-detect-push | User initiates the flow from the extension; auto-detect + auto-fill after code arrives | — Pending |
 | Railway for relay hosting | User's preferred deployment platform; Vercel explicitly excluded | — Pending |
 | APNs for phone wakeup | Relay server must push to phone; APNs is the standard iOS mechanism | — Pending |
 
 ---
-*Last updated: 2026-04-14 after initialization*
+*Last updated: 2026-04-15 after Phase 1 discussion — upgraded to E2E encryption*
