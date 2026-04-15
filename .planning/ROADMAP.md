@@ -53,7 +53,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md -- Core services: CryptoBoxManager (E2E encryption), PairingStore (Keychain), RelayClient (WebSocket)
 - [x] 02-02-PLAN.md -- APNs AppDelegate, push entitlement, pairing views (scan QR, manage, unpair)
-- [ ] 02-03-PLAN.md -- Code approval sheet with biometric gate, ContentView + KeyAuthApp wiring
+- [x] 02-03-PLAN.md -- Code approval sheet with biometric gate, ContentView + KeyAuthApp wiring
 
 ### Phase 3: Chrome Extension Core
 **Goal**: The Chrome extension popup lets the user pick an account, request a code from the phone, and receive the code with an expiry countdown — the full request-to-code flow works end-to-end
