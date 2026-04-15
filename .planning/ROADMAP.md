@@ -52,7 +52,7 @@ Plans:
 
 Plans:
 - [x] 02-01-PLAN.md -- Core services: CryptoBoxManager (E2E encryption), PairingStore (Keychain), RelayClient (WebSocket)
-- [ ] 02-02-PLAN.md -- APNs AppDelegate, push entitlement, pairing views (scan QR, manage, unpair)
+- [x] 02-02-PLAN.md -- APNs AppDelegate, push entitlement, pairing views (scan QR, manage, unpair)
 - [ ] 02-03-PLAN.md -- Code approval sheet with biometric gate, ContentView + KeyAuthApp wiring
 
 ### Phase 3: Chrome Extension Core

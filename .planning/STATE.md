@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-04-15T16:36:12.802Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-04-15T16:46:18.884Z"
 last_activity: 2026-04-15
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 7
-  completed_plans: 5
-  percent: 71
+  completed_plans: 6
+  percent: 86
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-14)
 ## Current Position
 
 Phase: 02 (ios-relay-client-pairing) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-04-15
 
@@ -57,6 +57,7 @@ Progress: [██████████] 100%
 | Phase 01-relay-server P03 | 5min | 2 tasks | 2 files |
 | Phase 01-relay-server P04 | 3min | 3 tasks | 1 files |
 | Phase 02 P01 | 8min | 3 tasks | 4 files |
+| Phase 02 P02 | 5min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,9 @@ Recent decisions affecting current work:
 - [Phase 02]: fileprivate(set) for RelayClient.state to allow WebSocketDelegate access within same file
 - [Phase 02]: Separate WebSocketDelegate class avoids nonisolated conformance complexity on @MainActor class
 - [Phase 02]: All relay protocol types colocated in CryptoBoxManager.swift for cohesion
+- [Phase 02]: Closure callbacks (onDeviceToken, onNotificationTapped) on AppDelegate for APNs-to-SwiftUI communication
+- [Phase 02]: PairingQRScannerView reuses QRCameraPreview -- same camera infra, only JSON parsing differs from QRScannerView
+- [Phase 02]: aps-environment set to development -- switches to production automatically on App Store submission
 
 ### Pending Todos
 
@@ -95,6 +99,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-15T16:36:12.800Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-04-15T16:46:18.881Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None
