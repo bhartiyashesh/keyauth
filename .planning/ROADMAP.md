@@ -36,7 +36,7 @@ Plans:
 - [x] 01-01-PLAN.md -- Scaffold relay project, types, logger, and RoomManager with tests
 - [x] 01-02-PLAN.md -- APNs client wrapper and message handler routing with tests
 - [x] 01-03-PLAN.md -- Server entry point, health endpoint, WebSocket wiring, and local verification
-- [ ] 01-04-PLAN.md -- Gap closure: Railway deployment configuration and provisioning (RELAY-03)
+- [x] 01-04-PLAN.md -- Gap closure: Railway deployment configuration and provisioning (RELAY-03)
 
 ### Phase 2: iOS Relay Client + Pairing
 **Goal**: The iOS app can connect to the relay, register for push notifications, handle a code request, and display a pairing management screen
