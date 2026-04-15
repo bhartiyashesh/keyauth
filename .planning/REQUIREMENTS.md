@@ -17,7 +17,7 @@
 ### Pairing
 
 - [ ] **PAIR-01**: Chrome extension generates a QR code containing roomId and relay URL for one-time pairing
-- [ ] **PAIR-02**: iOS app scans pairing QR code and joins the relay room
+- [x] **PAIR-02**: iOS app scans pairing QR code and joins the relay room
 - [ ] **PAIR-03**: Pairing tokens are single-use and expire after a TTL (e.g., 5 minutes)
 - [ ] **PAIR-04**: iOS app sends APNs device token to relay during pairing handshake
 - [ ] **PAIR-05**: Extension popup shows pairing status indicator (connected/disconnected/paired)
@@ -25,7 +25,7 @@
 ### Code Request & Delivery
 
 - [ ] **CODE-01**: User clicks extension popup, selects an account, and initiates a code request
-- [ ] **CODE-02**: iOS app receives code request and prompts Face ID/Touch ID before generating code
+- [x] **CODE-02**: iOS app receives code request and prompts Face ID/Touch ID before generating code
 - [ ] **CODE-03**: TOTP code is generated on the phone after biometric approval, then sent via relay to extension
 - [ ] **CODE-04**: Extension popup displays the received code with an expiry countdown timer
 - [ ] **CODE-05**: Extension surfaces relevant accounts based on the current website domain
@@ -46,10 +46,10 @@
 
 ### iOS App Additions
 
-- [ ] **IOS-01**: iOS app includes a WebSocket relay client (URLSessionWebSocketTask, foreground-only)
+- [x] **IOS-01**: iOS app includes a WebSocket relay client (URLSessionWebSocketTask, foreground-only)
 - [ ] **IOS-02**: iOS app registers for and handles APNs alert push notifications
 - [ ] **IOS-03**: iOS app presents a TOTP approval sheet (account name, site, approve/deny + Face ID)
-- [ ] **IOS-04**: iOS app includes a pairing management screen (view paired devices, unpair)
+- [x] **IOS-04**: iOS app includes a pairing management screen (view paired devices, unpair)
 
 ## v2 Requirements
 
@@ -91,17 +91,17 @@
 | RELAY-04 | Phase 1 | Complete |
 | RELAY-05 | Phase 1 | Complete |
 | RELAY-06 | Phase 1 | Complete |
-| IOS-01 | Phase 2 | Pending |
+| IOS-01 | Phase 2 | Complete |
 | IOS-02 | Phase 2 | Pending |
 | IOS-03 | Phase 2 | Pending |
-| IOS-04 | Phase 2 | Pending |
+| IOS-04 | Phase 2 | Complete |
 | PAIR-01 | Phase 3 | Pending |
-| PAIR-02 | Phase 2 | Pending |
+| PAIR-02 | Phase 2 | Complete |
 | PAIR-03 | Phase 3 | Pending |
 | PAIR-04 | Phase 2 | Pending |
 | PAIR-05 | Phase 3 | Pending |
 | CODE-01 | Phase 3 | Pending |
-| CODE-02 | Phase 2 | Pending |
+| CODE-02 | Phase 2 | Complete |
 | CODE-03 | Phase 3 | Pending |
 | CODE-04 | Phase 3 | Pending |
 | CODE-05 | Phase 4 | Pending |

@@ -48,10 +48,10 @@ Plans:
   3. The TOTP approval sheet shows the account name and site, and Face ID or Touch ID must pass before a code is generated and sent
   4. The iOS app sends its APNs device token to the relay during the pairing handshake so future pushes reach the correct device
   5. The pairing management screen lists paired devices and allows the user to unpair any of them
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 
 Plans:
-- [ ] 02-01-PLAN.md -- Core services: CryptoBoxManager (E2E encryption), PairingStore (Keychain), RelayClient (WebSocket)
+- [x] 02-01-PLAN.md -- Core services: CryptoBoxManager (E2E encryption), PairingStore (Keychain), RelayClient (WebSocket)
 - [ ] 02-02-PLAN.md -- APNs AppDelegate, push entitlement, pairing views (scan QR, manage, unpair)
 - [ ] 02-03-PLAN.md -- Code approval sheet with biometric gate, ContentView + KeyAuthApp wiring
 
@@ -97,7 +97,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Relay Server | 4/4 | Complete | 2026-04-15 |
-| 2. iOS Relay Client + Pairing | 0/3 | Planned | - |
+| 2. iOS Relay Client + Pairing | 1/3 | In Progress|  |
 | 3. Chrome Extension Core | 0/TBD | Not started | - |
 | 4. Auto-Fill + Domain Matching | 0/TBD | Not started | - |
 | 5. Resilience | 0/TBD | Not started | - |

@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-04-PLAN.md
-last_updated: "2026-04-15T07:14:00.000Z"
-last_activity: 2026-04-15 -- Phase 01 complete (all 4 plans executed)
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-04-15T16:36:12.802Z"
+last_activity: 2026-04-15
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  total_plans: 7
+  completed_plans: 5
+  percent: 71
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-14)
 
 **Core value:** One-click TOTP code delivery from phone to browser — secrets never leave the phone
-**Current focus:** Phase 01 — relay-server
+**Current focus:** Phase 02 — ios-relay-client-pairing
 
 ## Current Position
 
-Phase: 01 (relay-server) — COMPLETE
-Plan: 4 of 4
-Status: Phase 01 complete
-Last activity: 2026-04-15 -- Phase 01 complete (all 4 plans executed)
+Phase: 02 (ios-relay-client-pairing) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-04-15
 
 Progress: [██████████] 100%
 
@@ -56,6 +56,7 @@ Progress: [██████████] 100%
 | Phase 01 P02 | 4min | 2 tasks | 4 files |
 | Phase 01-relay-server P03 | 5min | 2 tasks | 2 files |
 | Phase 01-relay-server P04 | 3min | 3 tasks | 1 files |
+| Phase 02 P01 | 8min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,9 @@ Recent decisions affecting current work:
 - [Phase 01-relay-server]: ROOM_TTL_MINUTES env var defaults to 30 for configurable room eviction
 - [Phase 01-relay-server]: APNs init wrapped in try/catch -- relay works without push credentials for local testing
 - [Phase 01-relay-server]: noServer mode with manual handleUpgrade validates roomId and capacity before completing WebSocket handshake
+- [Phase 02]: fileprivate(set) for RelayClient.state to allow WebSocketDelegate access within same file
+- [Phase 02]: Separate WebSocketDelegate class avoids nonisolated conformance complexity on @MainActor class
+- [Phase 02]: All relay protocol types colocated in CryptoBoxManager.swift for cohesion
 
 ### Pending Todos
 
@@ -91,6 +95,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-15T06:35:13.295Z
-Stopped at: Completed 01-03-PLAN.md
+Last session: 2026-04-15T16:36:12.800Z
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None
