@@ -103,9 +103,9 @@ final class RelayClient: ObservableObject {
         send(envelope)
     }
 
-    func sendEncryptedCode(_ code: String, requestId: String) {
+    func sendEncryptedCode(_ code: String, requestId: String, issuer: String, label: String) {
         guard let sharedKey = PairingStore.shared.sharedKey else { return }
-        let responseJSON: [String: String] = ["code": code, "requestId": requestId]
+        let responseJSON: [String: String] = ["code": code, "requestId": requestId, "issuer": issuer, "label": label]
         guard let plaintext = try? JSONEncoder().encode(responseJSON),
               let encrypted = try? CryptoBoxManager.seal(plaintext, using: sharedKey)
         else { return }

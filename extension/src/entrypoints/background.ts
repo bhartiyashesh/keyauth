@@ -228,12 +228,14 @@ async function handleCodeResponse(msg: MessageEnvelope): Promise<void> {
     const sharedKey = base64ToUint8Array(pairing.sharedKey);
     const decrypted = open(encrypted, sharedKey);
     const decoded = new TextDecoder().decode(decrypted);
-    const { code, requestId } = JSON.parse(decoded);
+    const { code, requestId, issuer, label } = JSON.parse(decoded);
 
-    console.log('[KeyAuth] Code received:', code);
+    console.log('[KeyAuth] Code received for', issuer || '(unknown)', ':', code);
     await setSessionState({
       lastCode: code,
       lastRequestId: requestId,
+      lastIssuer: issuer || '',
+      lastLabel: label || '',
       codeReceivedAt: Date.now(),
     });
     await setConnectionState('code_received');
@@ -376,12 +378,16 @@ async function handlePopupMessage(
       const pairing = await loadPairingData();
       const connectionState = await getSessionState<ConnectionState>('connectionState');
       const lastCode = await getSessionState<string>('lastCode');
+      const lastIssuer = await getSessionState<string>('lastIssuer');
+      const lastLabel = await getSessionState<string>('lastLabel');
       const codeReceivedAt = await getSessionState<number>('codeReceivedAt');
       const roomError = await getSessionState<string>('roomError');
       sendResponse({
         paired: !!pairing,
         connectionState: connectionState ?? (pairing ? 'disconnected' : 'unpaired'),
         lastCode,
+        lastIssuer,
+        lastLabel,
         codeReceivedAt,
         roomError,
       });

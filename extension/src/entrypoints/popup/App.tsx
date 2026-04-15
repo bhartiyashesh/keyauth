@@ -10,6 +10,8 @@ interface AppState {
   paired: boolean;
   connectionState: ConnectionState;
   lastCode: string | null;
+  lastIssuer: string | null;
+  lastLabel: string | null;
   codeReceivedAt: number | null;
   loading: boolean;
 }
@@ -19,6 +21,8 @@ export default function App() {
     paired: false,
     connectionState: 'unpaired',
     lastCode: null,
+    lastIssuer: null,
+    lastLabel: null,
     codeReceivedAt: null,
     loading: true,
   });
@@ -31,6 +35,8 @@ export default function App() {
           paired: response.paired,
           connectionState: response.connectionState ?? 'unpaired',
           lastCode: response.lastCode ?? null,
+          lastIssuer: response.lastIssuer ?? null,
+          lastLabel: response.lastLabel ?? null,
           codeReceivedAt: response.codeReceivedAt ?? null,
           loading: false,
         });
@@ -54,16 +60,16 @@ export default function App() {
           }));
         }
         if (changes.lastCode) {
-          setState((prev) => ({
-            ...prev,
-            lastCode: changes.lastCode.newValue as string,
-          }));
+          setState((prev) => ({ ...prev, lastCode: changes.lastCode.newValue as string }));
+        }
+        if (changes.lastIssuer) {
+          setState((prev) => ({ ...prev, lastIssuer: changes.lastIssuer.newValue as string }));
+        }
+        if (changes.lastLabel) {
+          setState((prev) => ({ ...prev, lastLabel: changes.lastLabel.newValue as string }));
         }
         if (changes.codeReceivedAt) {
-          setState((prev) => ({
-            ...prev,
-            codeReceivedAt: changes.codeReceivedAt.newValue as number,
-          }));
+          setState((prev) => ({ ...prev, codeReceivedAt: changes.codeReceivedAt.newValue as number }));
         }
       }
 
@@ -73,7 +79,6 @@ export default function App() {
           setState((prev) => ({
             ...prev,
             paired: hasPairing,
-            // When pairing is cleared, go back to unpaired state
             connectionState: hasPairing ? prev.connectionState : 'unpaired',
           }));
         }
@@ -88,6 +93,8 @@ export default function App() {
     chrome.storage.session.set({
       connectionState: 'connected',
       lastCode: null,
+      lastIssuer: null,
+      lastLabel: null,
       codeReceivedAt: null,
     });
   }, []);
@@ -122,6 +129,8 @@ export default function App() {
         {state.paired && state.connectionState === 'code_received' && state.lastCode && (
           <CodeView
             code={state.lastCode}
+            issuer={state.lastIssuer || ''}
+            label={state.lastLabel || ''}
             receivedAt={state.codeReceivedAt ?? Date.now()}
             onDismiss={handleCodeDismiss}
           />

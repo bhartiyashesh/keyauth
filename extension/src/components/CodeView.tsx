@@ -2,6 +2,8 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 
 interface CodeViewProps {
   code: string;
+  issuer: string;
+  label: string;
   receivedAt: number;
   onDismiss: () => void;
 }
@@ -47,7 +49,7 @@ function CountdownRing({ secondsRemaining, size }: { secondsRemaining: number; s
   );
 }
 
-export default function CodeView({ code, receivedAt: _receivedAt, onDismiss }: CodeViewProps) {
+export default function CodeView({ code, issuer, label, receivedAt: _receivedAt, onDismiss }: CodeViewProps) {
   const [secondsRemaining, setSecondsRemaining] = useState(() => {
     return 30 - (Math.floor(Date.now() / 1000) % 30);
   });
@@ -115,7 +117,9 @@ export default function CodeView({ code, receivedAt: _receivedAt, onDismiss }: C
 
   return (
     <div className="code-view">
-      <p className="code-label">Code received</p>
+      <p className="code-label">
+        {issuer ? `${issuer}${label ? ` (${label})` : ''}` : 'Code received'}
+      </p>
 
       <div className="countdown-ring">
         <CountdownRing secondsRemaining={secondsRemaining} size={48} />

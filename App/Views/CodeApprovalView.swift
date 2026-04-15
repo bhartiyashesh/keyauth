@@ -191,8 +191,8 @@ struct CodeApprovalView: View {
         // Generate TOTP code
         guard let code = TOTPGenerator.generate(for: account) else { return }
 
-        // Encrypt and send via relay
-        RelayClient.shared.sendEncryptedCode(code, requestId: request.id)
+        // Encrypt and send via relay (include account name so extension can display it)
+        RelayClient.shared.sendEncryptedCode(code, requestId: request.id, issuer: account.issuer, label: account.label)
 
         codeSent = true
 
