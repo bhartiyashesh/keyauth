@@ -61,19 +61,15 @@ export default function CodeView({ code, issuer, label, receivedAt: _receivedAt,
     ? code.slice(0, 3) + ' ' + code.slice(3)
     : code;
 
-  // Countdown timer with 1-second updates
+  // Countdown timer -- phone auto-sends fresh codes, so just keep counting
   useEffect(() => {
     const interval = setInterval(() => {
       const remaining = 30 - (Math.floor(Date.now() / 1000) % 30);
       setSecondsRemaining(remaining);
-
-      if (remaining <= 0) {
-        onDismiss();
-      }
     }, 1_000);
 
     return () => clearInterval(interval);
-  }, [onDismiss]);
+  }, []);
 
   // Cleanup copied toast timeout on unmount
   useEffect(() => {
