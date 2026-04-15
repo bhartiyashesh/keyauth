@@ -12,7 +12,7 @@ Build the Chrome extension and relay server that bridge the existing KeyAuth iOS
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [x] **Phase 1: Relay Server** - Deploy the WebSocket relay to Railway; everything else blocks on this (completed 2026-04-15)
+- [ ] **Phase 1: Relay Server** - Deploy the WebSocket relay to Railway; everything else blocks on this
 - [ ] **Phase 2: iOS Relay Client + Pairing** - Add additive relay and push notification modules to the existing iOS app
 - [ ] **Phase 3: Chrome Extension Core** - Build the popup, service worker, and full request-to-code flow end-to-end
 - [ ] **Phase 4: Auto-Fill + Domain Matching** - Detect TOTP fields in the browser and inject received codes automatically
@@ -30,12 +30,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. The relay is reachable at its Railway URL over TLS (wss://) with no manual certificate configuration
   4. The /health endpoint returns HTTP 200 so uptime monitoring tools can confirm the server is alive
   5. A third client attempting to join a room with two existing clients is rejected
-**Plans:** 3/3 plans complete
+**Plans:** 4 plans (3 complete, 1 gap closure pending)
 
 Plans:
 - [x] 01-01-PLAN.md -- Scaffold relay project, types, logger, and RoomManager with tests
 - [x] 01-02-PLAN.md -- APNs client wrapper and message handler routing with tests
 - [x] 01-03-PLAN.md -- Server entry point, health endpoint, WebSocket wiring, and local verification
+- [ ] 01-04-PLAN.md -- Gap closure: Railway deployment configuration and provisioning (RELAY-03)
 
 ### Phase 2: iOS Relay Client + Pairing
 **Goal**: The iOS app can connect to the relay, register for push notifications, handle a code request, and display a pairing management screen
@@ -90,7 +91,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Relay Server | 3/3 | Complete   | 2026-04-15 |
+| 1. Relay Server | 3/4 | Gap closure pending (RELAY-03 deployment) | - |
 | 2. iOS Relay Client + Pairing | 0/TBD | Not started | - |
 | 3. Chrome Extension Core | 0/TBD | Not started | - |
 | 4. Auto-Fill + Domain Matching | 0/TBD | Not started | - |
