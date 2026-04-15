@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var store: AccountStore
+    @ObservedObject private var relayClient = RelayClient.shared
     @State private var showingScanner = false
     @State private var showingManualEntry = false
     @State private var searchText = ""
@@ -41,6 +42,19 @@ struct ContentView: View {
             .navigationTitle("KeyAuth")
             .searchable(text: $searchText, prompt: "Search accounts")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    NavigationLink {
+                        PairingView()
+                    } label: {
+                        HStack(spacing: 6) {
+                            Circle()
+                                .fill(statusDotColor)
+                                .frame(width: 8, height: 8)
+                            Image(systemName: "link")
+                                .font(.system(size: 16))
+                        }
+                    }
+                }
                 ToolbarItem(placement: .primaryAction) {
                     Menu {
                         Button {
@@ -71,6 +85,20 @@ struct ContentView: View {
                     showingManualEntry = false
                 }
             }
+            .sheet(item: $relayClient.pendingCodeRequest) { request in
+                CodeApprovalView(request: request) {
+                    relayClient.pendingCodeRequest = nil
+                }
+                .environmentObject(store)
+            }
+        }
+    }
+
+    private var statusDotColor: Color {
+        switch relayClient.state {
+        case .connected: return .green
+        case .connecting: return .orange
+        case .disconnected: return .red
         }
     }
 
