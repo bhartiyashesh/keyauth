@@ -111,7 +111,7 @@ export default function App() {
         <h1>KeyAuth</h1>
       </header>
       <div className="popup-body">
-        {!state.paired && state.connectionState === 'unpaired' && (
+        {!state.paired && (
           <PairingView />
         )}
 

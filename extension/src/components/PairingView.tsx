@@ -17,7 +17,16 @@ export default function PairingView() {
     if (ttlTimerRef.current) clearInterval(ttlTimerRef.current);
     if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
 
-    const { privateKey, publicKey } = generateKeyPair();
+    let privateKey: Uint8Array;
+    let publicKey: Uint8Array;
+    try {
+      const kp = generateKeyPair();
+      privateKey = kp.privateKey;
+      publicKey = kp.publicKey;
+    } catch (err) {
+      console.error('[PairingView] generateKeyPair failed:', err);
+      return;
+    }
     const roomId = crypto.randomUUID();
 
     const payload = JSON.stringify({

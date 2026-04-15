@@ -86,12 +86,19 @@ struct PairingView: View {
             )
             try pairingStore.savePairing(pairingData)
 
-            // Connect to relay
-            RelayClient.shared.connect(
+            // Connect to relay and send pairing ack with our public key
+            let relay = RelayClient.shared
+            let ourPublicKeyData = privateKey.publicKey.rawRepresentation
+            relay.connect(
                 roomId: payload.roomId,
                 relayURL: payload.relayURL,
                 deviceToken: nil  // Will be registered via AppDelegate callback
             )
+            // Send pairing_ack after connection is established
+            relay.onConnected = {
+                relay.sendPairingAck(publicKey: ourPublicKeyData)
+                relay.onConnected = nil
+            }
         } catch {
             // Pairing failed -- error surfaced via pairingStore.error
         }

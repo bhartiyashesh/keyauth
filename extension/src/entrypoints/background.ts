@@ -104,12 +104,22 @@ async function scheduleReconnect(): Promise<void> {
     reconnectTimeout = setTimeout(() => {
       connect(pairing.roomId, pairing.relayURL);
     }, RECONNECT_DELAY_MS);
+    return;
+  }
+  // Also reconnect during active pairing (before pairing is saved to local storage)
+  const pending = await getSessionState<{ roomId: string; privateKey: string }>('pendingPairing');
+  if (pending) {
+    console.log('[KeyAuth] Reconnecting for pending pairing, room:', pending.roomId);
+    reconnectTimeout = setTimeout(() => {
+      connect(pending.roomId, RELAY_URL);
+    }, RECONNECT_DELAY_MS);
   }
 }
 
 // ---------- Message Routing ----------
 
 async function handleRelayMessage(raw: string): Promise<void> {
+  console.log('[KeyAuth] Relay message received:', raw.substring(0, 200));
   let msg: MessageEnvelope;
   try {
     msg = JSON.parse(raw);
@@ -117,6 +127,8 @@ async function handleRelayMessage(raw: string): Promise<void> {
     console.warn('[KeyAuth] Received non-JSON message from relay');
     return;
   }
+
+  console.log('[KeyAuth] Parsed message type:', msg.type);
 
   if (msg.v !== 1) {
     console.warn('[KeyAuth] Unknown protocol version:', msg.v);
@@ -152,9 +164,13 @@ async function handleRelayMessage(raw: string): Promise<void> {
 }
 
 async function handlePairingAck(msg: MessageEnvelope): Promise<void> {
+  console.log('[KeyAuth] handlePairingAck called, payload:', JSON.stringify(msg.payload));
   const peerPublicKeyBase64 = msg.payload.publicKey as string | undefined;
   if (peerPublicKeyBase64) {
+    console.log('[KeyAuth] Got peer public key, completing pairing...');
     await completePairing(peerPublicKeyBase64);
+  } else {
+    console.warn('[KeyAuth] pairing_ack missing publicKey in payload');
   }
 }
 
@@ -240,14 +256,11 @@ async function completePairing(peerPublicKeyBase64: string): Promise<void> {
 
 // ---------- Message Handlers from Popup ----------
 
-chrome.runtime.onMessage.addListener(
-  (
-    message: { type: string; [key: string]: unknown },
-    _sender: chrome.runtime.MessageSender,
-    sendResponse: (response?: unknown) => void,
-  ) => {
-    const handler = async () => {
-      switch (message.type) {
+async function handlePopupMessage(
+  message: { type: string; [key: string]: unknown },
+  sendResponse: (response?: unknown) => void,
+): Promise<void> {
+    switch (message.type) {
         case 'start_pairing': {
           const { roomId, relayURL } = message as { type: string; roomId: string; relayURL: string };
           connect(roomId, relayURL);
@@ -274,10 +287,22 @@ chrome.runtime.onMessage.addListener(
             break;
           }
 
+          // Get current tab domain for account matching on the phone
+          let domain = '';
+          try {
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            if (tab?.url) {
+              domain = new URL(tab.url).hostname.replace(/^www\./, '');
+            }
+          } catch {
+            // Tabs API may fail on chrome:// pages -- proceed without domain
+          }
+
           const codeRequest = {
             id: crypto.randomUUID(),
             issuer: '',
             label: '',
+            domain,
           };
 
           try {
@@ -322,30 +347,42 @@ chrome.runtime.onMessage.addListener(
         default:
           sendResponse({ ok: false, error: 'Unknown message type' });
       }
-    };
-
-    handler().catch((err) => {
-      console.error('[KeyAuth] Message handler error:', err);
-      sendResponse({ ok: false, error: String(err) });
-    });
-
-    // Return true to indicate async response
-    return true;
-  },
-);
+}
 
 // ---------- Service Worker Startup ----------
 
 export default defineBackground(() => {
   console.log('[KeyAuth] Service worker started');
 
-  // Auto-reconnect if already paired
-  loadPairingData().then((pairing) => {
+  // Register message listener inside defineBackground so WXT picks it up
+  chrome.runtime.onMessage.addListener(
+    (
+      message: { type: string; [key: string]: unknown },
+      _sender: chrome.runtime.MessageSender,
+      sendResponse: (response?: unknown) => void,
+    ) => {
+      handlePopupMessage(message, sendResponse).catch((err) => {
+        console.error('[KeyAuth] Message handler error:', err);
+        sendResponse({ ok: false, error: String(err) });
+      });
+      return true; // async response
+    },
+  );
+
+  // Auto-reconnect if already paired or mid-pairing
+  loadPairingData().then(async (pairing) => {
     if (pairing) {
       console.log('[KeyAuth] Found existing pairing, reconnecting...');
       connect(pairing.roomId, pairing.relayURL);
     } else {
-      setConnectionState('unpaired');
+      // Check for in-progress pairing (service worker restarted mid-pairing)
+      const pending = await getSessionState<{ roomId: string; privateKey: string }>('pendingPairing');
+      if (pending) {
+        console.log('[KeyAuth] Found pending pairing, reconnecting to room:', pending.roomId);
+        connect(pending.roomId, RELAY_URL);
+      } else {
+        setConnectionState('unpaired');
+      }
     }
   });
 });

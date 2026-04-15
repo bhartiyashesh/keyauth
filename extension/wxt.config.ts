@@ -7,7 +7,7 @@ export default defineConfig({
     name: 'KeyAuth',
     description: 'One-click TOTP codes from your phone',
     minimum_chrome_version: '116',
-    permissions: ['storage', 'clipboardWrite'],
+    permissions: ['storage', 'clipboardWrite', 'tabs'],
     action: {
       default_popup: 'popup.html',
       default_icon: {

@@ -13,6 +13,9 @@ final class RelayClient: ObservableObject {
     @Published fileprivate(set) var state: ConnectionState = .disconnected
     @Published var pendingCodeRequest: CodeRequest?
 
+    /// Called once after WebSocket connection is established. Set by pairing flow to send ack.
+    var onConnected: (() -> Void)?
+
     private var webSocketTask: URLSessionWebSocketTask?
     private var session: URLSession?
     private var roomId: String?
@@ -58,6 +61,14 @@ final class RelayClient: ObservableObject {
                 print("[RelayClient] Send error: \(error.localizedDescription)")
             }
         }
+    }
+
+    func sendPairingAck(publicKey: Data) {
+        let envelope = MessageEnvelope(
+            type: "pairing_ack",
+            payload: ["publicKey": publicKey.base64EncodedString()]
+        )
+        send(envelope)
     }
 
     func registerToken(_ token: String) {
@@ -156,6 +167,7 @@ private final class WebSocketDelegate: NSObject, URLSessionWebSocketDelegate {
             let joinPayload: [String: String] = relay.deviceToken.map { ["deviceToken": $0] } ?? [:]
             let joinEnvelope = MessageEnvelope(type: "join", payload: joinPayload)
             relay.send(joinEnvelope)
+            relay.onConnected?()
         }
     }
 

@@ -21,6 +21,7 @@ struct CodeRequest: Codable, Identifiable {
     let id: String
     let issuer: String
     let label: String
+    let domain: String?
 }
 
 struct PairingQRPayload: Codable {
