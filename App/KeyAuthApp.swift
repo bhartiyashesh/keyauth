@@ -31,6 +31,8 @@ struct KeyAuthApp: App {
                     for: UIApplication.willEnterForegroundNotification
                 )
             ) { _ in
+                // Reconnect with backoff reset (fresh foreground)
+                RelayClient.shared.reconnectIfNeeded()
                 connectRelayIfPaired()
             }
             .onReceive(

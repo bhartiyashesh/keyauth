@@ -18,16 +18,33 @@ final class RelayClient: ObservableObject {
 
     private var webSocketTask: URLSessionWebSocketTask?
     private var session: URLSession?
-    private var roomId: String?
+    private(set) var roomId: String?
+    private var relayURL: String?
     fileprivate var deviceToken: String?
+
+    // Reconnection state
+    fileprivate var reconnectAttempts = 0
+    private var reconnectTimer: Timer?
+    private var intentionalDisconnect = false
+    private let reconnectBaseInterval: TimeInterval = 1.0
+    private let reconnectMaxInterval: TimeInterval = 30.0
+
+    // Keepalive
+    private var keepaliveTimer: Timer?
+    private let keepaliveInterval: TimeInterval = 20.0
 
     private init() {}
 
     // MARK: - Connection Lifecycle
 
     func connect(roomId: String, relayURL: String, deviceToken: String?) {
-        guard state == .disconnected else { return }
+        // Allow reconnect even if already connecting/connected to the same room
+        if state != .disconnected && self.roomId == roomId { return }
+
+        cleanup()
+        intentionalDisconnect = false
         self.roomId = roomId
+        self.relayURL = relayURL
         self.deviceToken = deviceToken
         state = .connecting
 
@@ -36,6 +53,7 @@ final class RelayClient: ObservableObject {
             return
         }
 
+        print("[RelayClient] Connecting to room \(roomId.prefix(8))...")
         session = makeSession()
         webSocketTask = session?.webSocketTask(with: url)
         webSocketTask?.resume()
@@ -43,12 +61,19 @@ final class RelayClient: ObservableObject {
     }
 
     func disconnect() {
-        webSocketTask?.cancel(with: .goingAway, reason: nil)
-        webSocketTask = nil
-        session?.invalidateAndCancel()
-        session = nil
+        intentionalDisconnect = true
+        cleanup()
         state = .disconnected
         pendingCodeRequest = nil
+    }
+
+    /// Reconnect to the current room (e.g., after foreground resume)
+    func reconnectIfNeeded() {
+        guard state == .disconnected,
+              !intentionalDisconnect,
+              let roomId, let relayURL else { return }
+        reconnectAttempts = 0 // Fresh foreground = reset backoff
+        connect(roomId: roomId, relayURL: relayURL, deviceToken: deviceToken)
     }
 
     // MARK: - Sending
@@ -101,8 +126,9 @@ final class RelayClient: ObservableObject {
                 case .success(let message):
                     self.handleMessage(message)
                     self.receiveLoop()  // MUST re-call for next message
-                case .failure:
-                    self.state = .disconnected
+                case .failure(let error):
+                    print("[RelayClient] Receive error: \(error.localizedDescription)")
+                    self.handleDisconnect()
                 }
             }
         }
@@ -118,6 +144,9 @@ final class RelayClient: ObservableObject {
             switch envelope.type {
             case "joined":
                 print("[RelayClient] Joined room successfully")
+
+            case "pong":
+                break // Keepalive response
 
             case "error":
                 let errorMsg = envelope.payload["message"] ?? "Unknown error"
@@ -136,14 +165,69 @@ final class RelayClient: ObservableObject {
             }
 
         case .data:
-            break  // Binary messages not expected
+            break
 
         @unknown default:
             break
         }
     }
 
-    // MARK: - Helpers
+    // MARK: - Reconnection
+
+    fileprivate func handleDisconnect() {
+        stopTimers()
+        state = .disconnected
+
+        guard !intentionalDisconnect else { return }
+        scheduleReconnect()
+    }
+
+    private func scheduleReconnect() {
+        reconnectTimer?.invalidate()
+
+        // Exponential backoff: 1s, 2s, 4s, 8s, 16s, 30s (capped)
+        let delay = min(reconnectBaseInterval * pow(2.0, Double(reconnectAttempts)), reconnectMaxInterval)
+        reconnectAttempts += 1
+
+        print("[RelayClient] Scheduling reconnect in \(delay)s (attempt \(reconnectAttempts))")
+
+        reconnectTimer = Timer.scheduledTimer(withTimeInterval: delay, repeats: false) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self, let roomId = self.roomId, let relayURL = self.relayURL else { return }
+                self.state = .disconnected // Reset so connect() guard passes
+                self.connect(roomId: roomId, relayURL: relayURL, deviceToken: self.deviceToken)
+            }
+        }
+    }
+
+    // MARK: - Keepalive
+
+    fileprivate func startKeepalive() {
+        keepaliveTimer?.invalidate()
+        keepaliveTimer = Timer.scheduledTimer(withTimeInterval: keepaliveInterval, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self, self.state == .connected else { return }
+                self.send(MessageEnvelope(type: "ping", payload: [:]))
+            }
+        }
+    }
+
+    // MARK: - Cleanup
+
+    private func stopTimers() {
+        keepaliveTimer?.invalidate()
+        keepaliveTimer = nil
+        reconnectTimer?.invalidate()
+        reconnectTimer = nil
+    }
+
+    private func cleanup() {
+        stopTimers()
+        webSocketTask?.cancel(with: .goingAway, reason: nil)
+        webSocketTask = nil
+        session?.invalidateAndCancel()
+        session = nil
+    }
 
     private func makeSession() -> URLSession {
         let config = URLSessionConfiguration.default
@@ -164,9 +248,16 @@ private final class WebSocketDelegate: NSObject, URLSessionWebSocketDelegate {
         Task { @MainActor in
             let relay = RelayClient.shared
             relay.state = .connected
+            relay.reconnectAttempts = 0 // Reset backoff on successful connect
+
             let joinPayload: [String: String] = relay.deviceToken.map { ["deviceToken": $0] } ?? [:]
             let joinEnvelope = MessageEnvelope(type: "join", payload: joinPayload)
             relay.send(joinEnvelope)
+
+            // Start keepalive pings
+            relay.startKeepalive()
+
+            // Fire one-shot connected callback (used by pairing flow)
             relay.onConnected?()
         }
     }
@@ -178,7 +269,8 @@ private final class WebSocketDelegate: NSObject, URLSessionWebSocketDelegate {
         reason: Data?
     ) {
         Task { @MainActor in
-            RelayClient.shared.state = .disconnected
+            print("[RelayClient] WebSocket closed, code: \(closeCode.rawValue)")
+            RelayClient.shared.handleDisconnect()
         }
     }
 }
