@@ -17,25 +17,23 @@ struct ContentView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
+            Group {
                 if store.accounts.isEmpty {
-                    emptyState
-                        .padding(.top, 80)
+                    ScrollView {
+                        emptyState
+                            .padding(.top, 80)
+                    }
                 } else {
-                    LazyVStack(spacing: 12) {
+                    List {
                         ForEach(filteredAccounts) { account in
                             AccountRowView(account: account)
-                                .contextMenu {
-                                    Button(role: .destructive) {
-                                        store.delete(account)
-                                    } label: {
-                                        Label("Delete", systemImage: "trash")
-                                    }
-                                }
+                                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                        }
+                        .onDelete { offsets in
+                            store.delete(at: offsets)
                         }
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 8)
+                    .listStyle(.plain)
                 }
             }
             .background(Color(.systemGroupedBackground))
