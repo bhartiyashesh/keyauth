@@ -1,0 +1,83 @@
+name: KeyAuth
+options:
+  bundleIdPrefix: com.keyauth
+  deploymentTarget:
+    iOS: "16.0"
+  xcodeVersion: "15.0"
+
+settings:
+  SWIFT_VERSION: "5.9"
+  DEVELOPMENT_TEAM: W646UCTVQV
+
+targets:
+  KeyAuth:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+      - path: Shared
+    info:
+      path: App/Info.plist
+      properties:
+        UILaunchScreen: {}
+        NSFaceIDUsageDescription: "KeyAuth uses Face ID to protect your authentication codes."
+        NSCameraUsageDescription: "KeyAuth uses the camera to scan QR codes for adding accounts."
+    entitlements:
+      path: App/KeyAuth.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.keyauth.shared
+        keychain-access-groups:
+          - $(AppIdentifierPrefix)com.keyauth.shared
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.keyauth.app
+      INFOPLIST_FILE: App/Info.plist
+      CODE_SIGN_ENTITLEMENTS: App/KeyAuth.entitlements
+      TARGETED_DEVICE_FAMILY: "1"
+    dependencies:
+      - target: KeyAuthKeyboard
+        embed: true
+
+  KeyAuthKeyboard:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: KeyboardExtension
+      - path: Shared
+    info:
+      path: KeyboardExtension/Info.plist
+      properties:
+        CFBundleDisplayName: KeyAuth
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.keyboard-service
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).KeyboardViewController
+          NSExtensionAttributes:
+            IsASCIICapable: true
+            PrefersRightToLeft: false
+            PrimaryLanguage: en-US
+            RequestsOpenAccess: false
+    entitlements:
+      path: KeyboardExtension/KeyAuthKeyboard.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.keyauth.shared
+        keychain-access-groups:
+          - $(AppIdentifierPrefix)com.keyauth.shared
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.keyauth.app.keyboard
+      INFOPLIST_FILE: KeyboardExtension/Info.plist
+      CODE_SIGN_ENTITLEMENTS: KeyboardExtension/KeyAuthKeyboard.entitlements
+      SKIP_INSTALL: YES
+
+schemes:
+  KeyAuth:
+    build:
+      targets:
+        KeyAuth: all
+        KeyAuthKeyboard: all
+    run:
+      config: Debug
+    profile:
+      config: Release
+    archive:
+      config: Release
