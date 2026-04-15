@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-04-15T06:09:45.561Z"
+status: verifying
+stopped_at: Completed 01-03-PLAN.md
+last_updated: "2026-04-15T06:35:13.297Z"
 last_activity: 2026-04-15
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
-  percent: 67
+  completed_plans: 3
+  percent: 100
 ---
 
 # Project State
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-04-14)
 
 Phase: 01 (relay-server) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-15
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 01-relay-server P01 | 3min | 2 tasks | 9 files |
 | Phase 01 P02 | 4min | 2 tasks | 4 files |
+| Phase 01-relay-server P03 | 5min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,9 @@ Recent decisions affecting current work:
 - [Phase 01-relay-server]: APNs push errors caught and logged, never thrown -- best-effort delivery
 - [Phase 01-relay-server]: Support both APNS_KEY (base64) and APNS_KEY_PATH (file) for signing key flexibility
 - [Phase 01-relay-server]: Dependency injection pattern for APNs test mocking (ESM-compatible)
+- [Phase 01-relay-server]: ROOM_TTL_MINUTES env var defaults to 30 for configurable room eviction
+- [Phase 01-relay-server]: APNs init wrapped in try/catch -- relay works without push credentials for local testing
+- [Phase 01-relay-server]: noServer mode with manual handleUpgrade validates roomId and capacity before completing WebSocket handshake
 
 ### Pending Todos
 
@@ -86,6 +90,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-15T06:09:45.559Z
-Stopped at: Completed 01-02-PLAN.md
+Last session: 2026-04-15T06:35:13.295Z
+Stopped at: Completed 01-03-PLAN.md
 Resume file: None

@@ -9,8 +9,8 @@
 
 - [x] **RELAY-01**: WebSocket relay server accepts connections and routes messages between paired devices via room IDs
 - [x] **RELAY-02**: Relay sends APNs alert push to wake iOS app when code is requested and iOS client is absent
-- [ ] **RELAY-03**: Relay server runs on Railway with automatic TLS termination
-- [ ] **RELAY-04**: Relay exposes /health endpoint for uptime monitoring
+- [x] **RELAY-03**: Relay server runs on Railway with automatic TLS termination
+- [x] **RELAY-04**: Relay exposes /health endpoint for uptime monitoring
 - [x] **RELAY-05**: Relay manages APNs JWT token rotation (refresh at 45-minute intervals)
 - [x] **RELAY-06**: Relay enforces max 2 clients per room
 
@@ -87,8 +87,8 @@
 |-------------|-------|--------|
 | RELAY-01 | Phase 1 | Complete |
 | RELAY-02 | Phase 1 | Complete |
-| RELAY-03 | Phase 1 | Pending |
-| RELAY-04 | Phase 1 | Pending |
+| RELAY-03 | Phase 1 | Complete |
+| RELAY-04 | Phase 1 | Complete |
 | RELAY-05 | Phase 1 | Complete |
 | RELAY-06 | Phase 1 | Complete |
 | IOS-01 | Phase 2 | Pending |
