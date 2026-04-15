@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Phase 1 context gathered
-last_updated: "2026-04-15T05:27:48.398Z"
-last_activity: 2026-04-14 — Roadmap created, phases derived from 28 v1 requirements
+status: executing
+stopped_at: Completed 01-01-PLAN.md
+last_updated: "2026-04-15T06:03:16.167Z"
+last_activity: 2026-04-15
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 3
+  completed_plans: 1
+  percent: 33
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-14)
 
 **Core value:** One-click TOTP code delivery from phone to browser — secrets never leave the phone
-**Current focus:** Phase 1 — Relay Server
+**Current focus:** Phase 01 — relay-server
 
 ## Current Position
 
-Phase: 1 of 5 (Relay Server)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-04-14 — Roadmap created, phases derived from 28 v1 requirements
+Phase: 01 (relay-server) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-04-15
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -52,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: —
 
 *Updated after each plan completion*
+| Phase 01-relay-server P01 | 3min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -65,6 +66,10 @@ Recent decisions affecting current work:
 - Setup: Click-to-request flow — user initiates from extension, not auto-detect-push
 - Setup: Railway for relay hosting — user's explicit preference, Vercel excluded
 - Setup: APNs alert push (not silent) — silent push throttled at ~3/hour by Apple
+- [Phase 01-relay-server]: Implicit room creation on first join -- no separate create API needed
+- [Phase 01-relay-server]: 30-minute TTL default for room eviction, configurable via constructor
+- [Phase 01-relay-server]: Room persists after client leave (D-06) -- TTL-based eviction handles cleanup
+- [Phase 01-relay-server]: deviceToken stored on both Client and Room objects for APNs lookup flexibility
 
 ### Pending Todos
 
@@ -77,6 +82,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-15T05:27:48.395Z
-Stopped at: Phase 1 context gathered
-Resume file: .planning/phases/01-relay-server/01-CONTEXT.md
+Last session: 2026-04-15T06:03:16.165Z
+Stopped at: Completed 01-01-PLAN.md
+Resume file: None
