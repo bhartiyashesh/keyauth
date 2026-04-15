@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import PairingView from '../../components/PairingView';
 import ConnectedView from '../../components/ConnectedView';
+import CodeView from '../../components/CodeView';
 import './style.css';
 
 type ConnectionState = 'unpaired' | 'connecting' | 'connected' | 'disconnected' | 'code_received';
@@ -9,6 +10,7 @@ interface AppState {
   paired: boolean;
   connectionState: ConnectionState;
   lastCode: string | null;
+  codeReceivedAt: number | null;
   loading: boolean;
 }
 
@@ -17,6 +19,7 @@ export default function App() {
     paired: false,
     connectionState: 'unpaired',
     lastCode: null,
+    codeReceivedAt: null,
     loading: true,
   });
 
@@ -28,6 +31,7 @@ export default function App() {
           paired: response.paired,
           connectionState: response.connectionState ?? 'unpaired',
           lastCode: response.lastCode ?? null,
+          codeReceivedAt: response.codeReceivedAt ?? null,
           loading: false,
         });
       } else {
@@ -55,6 +59,12 @@ export default function App() {
             lastCode: changes.lastCode.newValue as string,
           }));
         }
+        if (changes.codeReceivedAt) {
+          setState((prev) => ({
+            ...prev,
+            codeReceivedAt: changes.codeReceivedAt.newValue as number,
+          }));
+        }
       }
 
       if (areaName === 'local') {
@@ -72,6 +82,14 @@ export default function App() {
 
     chrome.storage.onChanged.addListener(listener);
     return () => chrome.storage.onChanged.removeListener(listener);
+  }, []);
+
+  const handleCodeDismiss = useCallback(() => {
+    chrome.storage.session.set({
+      connectionState: 'connected',
+      lastCode: null,
+      codeReceivedAt: null,
+    });
   }, []);
 
   if (state.loading) {
@@ -101,11 +119,12 @@ export default function App() {
           <ConnectedView connectionState="connected" />
         )}
 
-        {state.paired && state.connectionState === 'code_received' && (
-          <div className="code-placeholder">
-            <p>Code received</p>
-            <ConnectedView connectionState="connected" />
-          </div>
+        {state.paired && state.connectionState === 'code_received' && state.lastCode && (
+          <CodeView
+            code={state.lastCode}
+            receivedAt={state.codeReceivedAt ?? Date.now()}
+            onDismiss={handleCodeDismiss}
+          />
         )}
 
         {state.paired && state.connectionState === 'disconnected' && (
