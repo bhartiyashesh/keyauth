@@ -48,7 +48,7 @@ Plans:
   3. The TOTP approval sheet shows the account name and site, and Face ID or Touch ID must pass before a code is generated and sent
   4. The iOS app sends its APNs device token to the relay during the pairing handshake so future pushes reach the correct device
   5. The pairing management screen lists paired devices and allows the user to unpair any of them
-**Plans:** 1/3 plans executed
+**Plans:** 3 plans
 
 Plans:
 - [x] 02-01-PLAN.md -- Core services: CryptoBoxManager (E2E encryption), PairingStore (Keychain), RelayClient (WebSocket)
@@ -56,7 +56,7 @@ Plans:
 - [x] 02-03-PLAN.md -- Code approval sheet with biometric gate, ContentView + KeyAuthApp wiring
 
 ### Phase 3: Chrome Extension Core
-**Goal**: The Chrome extension popup lets the user pick an account, request a code from the phone, and receive the code with an expiry countdown — the full request-to-code flow works end-to-end
+**Goal**: The Chrome extension popup lets the user pick an account, request a code from the phone, and receive the code with an expiry countdown -- the full request-to-code flow works end-to-end
 **Depends on**: Phase 2
 **Requirements**: PAIR-01, PAIR-03, PAIR-05, CODE-01, CODE-03, CODE-04, FILL-03
 **Success Criteria** (what must be TRUE):
@@ -65,7 +65,12 @@ Plans:
   3. The popup shows a connected, disconnected, or paired status indicator that reflects the actual relay connection state
   4. The user selects an account in the popup, the request reaches the phone, Face ID approves it, and the 6-digit code appears in the popup within the 30-second TOTP window
   5. The popup displays the received code alongside a live expiry countdown timer, and a clipboard copy button clears the clipboard after 30 seconds
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 03-01-PLAN.md -- WXT project scaffold, CryptoBox module (X25519+ChaCha20 interop with CryptoKit), types, and storage wrappers
+- [ ] 03-02-PLAN.md -- Service worker (WebSocket, keepalive, message routing) and popup UI (QR pairing, status indicator, Request Code)
+- [ ] 03-03-PLAN.md -- Code display with countdown ring, clipboard copy with 30s auto-clear, end-to-end verification
 
 ### Phase 4: Auto-Fill + Domain Matching
 **Goal**: The browser auto-fills TOTP fields with received codes and surfaces relevant accounts by matching the current domain
@@ -78,7 +83,7 @@ Plans:
 **Plans**: TBD
 
 ### Phase 5: Resilience
-**Goal**: The extension and iOS app recover automatically from WebSocket drops, service worker restarts, and APNs token refreshes — the happy path survives production network conditions
+**Goal**: The extension and iOS app recover automatically from WebSocket drops, service worker restarts, and APNs token refreshes -- the happy path survives production network conditions
 **Depends on**: Phase 4
 **Requirements**: RESIL-01, RESIL-02, RESIL-03, RESIL-04, RESIL-05
 **Success Criteria** (what must be TRUE):
@@ -97,7 +102,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Relay Server | 4/4 | Complete | 2026-04-15 |
-| 2. iOS Relay Client + Pairing | 1/3 | In Progress|  |
-| 3. Chrome Extension Core | 0/TBD | Not started | - |
+| 2. iOS Relay Client + Pairing | 3/3 | Complete | 2026-04-15 |
+| 3. Chrome Extension Core | 0/3 | Not started | - |
 | 4. Auto-Fill + Domain Matching | 0/TBD | Not started | - |
 | 5. Resilience | 0/TBD | Not started | - |
