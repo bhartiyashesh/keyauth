@@ -117,7 +117,7 @@ describe('handleMessage', () => {
 
     handleMessage(raw, ws, 'room-1', 'client-1', roomManager);
 
-    const joinMock = (roomManager.join as ReturnType<typeof mock.fn>);
+    const joinMock = (roomManager.join as unknown as ReturnType<typeof mock.fn>);
     assert.equal(joinMock.mock.callCount(), 1);
     const args = joinMock.mock.calls[0].arguments;
     assert.equal(args[0], 'room-1');
@@ -211,7 +211,7 @@ describe('handleMessage', () => {
 
     handleMessage(raw, ws, 'room-1', 'client-1', roomManager);
 
-    const forwardMock = (roomManager.forward as ReturnType<typeof mock.fn>);
+    const forwardMock = (roomManager.forward as unknown as ReturnType<typeof mock.fn>);
     assert.equal(forwardMock.mock.callCount(), 1);
     const args = forwardMock.mock.calls[0].arguments;
     assert.equal(args[0], 'room-1');
