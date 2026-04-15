@@ -133,6 +133,9 @@
 				FD66B74369598846CBD85FE9 /* LockScreenView.swift */,
 				E9B0F9F5608AEF29BF6D1379 /* ManualEntryView.swift */,
 				A363B81015F05C5B3C0DC5A7 /* QRScannerView.swift */,
+				A718293A4B5C6D7E8F900112 /* PairedDeviceView.swift */,
+				E5F60718293A4B5C6D7E8F90 /* PairingView.swift */,
+				F60718293A4B5C6D7E8F9001 /* PairingQRScannerView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -286,6 +289,9 @@
 				E3A35868FCE3BB9A54CB5C51 /* SharedDefaults.swift in Sources */,
 				140FCBAC17D3AB6F9E090BD1 /* TOTPGenerator.swift in Sources */,
 				05D4E5F6A7B8C9D0E1F2A3B4 /* AppDelegate.swift in Sources */,
+				06E5F607A8B9C0D1E2F3A4B5 /* PairingView.swift in Sources */,
+				07F60718A9B0C1D2E3F4A5B6 /* PairingQRScannerView.swift in Sources */,
+				08A71829AAB1C2D3E4F5A6B7 /* PairedDeviceView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
