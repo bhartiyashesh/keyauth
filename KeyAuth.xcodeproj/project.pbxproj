@@ -40,6 +40,7 @@
 		06E5F607A8B9C0D1E2F3A4B5 /* PairingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F60718293A4B5C6D7E8F90 /* PairingView.swift */; };
 		07F60718A9B0C1D2E3F4A5B6 /* PairingQRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60718293A4B5C6D7E8F9001 /* PairingQRScannerView.swift */; };
 		08A71829AAB1C2D3E4F5A6B7 /* PairedDeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A718293A4B5C6D7E8F900112 /* PairedDeviceView.swift */; };
+		09B8293ABBC2D3E4F5A6B7C8 /* CodeApprovalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8293A4B5C6D7E8F90011234 /* CodeApprovalView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -95,6 +96,7 @@
 		E5F60718293A4B5C6D7E8F90 /* PairingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingView.swift; sourceTree = "<group>"; };
 		F60718293A4B5C6D7E8F9001 /* PairingQRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingQRScannerView.swift; sourceTree = "<group>"; };
 		A718293A4B5C6D7E8F900112 /* PairedDeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairedDeviceView.swift; sourceTree = "<group>"; };
+		B8293A4B5C6D7E8F90011234 /* CodeApprovalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeApprovalView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -136,6 +138,7 @@
 				A718293A4B5C6D7E8F900112 /* PairedDeviceView.swift */,
 				E5F60718293A4B5C6D7E8F90 /* PairingView.swift */,
 				F60718293A4B5C6D7E8F9001 /* PairingQRScannerView.swift */,
+				B8293A4B5C6D7E8F90011234 /* CodeApprovalView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -292,6 +295,7 @@
 				06E5F607A8B9C0D1E2F3A4B5 /* PairingView.swift in Sources */,
 				07F60718A9B0C1D2E3F4A5B6 /* PairingQRScannerView.swift in Sources */,
 				08A71829AAB1C2D3E4F5A6B7 /* PairedDeviceView.swift in Sources */,
+				09B8293ABBC2D3E4F5A6B7C8 /* CodeApprovalView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
