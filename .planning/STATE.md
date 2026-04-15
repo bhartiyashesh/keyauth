@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-04-15T16:46:18.884Z"
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-04-15T19:47:43.935Z"
 last_activity: 2026-04-15
 progress:
   total_phases: 5
-  completed_phases: 1
-  total_plans: 7
-  completed_plans: 6
-  percent: 86
+  completed_phases: 2
+  total_plans: 10
+  completed_plans: 8
+  percent: 80
 ---
 
 # Project State
@@ -21,12 +21,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-14)
 
 **Core value:** One-click TOTP code delivery from phone to browser — secrets never leave the phone
-**Current focus:** Phase 02 — ios-relay-client-pairing
+**Current focus:** Phase 03 — chrome-extension-core
 
 ## Current Position
 
-Phase: 02 (ios-relay-client-pairing) — EXECUTING
-Plan: 3 of 3
+Phase: 03 (chrome-extension-core) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
 Last activity: 2026-04-15
 
@@ -58,6 +58,7 @@ Progress: [██████████] 100%
 | Phase 01-relay-server P04 | 3min | 3 tasks | 1 files |
 | Phase 02 P01 | 8min | 3 tasks | 4 files |
 | Phase 02 P02 | 5min | 2 tasks | 6 files |
+| Phase 03 P01 | 6min | 2 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,9 @@ Recent decisions affecting current work:
 - [Phase 02]: Closure callbacks (onDeviceToken, onNotificationTapped) on AppDelegate for APNs-to-SwiftUI communication
 - [Phase 02]: PairingQRScannerView reuses QRCameraPreview -- same camera infra, only JSON parsing differs from QRScannerView
 - [Phase 02]: aps-environment set to development -- switches to production automatically on App Store submission
+- [Phase 03]: Used x25519.utils.randomSecretKey() for noble-curves v2 (v1 had randomPrivateKey)
+- [Phase 03]: Noble v2 ESM imports require .js suffix on subpath exports
+- [Phase 03]: MessageEnvelope.v typed as literal 1 for strict relay protocol conformance
 
 ### Pending Todos
 
@@ -99,6 +103,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-15T16:46:18.881Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-04-15T19:47:43.931Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None
