@@ -119,18 +119,35 @@ export default function CodeView({ code, issuer, label, receivedAt, onDismiss }:
     chrome.runtime.sendMessage({ type: 'request_code' });
   }, []);
 
+  // Generate initial letter + color for the account badge
+  const initial = (issuer || '?')[0].toUpperCase();
+  const badgeColor = issuer
+    ? `hsl(${[...issuer].reduce((a, c) => a + c.charCodeAt(0), 0) % 360}, 55%, 50%)`
+    : '#888';
+
   return (
     <div className="code-view">
-      <p className="code-label">
-        {issuer ? `${issuer}${label ? ` (${label})` : ''}` : 'Code received'}
-      </p>
+      {issuer ? (
+        <div className="code-account">
+          <div className="code-account-badge" style={{ backgroundColor: badgeColor }}>
+            {initial}
+          </div>
+          <div className="code-account-info">
+            <span className="code-account-issuer">{issuer}</span>
+            {label && <span className="code-account-label">{label}</span>}
+          </div>
+        </div>
+      ) : (
+        <p className="code-label">Code received</p>
+      )}
 
-      <div className="countdown-ring">
-        <CountdownRing secondsRemaining={secondsRemaining} size={48} />
-      </div>
-
-      <div className="code-display" style={{ opacity: stale ? 0.4 : 1 }}>
-        {formattedCode}
+      <div className="code-row">
+        <div className="code-display" style={{ opacity: stale ? 0.4 : 1 }}>
+          {formattedCode}
+        </div>
+        <div className="countdown-ring">
+          <CountdownRing secondsRemaining={secondsRemaining} size={40} />
+        </div>
       </div>
 
       {stale && (
