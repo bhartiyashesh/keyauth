@@ -64,13 +64,18 @@ export default function CodeView({ code, issuer, label, receivedAt: _receivedAt,
   const displayName = issuer && issuer !== 'Unknown' ? issuer : label || 'Unknown';
   const badgeColor = `hsl(${[...displayName].reduce((a, c) => a + c.charCodeAt(0), 0) % 360}, 55%, 50%)`;
 
-  // Countdown timer
+  // Countdown timer -- dismiss when period ends
   useEffect(() => {
     const interval = setInterval(() => {
-      setSecondsRemaining(30 - (Math.floor(Date.now() / 1000) % 30));
+      const remaining = 30 - (Math.floor(Date.now() / 1000) % 30);
+      setSecondsRemaining(remaining);
+      if (remaining === 30) {
+        // New TOTP period started -- old code is expired
+        onDismiss();
+      }
     }, 1_000);
     return () => clearInterval(interval);
-  }, []);
+  }, [onDismiss]);
 
   useEffect(() => {
     return () => { if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current); };
