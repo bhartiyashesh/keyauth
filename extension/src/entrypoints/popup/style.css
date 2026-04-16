@@ -135,8 +135,16 @@ body {
   margin: 0 0 12px;
 }
 
+.refreshing-text {
+  font-size: 13px;
+  color: #f59e0b;
+  margin: 0 0 8px;
+  animation: fadeIn 0.3s ease-in;
+}
+
 .code-display {
   font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+  transition: opacity 0.3s;
   font-size: 36px;
   font-weight: 600;
   letter-spacing: 4px;
