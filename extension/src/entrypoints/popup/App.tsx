@@ -6,13 +6,18 @@ import './style.css';
 
 type ConnectionState = 'unpaired' | 'connecting' | 'connected' | 'disconnected' | 'code_received';
 
+interface ActiveCode {
+  code: string;
+  issuer: string;
+  label: string;
+  receivedAt: number;
+  requestId: string;
+}
+
 interface AppState {
   paired: boolean;
   connectionState: ConnectionState;
-  lastCode: string | null;
-  lastIssuer: string | null;
-  lastLabel: string | null;
-  codeReceivedAt: number | null;
+  activeCodes: ActiveCode[];
   loading: boolean;
 }
 
@@ -20,10 +25,7 @@ export default function App() {
   const [state, setState] = useState<AppState>({
     paired: false,
     connectionState: 'unpaired',
-    lastCode: null,
-    lastIssuer: null,
-    lastLabel: null,
-    codeReceivedAt: null,
+    activeCodes: [],
     loading: true,
   });
 
@@ -34,10 +36,7 @@ export default function App() {
         setState({
           paired: response.paired,
           connectionState: response.connectionState ?? 'unpaired',
-          lastCode: response.lastCode ?? null,
-          lastIssuer: response.lastIssuer ?? null,
-          lastLabel: response.lastLabel ?? null,
-          codeReceivedAt: response.codeReceivedAt ?? null,
+          activeCodes: response.activeCodes ?? [],
           loading: false,
         });
       } else {
@@ -59,17 +58,11 @@ export default function App() {
             connectionState: changes.connectionState.newValue as ConnectionState,
           }));
         }
-        if (changes.lastCode) {
-          setState((prev) => ({ ...prev, lastCode: changes.lastCode.newValue as string }));
-        }
-        if (changes.lastIssuer) {
-          setState((prev) => ({ ...prev, lastIssuer: changes.lastIssuer.newValue as string }));
-        }
-        if (changes.lastLabel) {
-          setState((prev) => ({ ...prev, lastLabel: changes.lastLabel.newValue as string }));
-        }
-        if (changes.codeReceivedAt) {
-          setState((prev) => ({ ...prev, codeReceivedAt: changes.codeReceivedAt.newValue as number }));
+        if (changes.activeCodes) {
+          setState((prev) => ({
+            ...prev,
+            activeCodes: (changes.activeCodes.newValue as ActiveCode[]) ?? [],
+          }));
         }
       }
 
@@ -89,14 +82,26 @@ export default function App() {
     return () => chrome.storage.onChanged.removeListener(listener);
   }, []);
 
-  const handleCodeDismiss = useCallback(() => {
-    chrome.storage.session.set({
-      connectionState: 'connected',
-      lastCode: null,
-      lastIssuer: null,
-      lastLabel: null,
-      codeReceivedAt: null,
+  const handleDismissCode = useCallback((issuer: string, label: string) => {
+    setState((prev) => {
+      const remaining = prev.activeCodes.filter(
+        c => !(c.issuer === issuer && c.label === label)
+      );
+      // Update session storage too
+      chrome.storage.session.set({
+        activeCodes: remaining,
+        connectionState: remaining.length > 0 ? 'code_received' : 'connected',
+      });
+      return {
+        ...prev,
+        activeCodes: remaining,
+        connectionState: remaining.length > 0 ? 'code_received' : 'connected',
+      };
     });
+  }, []);
+
+  const handleRequestAnother = useCallback(() => {
+    chrome.runtime.sendMessage({ type: 'request_code' });
   }, []);
 
   if (state.loading) {
@@ -112,6 +117,8 @@ export default function App() {
     );
   }
 
+  const hasCodes = state.activeCodes.length > 0;
+
   return (
     <div className="popup">
       <header className="popup-header">
@@ -122,25 +129,33 @@ export default function App() {
           <PairingView />
         )}
 
-        {state.paired && state.connectionState === 'connected' && (
+        {state.paired && !hasCodes && state.connectionState === 'connected' && (
           <ConnectedView connectionState="connected" />
         )}
 
-        {state.paired && state.connectionState === 'code_received' && state.lastCode && (
-          <CodeView
-            code={state.lastCode}
-            issuer={state.lastIssuer || ''}
-            label={state.lastLabel || ''}
-            receivedAt={state.codeReceivedAt ?? Date.now()}
-            onDismiss={handleCodeDismiss}
-          />
+        {state.paired && hasCodes && (
+          <div className="codes-list">
+            {state.activeCodes.map((c) => (
+              <CodeView
+                key={`${c.issuer}-${c.label}`}
+                code={c.code}
+                issuer={c.issuer}
+                label={c.label}
+                receivedAt={c.receivedAt}
+                onDismiss={() => handleDismissCode(c.issuer, c.label)}
+              />
+            ))}
+            <button type="button" className="btn-link request-another" onClick={handleRequestAnother}>
+              + Request Another Code
+            </button>
+          </div>
         )}
 
-        {state.paired && state.connectionState === 'disconnected' && (
+        {state.paired && !hasCodes && state.connectionState === 'disconnected' && (
           <ConnectedView connectionState="disconnected" />
         )}
 
-        {state.paired && state.connectionState === 'connecting' && (
+        {state.paired && !hasCodes && state.connectionState === 'connecting' && (
           <ConnectedView connectionState="connecting" />
         )}
       </div>

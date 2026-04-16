@@ -28,6 +28,14 @@ let lastPongAt = 0;
 let healthCheckInterval: ReturnType<typeof setInterval> | null = null;
 let intentionalDisconnect = false;
 
+interface ActiveCode {
+  code: string;
+  issuer: string;
+  label: string;
+  receivedAt: number;
+  requestId: string;
+}
+
 // ---------- Connection State ----------
 
 type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'code_received' | 'unpaired';
@@ -231,13 +239,19 @@ async function handleCodeResponse(msg: MessageEnvelope): Promise<void> {
     const { code, requestId, issuer, label } = JSON.parse(decoded);
 
     console.log('[KeyAuth] Code received for', issuer || '(unknown)', ':', code);
-    await setSessionState({
-      lastCode: code,
-      lastRequestId: requestId,
-      lastIssuer: issuer || '',
-      lastLabel: label || '',
-      codeReceivedAt: Date.now(),
-    });
+
+    // Store as array of active codes, keyed by issuer to allow updates
+    const activeCodes = (await getSessionState<ActiveCode[]>('activeCodes')) || [];
+    const entry: ActiveCode = { code, issuer: issuer || '', label: label || '', receivedAt: Date.now(), requestId };
+    const existingIdx = activeCodes.findIndex(c => c.issuer === entry.issuer && c.label === entry.label);
+    if (existingIdx >= 0) {
+      activeCodes[existingIdx] = entry; // Update existing
+    } else {
+      activeCodes.push(entry); // Add new
+    }
+    // Remove codes older than 5 minutes
+    const fresh = activeCodes.filter(c => Date.now() - c.receivedAt < 5 * 60 * 1000);
+    await setSessionState({ activeCodes: fresh });
     await setConnectionState('code_received');
   } catch (err) {
     console.error('[KeyAuth] Failed to decrypt code_response:', err);
@@ -377,18 +391,14 @@ async function handlePopupMessage(
     case 'get_state': {
       const pairing = await loadPairingData();
       const connectionState = await getSessionState<ConnectionState>('connectionState');
-      const lastCode = await getSessionState<string>('lastCode');
-      const lastIssuer = await getSessionState<string>('lastIssuer');
-      const lastLabel = await getSessionState<string>('lastLabel');
-      const codeReceivedAt = await getSessionState<number>('codeReceivedAt');
+      const activeCodes = (await getSessionState<ActiveCode[]>('activeCodes')) || [];
+      // Filter stale codes (>5 min)
+      const fresh = activeCodes.filter(c => Date.now() - c.receivedAt < 5 * 60 * 1000);
       const roomError = await getSessionState<string>('roomError');
       sendResponse({
         paired: !!pairing,
         connectionState: connectionState ?? (pairing ? 'disconnected' : 'unpaired'),
-        lastCode,
-        lastIssuer,
-        lastLabel,
-        codeReceivedAt,
+        activeCodes: fresh,
         roomError,
       });
       break;
