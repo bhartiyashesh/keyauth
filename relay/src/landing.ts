@@ -10,6 +10,14 @@ export const landingHTML = `<!DOCTYPE html>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
   <style>
+    @font-face {
+      font-family: 'DxBurst';
+      src: url('/fonts/DxBurst-Regular.otf') format('opentype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
@@ -56,11 +64,12 @@ export const landingHTML = `<!DOCTYPE html>
       justify-content: space-between;
     }
     .logo {
-      font-family: 'Caveat', cursive;
-      font-size: 26px;
-      font-weight: 700;
+      font-family: 'DxBurst', 'Caveat', cursive;
+      font-size: 30px;
+      font-weight: normal;
       transform: rotate(-1deg);
       display: inline-block;
+      letter-spacing: 0.5px;
     }
     .logo .better { color: var(--accent); }
     .nav-links a {
@@ -90,9 +99,9 @@ export const landingHTML = `<!DOCTYPE html>
       50% { transform: rotate(3deg); }
     }
     h1 {
-      font-family: 'Caveat', cursive;
-      font-size: 52px;
-      font-weight: 700;
+      font-family: 'DxBurst', 'Caveat', cursive;
+      font-size: 56px;
+      font-weight: normal;
       line-height: 1.15;
       margin-bottom: 16px;
       transform: rotate(-0.5deg);

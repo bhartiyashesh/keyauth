@@ -19,6 +19,12 @@ try {
 }
 
 import { landingHTML } from './landing.js';
+import { readFileSync } from 'fs';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const publicDir = resolve(__dirname, '..', 'public');
 
 const server = createServer((req: IncomingMessage, res: ServerResponse) => {
   if (req.url === '/health' && req.method === 'GET') {
@@ -33,6 +39,20 @@ const server = createServer((req: IncomingMessage, res: ServerResponse) => {
   if ((req.url === '/' || req.url === '') && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(landingHTML);
+    return;
+  }
+  if (req.url === '/fonts/DxBurst-Regular.otf' && req.method === 'GET') {
+    try {
+      const font = readFileSync(resolve(publicDir, 'DxBurst-Regular.otf'));
+      res.writeHead(200, {
+        'Content-Type': 'font/otf',
+        'Cache-Control': 'public, max-age=31536000, immutable',
+      });
+      res.end(font);
+    } catch {
+      res.writeHead(404);
+      res.end();
+    }
     return;
   }
   res.writeHead(404);
