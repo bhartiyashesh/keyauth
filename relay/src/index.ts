@@ -18,6 +18,8 @@ try {
   logger.warn({ err }, 'APNs client not initialized -- push notifications disabled');
 }
 
+import { landingHTML } from './landing.js';
+
 const server = createServer((req: IncomingMessage, res: ServerResponse) => {
   if (req.url === '/health' && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -26,6 +28,11 @@ const server = createServer((req: IncomingMessage, res: ServerResponse) => {
       uptime: process.uptime(),
       timestamp: new Date().toISOString(),
     }));
+    return;
+  }
+  if ((req.url === '/' || req.url === '') && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(landingHTML);
     return;
   }
   res.writeHead(404);
