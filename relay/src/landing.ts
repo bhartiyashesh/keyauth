@@ -3,8 +3,8 @@ export const landingHTML = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Better Authenticator — 2FA codes from phone to browser</title>
-  <meta name="description" content="One-click TOTP codes from your phone to your browser. No more switching apps, copying codes, or racing the clock.">
+  <title>Better Authenticator</title>
+  <meta name="description" content="2FA codes from phone to browser. One click.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🔐</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,443 +20,230 @@ export const landingHTML = `<!DOCTYPE html>
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    :root {
-      --paper: #0a0a0a;
-      --paper-dark: #111;
-      --ink: #f0f0f0;
-      --ink-light: #aaa;
-      --accent: #e63946;
-      --blue: #6db5d4;
-      --green: #2a9d8f;
-      --pencil: #555;
-      --shadow: rgba(255, 255, 255, 0.05);
-      --card-bg: #161616;
-      --border: #333;
-    }
-
     body {
+      background: #0a0a0a;
+      color: #f0f0f0;
       font-family: 'Patrick Hand', cursive;
-      background: var(--paper);
-      color: var(--ink);
-      line-height: 1.7;
-      font-size: 18px;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 100% 32px;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    /* Hand-drawn SVG filter */
-    .sketch-filter { position: absolute; width: 0; height: 0; }
-
-    .container {
-      max-width: 700px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    /* Nav */
-    nav {
-      padding: 20px 0;
-      border-bottom: 2px solid var(--border);
-      border-bottom-style: dashed;
-    }
-    nav .container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .logo {
-      font-family: 'DxBurst', 'Caveat', cursive;
-      font-size: 30px;
-      font-weight: normal;
-      transform: rotate(-1deg);
-      display: inline-block;
-      letter-spacing: 0.5px;
-    }
-    .logo .better { color: var(--accent); }
-    .nav-links a {
-      font-size: 16px;
-      color: var(--ink-light);
-      text-decoration: none;
-      margin-left: 20px;
-      border-bottom: 2px dashed transparent;
-    }
-    .nav-links a:hover {
-      border-bottom-color: var(--pencil);
-    }
-
-    /* Hero */
+    /* ===== HERO ===== */
     .hero {
-      padding: 72px 0 56px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       text-align: center;
-    }
-    .hero-doodle {
-      font-size: 64px;
-      margin-bottom: 16px;
-      display: inline-block;
-      animation: wiggle 3s ease-in-out infinite;
-    }
-    @keyframes wiggle {
-      0%, 100% { transform: rotate(-3deg); }
-      50% { transform: rotate(3deg); }
-    }
-    h1 {
-      font-family: 'DxBurst', 'Caveat', cursive;
-      font-size: 56px;
-      font-weight: normal;
-      line-height: 1.15;
-      margin-bottom: 16px;
-      transform: rotate(-0.5deg);
-    }
-    .underline-sketch {
+      padding: 40px 24px;
       position: relative;
-      display: inline-block;
-    }
-    .underline-sketch::after {
-      content: '';
-      position: absolute;
-      bottom: 2px;
-      left: -4px;
-      right: -4px;
-      height: 12px;
-      background: rgba(230, 57, 70, 0.2);
-      border-radius: 50% 40% 50% 45% / 80% 60% 80% 70%;
-      z-index: -1;
-      transform: rotate(-1deg);
-    }
-    .hero p {
-      font-size: 20px;
-      color: var(--ink-light);
-      max-width: 460px;
-      margin: 0 auto 32px;
-    }
-    .arrow-down {
-      font-size: 32px;
-      display: inline-block;
-      animation: bounce 2s ease-in-out infinite;
-    }
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(8px); }
     }
 
-    /* Buttons */
-    .cta-group {
-      display: flex;
-      gap: 14px;
-      justify-content: center;
-      flex-wrap: wrap;
+    .hero-logo {
+      font-family: 'DxBurst', 'Caveat', cursive;
+      font-size: 96px;
+      font-weight: normal;
+      line-height: 1;
       margin-bottom: 24px;
+      letter-spacing: 2px;
     }
-    .btn {
-      display: inline-flex;
+    .hero-logo .red { color: #e63946; }
+
+    .hero-tagline {
+      font-family: 'Caveat', cursive;
+      font-size: 32px;
+      color: #888;
+      margin-bottom: 48px;
+      transform: rotate(-1deg);
+    }
+
+    .hero-steps {
+      display: flex;
+      gap: 48px;
+      align-items: center;
+      margin-bottom: 56px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .hero-step {
+      font-family: 'Caveat', cursive;
+      font-size: 26px;
+      display: flex;
+      flex-direction: column;
       align-items: center;
       gap: 8px;
-      padding: 12px 28px;
+    }
+    .hero-step-icon {
+      font-size: 48px;
+    }
+    .hero-step-arrow {
+      font-size: 32px;
+      color: #555;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+    .btn {
       font-family: 'Caveat', cursive;
-      font-size: 22px;
+      font-size: 26px;
       font-weight: 600;
+      padding: 16px 40px;
       text-decoration: none;
-      border: 2.5px solid var(--border);
+      border: 3px solid #333;
       border-radius: 40% 60% 55% 45% / 60% 45% 55% 40%;
       transition: all 0.2s;
       cursor: pointer;
-      position: relative;
+      display: inline-block;
     }
     .btn:hover {
       transform: translate(-2px, -2px);
-      box-shadow: 4px 4px 0 var(--border);
+      box-shadow: 5px 5px 0 #333;
     }
-    .btn-primary {
-      background: var(--accent);
+    .btn-red {
+      background: #e63946;
       color: white;
-      border-color: var(--accent);
+      border-color: #e63946;
     }
-    .btn-primary:hover {
-      box-shadow: 4px 4px 0 #b22e3a;
+    .btn-red:hover {
+      box-shadow: 5px 5px 0 #b22e3a;
     }
-    .btn-secondary {
-      background: var(--card-bg);
-      color: var(--ink);
-    }
-
-    /* Steps */
-    .flow {
-      padding: 48px 0;
-    }
-    .flow h2 {
-      font-family: 'Caveat', cursive;
-      font-size: 36px;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 32px;
-      transform: rotate(0.5deg);
-    }
-    .steps {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    .step {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      padding: 20px;
-      background: var(--card-bg);
-      border: 2px solid var(--border);
-      position: relative;
-    }
-    .step:nth-child(1) {
-      border-radius: 12px 44px 8px 40px;
-      transform: rotate(-0.4deg);
-    }
-    .step:nth-child(2) {
-      border-radius: 40px 8px 44px 12px;
-      transform: rotate(0.3deg);
-    }
-    .step:nth-child(3) {
-      border-radius: 8px 40px 12px 44px;
-      transform: rotate(-0.2deg);
-    }
-    .step::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      box-shadow: 3px 3px 0 var(--border);
-      pointer-events: none;
-    }
-    .step-num {
-      width: 36px;
-      height: 36px;
-      background: var(--accent);
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Caveat', cursive;
-      font-weight: 700;
-      font-size: 22px;
-      flex-shrink: 0;
-      border: 2px solid var(--accent);
-    }
-    .step h3 {
-      font-family: 'Caveat', cursive;
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 2px;
-    }
-    .step p {
-      font-size: 16px;
-      color: var(--ink-light);
+    .btn-ghost {
+      background: transparent;
+      color: #f0f0f0;
     }
 
-    /* Connector arrows between steps */
-    .step-connector {
-      text-align: center;
-      font-size: 24px;
-      color: var(--pencil);
-      margin: -8px 0;
+    .hero-note {
+      font-family: 'Caveat', cursive;
+      font-size: 18px;
+      color: #555;
     }
 
-    /* Features */
+    /* ===== FEATURES (minimal) ===== */
     .features {
-      padding: 32px 0 56px;
+      padding: 80px 24px;
+      max-width: 800px;
+      margin: 0 auto;
     }
     .features h2 {
-      font-family: 'Caveat', cursive;
-      font-size: 36px;
-      font-weight: 700;
+      font-family: 'DxBurst', 'Caveat', cursive;
+      font-size: 48px;
       text-align: center;
-      margin-bottom: 32px;
-      transform: rotate(-0.3deg);
+      margin-bottom: 48px;
     }
-    .feature-grid {
+    .feature-row {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      text-align: center;
     }
-    .feature {
-      padding: 18px;
-      background: var(--card-bg);
-      border: 2px solid var(--border);
-      position: relative;
+    .feature-item {
+      padding: 24px 16px;
+      border: 2px solid #222;
+      border-radius: 12px 40px 8px 36px;
+      background: #111;
     }
-    .feature:nth-child(1) { border-radius: 12px 40px 8px 36px; transform: rotate(-0.5deg); }
-    .feature:nth-child(2) { border-radius: 36px 12px 40px 8px; transform: rotate(0.4deg); }
-    .feature:nth-child(3) { border-radius: 8px 36px 12px 40px; transform: rotate(0.3deg); }
-    .feature:nth-child(4) { border-radius: 40px 8px 36px 12px; transform: rotate(-0.6deg); }
-    .feature:nth-child(5) { border-radius: 12px 36px 40px 8px; transform: rotate(0.2deg); }
-    .feature:nth-child(6) { border-radius: 36px 12px 8px 40px; transform: rotate(-0.3deg); }
-    .feature::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      box-shadow: 3px 3px 0 var(--border);
-      pointer-events: none;
-    }
-    .feature-icon {
-      font-size: 28px;
-      margin-bottom: 6px;
-    }
-    .feature h3 {
+    .feature-item:nth-child(2) { border-radius: 40px 12px 36px 8px; }
+    .feature-item:nth-child(3) { border-radius: 8px 36px 12px 40px; }
+    .feature-item .icon { font-size: 36px; margin-bottom: 8px; }
+    .feature-item h3 {
       font-family: 'Caveat', cursive;
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 2px;
+      font-size: 22px;
+      margin-bottom: 4px;
     }
-    .feature p {
+    .feature-item p {
       font-size: 15px;
-      color: var(--ink-light);
+      color: #888;
     }
 
-    /* Scribble divider */
-    .divider {
-      text-align: center;
-      padding: 16px 0;
-      color: var(--pencil);
-      font-size: 14px;
-      letter-spacing: 8px;
-    }
-
-    /* Footer */
+    /* ===== FOOTER ===== */
     footer {
-      padding: 28px 0;
-      border-top: 2px dashed var(--pencil);
       text-align: center;
-      color: var(--ink-light);
+      padding: 32px 24px;
+      color: #444;
       font-size: 16px;
+      border-top: 2px dashed #222;
     }
-    footer .heart { color: var(--accent); }
-
-    /* Margin notes / annotations */
-    .annotation {
-      font-family: 'Caveat', cursive;
-      font-size: 16px;
-      color: var(--blue);
-      transform: rotate(-3deg);
-      display: inline-block;
-      margin-top: 4px;
-    }
-    .annotation::before {
-      content: '^ ';
-    }
+    footer .heart { color: #e63946; }
 
     @media (max-width: 600px) {
-      h1 { font-size: 38px; }
-      .hero { padding: 48px 0 36px; }
-      .feature-grid { grid-template-columns: 1fr; }
-      .cta-group { flex-direction: column; align-items: center; }
-      body { font-size: 16px; }
+      .hero-logo { font-size: 56px; }
+      .hero-tagline { font-size: 24px; }
+      .hero-steps { gap: 24px; }
+      .hero-step { font-size: 20px; }
+      .hero-step-icon { font-size: 36px; }
+      .hero-step-arrow { display: none; }
+      .btn { font-size: 22px; padding: 14px 32px; }
+      .features h2 { font-size: 36px; }
+      .feature-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <nav>
-    <div class="container">
-      <div class="logo"><span class="better">Better</span> Authenticator</div>
-      <div class="nav-links">
-        <a href="#how-it-works">How?</a>
-        <a href="#features">Why?</a>
-      </div>
-    </div>
-  </nav>
 
   <section class="hero">
-    <div class="container">
-      <div class="hero-doodle">🔐</div>
-      <h1>2FA codes from phone<br>to <span class="underline-sketch">browser</span></h1>
-      <p>One click in Chrome. Face ID on your phone. Code appears instantly. No more app-switching.</p>
-      <div class="cta-group">
-        <a href="#" class="btn btn-primary">Get the Extension</a>
-        <a href="#" class="btn btn-secondary">iOS App</a>
+    <div class="hero-logo"><span class="red">Better</span> Authenticator</div>
+    <div class="hero-tagline">2FA codes from phone to browser. One click.</div>
+
+    <div class="hero-steps">
+      <div class="hero-step">
+        <div class="hero-step-icon">📱</div>
+        Pair once
       </div>
-      <div class="arrow-down">↓</div>
-    </div>
-  </section>
-
-  <div class="divider">~ ~ ~ ~ ~ ~</div>
-
-  <section class="flow" id="how-it-works">
-    <div class="container">
-      <h2>How it works (it's stupidly simple)</h2>
-      <div class="steps">
-        <div class="step">
-          <div class="step-num">1</div>
-          <div>
-            <h3>Pair once 📱💻</h3>
-            <p>Scan a QR code in Chrome with your phone. Keys exchange automatically. One-time thing, takes 5 seconds.</p>
-            <span class="annotation">end-to-end encrypted from this point on!</span>
-          </div>
-        </div>
-        <div class="step-connector">⋮</div>
-        <div class="step">
-          <div class="step-num">2</div>
-          <div>
-            <h3>Click "Request Code" 🖱️</h3>
-            <p>On any login page, click the extension. It knows which site you're on and asks your phone for the right code.</p>
-            <span class="annotation">domain-aware matching, no scrolling</span>
-          </div>
-        </div>
-        <div class="step-connector">⋮</div>
-        <div class="step">
-          <div class="step-num">3</div>
-          <div>
-            <h3>Face ID → done ✨</h3>
-            <p>Your phone pops up the right account. One tap, Face ID, code appears in Chrome. Click to copy.</p>
-            <span class="annotation">codes auto-refresh for 5 min, no repeated approvals</span>
-          </div>
-        </div>
+      <div class="hero-step-arrow">→</div>
+      <div class="hero-step">
+        <div class="hero-step-icon">🖱️</div>
+        Click
+      </div>
+      <div class="hero-step-arrow">→</div>
+      <div class="hero-step">
+        <div class="hero-step-icon">🔓</div>
+        Face ID
+      </div>
+      <div class="hero-step-arrow">→</div>
+      <div class="hero-step">
+        <div class="hero-step-icon">✨</div>
+        Done
       </div>
     </div>
+
+    <div class="hero-cta">
+      <a href="#" class="btn btn-red">Chrome Extension</a>
+      <a href="#" class="btn btn-ghost">iOS App</a>
+    </div>
+
+    <div class="hero-note">Open source &bull; E2E encrypted &bull; Secrets never leave your phone</div>
   </section>
 
-  <div class="divider">~ ~ ~ ~ ~ ~</div>
-
-  <section class="features" id="features">
-    <div class="container">
-      <h2>Why this is better than alt-tabbing</h2>
-      <div class="feature-grid">
-        <div class="feature">
-          <div class="feature-icon">🔒</div>
-          <h3>E2E Encrypted</h3>
-          <p>X25519 + ChaCha20. The relay server literally cannot read your codes. Zero-knowledge.</p>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">📱</div>
-          <h3>Secrets never leave phone</h3>
-          <p>TOTP seeds stay on your device. Only generated codes fly through, and they expire in 30 seconds anyway.</p>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">🌐</div>
-          <h3>Knows which site</h3>
-          <p>On github.com? It auto-matches your GitHub account on the phone. No hunting through a list.</p>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">⚡</div>
-          <h3>Auto-refresh</h3>
-          <p>One Face ID approval = 5 minutes of fresh codes. It just keeps sending new ones every 30 seconds.</p>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">🔄</div>
-          <h3>Stays connected</h3>
-          <p>Exponential backoff reconnection. 20-second keepalive pings. Survives network blips like a champ.</p>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">📋</div>
-          <h3>Click to copy</h3>
-          <p>Click the code, it's copied. Clipboard auto-clears after 30 seconds. No stale codes lying around.</p>
-        </div>
+  <section class="features">
+    <h2>Why?</h2>
+    <div class="feature-row">
+      <div class="feature-item">
+        <div class="icon">🔒</div>
+        <h3>Zero-knowledge relay</h3>
+        <p>Server can't read your codes. Ever.</p>
+      </div>
+      <div class="feature-item">
+        <div class="icon">🌐</div>
+        <h3>Knows the site</h3>
+        <p>Auto-matches the right account.</p>
+      </div>
+      <div class="feature-item">
+        <div class="icon">⚡</div>
+        <h3>Auto-refresh</h3>
+        <p>One approval, 5 min of fresh codes.</p>
       </div>
     </div>
   </section>
 
   <footer>
-    <div class="container">
-      Made with <span class="heart">♥</span> &mdash; Open source. Zero iOS dependencies. Privacy first.
-    </div>
+    Made with <span class="heart">♥</span> &mdash; Privacy first
   </footer>
+
 </body>
 </html>`;
