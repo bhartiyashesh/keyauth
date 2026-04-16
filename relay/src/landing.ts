@@ -21,15 +21,17 @@ export const landingHTML = `<!DOCTYPE html>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --paper: #fdf6e3;
-      --paper-dark: #f5ead0;
-      --ink: #2c2c2c;
-      --ink-light: #666;
+      --paper: #0a0a0a;
+      --paper-dark: #111;
+      --ink: #f0f0f0;
+      --ink-light: #aaa;
       --accent: #e63946;
-      --blue: #457b9d;
+      --blue: #6db5d4;
       --green: #2a9d8f;
-      --pencil: #888;
-      --shadow: rgba(0, 0, 0, 0.08);
+      --pencil: #555;
+      --shadow: rgba(255, 255, 255, 0.05);
+      --card-bg: #161616;
+      --border: #333;
     }
 
     body {
@@ -39,7 +41,7 @@ export const landingHTML = `<!DOCTYPE html>
       line-height: 1.7;
       font-size: 18px;
       background-image:
-        linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px);
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
       background-size: 100% 32px;
     }
 
@@ -55,7 +57,7 @@ export const landingHTML = `<!DOCTYPE html>
     /* Nav */
     nav {
       padding: 20px 0;
-      border-bottom: 2px solid var(--ink);
+      border-bottom: 2px solid var(--border);
       border-bottom-style: dashed;
     }
     nav .container {
@@ -155,7 +157,7 @@ export const landingHTML = `<!DOCTYPE html>
       font-size: 22px;
       font-weight: 600;
       text-decoration: none;
-      border: 2.5px solid var(--ink);
+      border: 2.5px solid var(--border);
       border-radius: 40% 60% 55% 45% / 60% 45% 55% 40%;
       transition: all 0.2s;
       cursor: pointer;
@@ -163,7 +165,7 @@ export const landingHTML = `<!DOCTYPE html>
     }
     .btn:hover {
       transform: translate(-2px, -2px);
-      box-shadow: 4px 4px 0 var(--ink);
+      box-shadow: 4px 4px 0 var(--border);
     }
     .btn-primary {
       background: var(--accent);
@@ -174,7 +176,7 @@ export const landingHTML = `<!DOCTYPE html>
       box-shadow: 4px 4px 0 #b22e3a;
     }
     .btn-secondary {
-      background: white;
+      background: var(--card-bg);
       color: var(--ink);
     }
 
@@ -200,8 +202,8 @@ export const landingHTML = `<!DOCTYPE html>
       align-items: flex-start;
       gap: 16px;
       padding: 20px;
-      background: white;
-      border: 2px solid var(--ink);
+      background: var(--card-bg);
+      border: 2px solid var(--border);
       position: relative;
     }
     .step:nth-child(1) {
@@ -221,7 +223,7 @@ export const landingHTML = `<!DOCTYPE html>
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      box-shadow: 3px 3px 0 var(--ink);
+      box-shadow: 3px 3px 0 var(--border);
       pointer-events: none;
     }
     .step-num {
@@ -237,7 +239,7 @@ export const landingHTML = `<!DOCTYPE html>
       font-weight: 700;
       font-size: 22px;
       flex-shrink: 0;
-      border: 2px solid var(--ink);
+      border: 2px solid var(--accent);
     }
     .step h3 {
       font-family: 'Caveat', cursive;
@@ -277,8 +279,8 @@ export const landingHTML = `<!DOCTYPE html>
     }
     .feature {
       padding: 18px;
-      background: white;
-      border: 2px solid var(--ink);
+      background: var(--card-bg);
+      border: 2px solid var(--border);
       position: relative;
     }
     .feature:nth-child(1) { border-radius: 12px 40px 8px 36px; transform: rotate(-0.5deg); }
@@ -292,7 +294,7 @@ export const landingHTML = `<!DOCTYPE html>
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      box-shadow: 3px 3px 0 var(--ink);
+      box-shadow: 3px 3px 0 var(--border);
       pointer-events: none;
     }
     .feature-icon {

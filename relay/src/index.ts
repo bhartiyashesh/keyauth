@@ -25,6 +25,8 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicDir = resolve(__dirname, '..', 'public');
+// Fallback for Railway where cwd may differ from source dir
+const publicDirAlt = resolve(process.cwd(), 'public');
 
 const server = createServer((req: IncomingMessage, res: ServerResponse) => {
   if (req.url === '/health' && req.method === 'GET') {
@@ -42,14 +44,17 @@ const server = createServer((req: IncomingMessage, res: ServerResponse) => {
     return;
   }
   if (req.url === '/fonts/DxBurst-Regular.otf' && req.method === 'GET') {
-    try {
-      const font = readFileSync(resolve(publicDir, 'DxBurst-Regular.otf'));
+    let font: Buffer | null = null;
+    for (const dir of [publicDir, publicDirAlt]) {
+      try { font = readFileSync(resolve(dir, 'DxBurst-Regular.otf')); break; } catch {}
+    }
+    if (font) {
       res.writeHead(200, {
         'Content-Type': 'font/otf',
         'Cache-Control': 'public, max-age=31536000, immutable',
       });
       res.end(font);
-    } catch {
+    } else {
       res.writeHead(404);
       res.end();
     }
