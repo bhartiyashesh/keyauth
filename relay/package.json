@@ -1,5 +1,5 @@
 {
-  "name": "keyauth-relay",
+  "name": "better-authenticator-relay",
   "version": "1.0.0",
   "type": "module",
   "engines": {

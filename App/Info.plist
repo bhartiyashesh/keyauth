@@ -19,9 +19,9 @@
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>NSCameraUsageDescription</key>
-	<string>KeyAuth uses the camera to scan QR codes for adding accounts.</string>
+	<string>Better Authenticator uses the camera to scan QR codes for adding accounts.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>KeyAuth uses Face ID to protect your authentication codes.</string>
+	<string>Better Authenticator uses Face ID to protect your authentication codes.</string>
 	<key>UILaunchScreen</key>
 	<dict/>
 </dict>

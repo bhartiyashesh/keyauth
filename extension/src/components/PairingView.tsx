@@ -85,7 +85,7 @@ export default function PairingView() {
 
   return (
     <div className="pairing-view">
-      <p className="pairing-label">Scan with KeyAuth on your phone</p>
+      <p className="pairing-label">Scan with Better Authenticator on your phone</p>
       <div className="qr-container">
         {qrData && (
           <QRCodeSVG value={qrData} size={200} level="M" />

@@ -78,7 +78,7 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage, roomId: string, clien
 });
 
 server.listen(port, () => {
-  logger.info({ port, roomTtlMinutes }, 'KeyAuth relay server listening');
+  logger.info({ port, roomTtlMinutes }, 'Better Authenticator relay server listening');
 });
 
 // Graceful shutdown

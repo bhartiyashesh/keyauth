@@ -13,6 +13,11 @@
 		03B2C4D5E6F7A8B9C0D1E2F4 /* PairingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5F60718293A4B5C6D /* PairingStore.swift */; };
 		04C3D5E6F7A8B9C0D1E2F3A4 /* RelayClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D4E5F60718293A4B5C6D7E /* RelayClient.swift */; };
 		04C3D5E6F7A8B9C0D1E2F3A5 /* RelayClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D4E5F60718293A4B5C6D7E /* RelayClient.swift */; };
+		05D4E5F6A7B8C9D0E1F2A3B4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E5F60718293A4B5C6D7E8F /* AppDelegate.swift */; };
+		06E5F607A8B9C0D1E2F3A4B5 /* PairingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F60718293A4B5C6D7E8F90 /* PairingView.swift */; };
+		07F60718A9B0C1D2E3F4A5B6 /* PairingQRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60718293A4B5C6D7E8F9001 /* PairingQRScannerView.swift */; };
+		08A71829AAB1C2D3E4F5A6B7 /* PairedDeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A718293A4B5C6D7E8F900112 /* PairedDeviceView.swift */; };
+		09B8293ABBC2D3E4F5A6B7C8 /* CodeApprovalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8293A4B5C6D7E8F90011234 /* CodeApprovalView.swift */; };
 		09DE7701F174F6FCB2FEDC68 /* KeyAuthApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3B10022A6CA17C6EA7903ED /* KeyAuthApp.swift */; };
 		134541E376DBA37C916368BC /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53ED4B44041710EEC7EE82C7 /* Account.swift */; };
 		140FCBAC17D3AB6F9E090BD1 /* TOTPGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB90502401FD358C36BAA33 /* TOTPGenerator.swift */; };
@@ -36,11 +41,6 @@
 		DC263CDF241B877ED7E67208 /* BiometricAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77D894396423F137C83BE1B /* BiometricAuthManager.swift */; };
 		E3A35868FCE3BB9A54CB5C51 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B936E7530F6ED79DACBA353 /* SharedDefaults.swift */; };
 		EA50FC6FE863B6FC2771CA3A /* Base32.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBDB95C539BA582A5BA3C248 /* Base32.swift */; };
-		05D4E5F6A7B8C9D0E1F2A3B4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E5F60718293A4B5C6D7E8F /* AppDelegate.swift */; };
-		06E5F607A8B9C0D1E2F3A4B5 /* PairingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F60718293A4B5C6D7E8F90 /* PairingView.swift */; };
-		07F60718A9B0C1D2E3F4A5B6 /* PairingQRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60718293A4B5C6D7E8F9001 /* PairingQRScannerView.swift */; };
-		08A71829AAB1C2D3E4F5A6B7 /* PairedDeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A718293A4B5C6D7E8F900112 /* PairedDeviceView.swift */; };
-		09B8293ABBC2D3E4F5A6B7C8 /* CodeApprovalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8293A4B5C6D7E8F90011234 /* CodeApprovalView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,32 +71,32 @@
 		0B936E7530F6ED79DACBA353 /* SharedDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedDefaults.swift; sourceTree = "<group>"; };
 		257BEB070E267733198F5ECB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		53ED4B44041710EEC7EE82C7 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
-		A1B2C3D4E5F60718293A4B5C /* CryptoBoxManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoBoxManager.swift; sourceTree = "<group>"; };
-		B2C3D4E5F60718293A4B5C6D /* PairingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingStore.swift; sourceTree = "<group>"; };
-		C3D4E5F60718293A4B5C6D7E /* RelayClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelayClient.swift; sourceTree = "<group>"; };
-		5C819D47267678FE6AAF9834 /* KeyAuthKeyboard.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = KeyAuthKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		5C819D47267678FE6AAF9834 /* KeyAuthKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = KeyAuthKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		66FD2A0722CD350CFC3C3977 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
 		7CFE1B0C62EDF21CB35A71B9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		96A617D6A6675B66C43394F4 /* AccountStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountStore.swift; sourceTree = "<group>"; };
 		9FB90502401FD358C36BAA33 /* TOTPGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TOTPGenerator.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B5C /* CryptoBoxManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoBoxManager.swift; sourceTree = "<group>"; };
 		A363B81015F05C5B3C0DC5A7 /* QRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerView.swift; sourceTree = "<group>"; };
+		A718293A4B5C6D7E8F900112 /* PairedDeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairedDeviceView.swift; sourceTree = "<group>"; };
+		B2C3D4E5F60718293A4B5C6D /* PairingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingStore.swift; sourceTree = "<group>"; };
+		B8293A4B5C6D7E8F90011234 /* CodeApprovalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeApprovalView.swift; sourceTree = "<group>"; };
 		BF6A6B00B9DA3EE988C03876 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C2F607D627AF74A81912E77B /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManager.swift; sourceTree = "<group>"; };
 		C3B10022A6CA17C6EA7903ED /* KeyAuthApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyAuthApp.swift; sourceTree = "<group>"; };
+		C3D4E5F60718293A4B5C6D7E /* RelayClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelayClient.swift; sourceTree = "<group>"; };
 		C50EFF20EB1E88A94EE865FB /* KeyAuthKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KeyAuthKeyboard.entitlements; sourceTree = "<group>"; };
 		CD58D52B0B77FD05FA679468 /* TOTPCodeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TOTPCodeCell.swift; sourceTree = "<group>"; };
+		D4E5F60718293A4B5C6D7E8F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D77D894396423F137C83BE1B /* BiometricAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuthManager.swift; sourceTree = "<group>"; };
+		E5F60718293A4B5C6D7E8F90 /* PairingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingView.swift; sourceTree = "<group>"; };
 		E9B0F9F5608AEF29BF6D1379 /* ManualEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualEntryView.swift; sourceTree = "<group>"; };
 		F261A828F30652E01C0E9158 /* KeyAuth.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KeyAuth.entitlements; sourceTree = "<group>"; };
-		F275264BB696FBD4F3AE1F3E /* KeyAuth.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = KeyAuth.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F275264BB696FBD4F3AE1F3E /* KeyAuth.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeyAuth.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F60718293A4B5C6D7E8F9001 /* PairingQRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingQRScannerView.swift; sourceTree = "<group>"; };
 		F6A4BC3FC29DD88F3A3F4603 /* AccountRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRowView.swift; sourceTree = "<group>"; };
 		FBDB95C539BA582A5BA3C248 /* Base32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Base32.swift; sourceTree = "<group>"; };
 		FD66B74369598846CBD85FE9 /* LockScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockScreenView.swift; sourceTree = "<group>"; };
-		D4E5F60718293A4B5C6D7E8F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		E5F60718293A4B5C6D7E8F90 /* PairingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingView.swift; sourceTree = "<group>"; };
-		F60718293A4B5C6D7E8F9001 /* PairingQRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingQRScannerView.swift; sourceTree = "<group>"; };
-		A718293A4B5C6D7E8F900112 /* PairedDeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairedDeviceView.swift; sourceTree = "<group>"; };
-		B8293A4B5C6D7E8F90011234 /* CodeApprovalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeApprovalView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -221,7 +221,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 2640;
 				TargetAttributes = {
 					048D7EB74B14F4A02C6D1482 = {
 						DevelopmentTeam = W646UCTVQV;
@@ -382,6 +382,7 @@
 				DEVELOPMENT_TEAM = W646UCTVQV;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -402,6 +403,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.9;
@@ -463,6 +465,7 @@
 				DEVELOPMENT_TEAM = W646UCTVQV;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -476,6 +479,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.9;

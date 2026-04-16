@@ -52,13 +52,13 @@ function connect(roomId: string, relayURL: string): void {
   intentionalDisconnect = false;
 
   setConnectionState('connecting');
-  console.log(`[KeyAuth] Connecting to room ${roomId.substring(0, 8)}...`);
+  console.log(`[BetterAuth] Connecting to room ${roomId.substring(0, 8)}...`);
 
   const url = `${relayURL}?roomId=${encodeURIComponent(roomId)}`;
   ws = new WebSocket(url);
 
   ws.onopen = () => {
-    console.log('[KeyAuth] WebSocket connected');
+    console.log('[BetterAuth] WebSocket connected');
     reconnectAttempts = 0; // Reset backoff on successful connect
 
     // Send join envelope
@@ -78,7 +78,7 @@ function connect(roomId: string, relayURL: string): void {
       const silentMs = Date.now() - lastPongAt;
       if (silentMs > KEEPALIVE_MS * 3) {
         // No pong for 3 keepalive cycles -- connection is stale
-        console.warn('[KeyAuth] Connection stale (no pong for', Math.round(silentMs / 1000), 's), reconnecting');
+        console.warn('[BetterAuth] Connection stale (no pong for', Math.round(silentMs / 1000), 's), reconnecting');
         ws?.close();
       }
     }, KEEPALIVE_MS * 2);
@@ -91,7 +91,7 @@ function connect(roomId: string, relayURL: string): void {
   };
 
   ws.onclose = (event: CloseEvent) => {
-    console.log('[KeyAuth] WebSocket closed, code:', event.code, 'reason:', event.reason || '(none)');
+    console.log('[BetterAuth] WebSocket closed, code:', event.code, 'reason:', event.reason || '(none)');
     stopTimers();
 
     if (intentionalDisconnect) {
@@ -104,7 +104,7 @@ function connect(roomId: string, relayURL: string): void {
   };
 
   ws.onerror = (event: Event) => {
-    console.error('[KeyAuth] WebSocket error:', event);
+    console.error('[BetterAuth] WebSocket error:', event);
   };
 }
 
@@ -153,7 +153,7 @@ async function scheduleReconnect(): Promise<void> {
   const delay = Math.min(RECONNECT_BASE_MS * Math.pow(2, reconnectAttempts), RECONNECT_MAX_MS);
   reconnectAttempts++;
 
-  console.log(`[KeyAuth] Scheduling reconnect in ${delay}ms (attempt ${reconnectAttempts})`);
+  console.log(`[BetterAuth] Scheduling reconnect in ${delay}ms (attempt ${reconnectAttempts})`);
 
   // Find room to reconnect to: completed pairing first, then pending pairing
   const pairing = await loadPairingData();
@@ -182,7 +182,7 @@ async function handleRelayMessage(raw: string): Promise<void> {
 
   switch (msg.type) {
     case 'joined':
-      console.log('[KeyAuth] Joined room');
+      console.log('[BetterAuth] Joined room');
       break;
 
     case 'pong':
@@ -192,11 +192,11 @@ async function handleRelayMessage(raw: string): Promise<void> {
     case 'error': {
       const code = msg.payload.code ?? '';
       const message = msg.payload.message ?? '';
-      console.error('[KeyAuth] Relay error:', code, message);
+      console.error('[BetterAuth] Relay error:', code, message);
 
       // Room-level errors may mean we need to re-pair
       if (code === 'room_full' || code === 'room_not_found') {
-        console.warn('[KeyAuth] Room error -- pairing may be stale');
+        console.warn('[BetterAuth] Room error -- pairing may be stale');
         await setSessionState({ roomError: code });
       }
       break;
@@ -219,7 +219,7 @@ async function handleRelayMessage(raw: string): Promise<void> {
 async function handlePairingAck(msg: MessageEnvelope): Promise<void> {
   const peerPublicKeyBase64 = msg.payload.publicKey as string | undefined;
   if (peerPublicKeyBase64) {
-    console.log('[KeyAuth] Received pairing_ack, completing key exchange...');
+    console.log('[BetterAuth] Received pairing_ack, completing key exchange...');
     await completePairing(peerPublicKeyBase64);
   }
 }
@@ -238,7 +238,7 @@ async function handleCodeResponse(msg: MessageEnvelope): Promise<void> {
     const decoded = new TextDecoder().decode(decrypted);
     const { code, requestId, issuer, label } = JSON.parse(decoded);
 
-    console.log('[KeyAuth] Code received for', issuer || '(unknown)', ':', code);
+    console.log('[BetterAuth] Code received for', issuer || '(unknown)', ':', code);
 
     // Store as array of active codes, keyed by issuer to allow updates
     const activeCodes = (await getSessionState<ActiveCode[]>('activeCodes')) || [];
@@ -254,7 +254,7 @@ async function handleCodeResponse(msg: MessageEnvelope): Promise<void> {
     await setSessionState({ activeCodes: fresh });
     await setConnectionState('code_received');
   } catch (err) {
-    console.error('[KeyAuth] Failed to decrypt code_response:', err);
+    console.error('[BetterAuth] Failed to decrypt code_response:', err);
   }
 }
 
@@ -284,7 +284,7 @@ async function handleForwardedMessage(msg: MessageEnvelope): Promise<void> {
 async function completePairing(peerPublicKeyBase64: string): Promise<void> {
   const pending = await getSessionState<{ roomId: string; privateKey: string }>('pendingPairing');
   if (!pending) {
-    console.warn('[KeyAuth] No pending pairing to complete');
+    console.warn('[BetterAuth] No pending pairing to complete');
     return;
   }
 
@@ -303,9 +303,9 @@ async function completePairing(peerPublicKeyBase64: string): Promise<void> {
     await savePairingData(pairingData);
     await chrome.storage.session.remove('pendingPairing');
     await setConnectionState('connected');
-    console.log('[KeyAuth] Pairing completed successfully');
+    console.log('[BetterAuth] Pairing completed successfully');
   } catch (err) {
-    console.error('[KeyAuth] Pairing completion failed:', err);
+    console.error('[BetterAuth] Pairing completion failed:', err);
   }
 }
 
@@ -339,7 +339,7 @@ async function handlePopupMessage(
 
       // If WebSocket is closed, try a quick reconnect
       if (!ws || ws.readyState !== WebSocket.OPEN) {
-        console.log('[KeyAuth] WebSocket not open for code request, reconnecting...');
+        console.log('[BetterAuth] WebSocket not open for code request, reconnecting...');
         connect(pairing.roomId, pairing.relayURL);
         sendResponse({ ok: false, error: 'Reconnecting -- try again in a moment' });
         break;
@@ -373,7 +373,7 @@ async function handlePopupMessage(
         ws.send(JSON.stringify(envelope));
         sendResponse({ ok: true, requestId: codeRequest.id });
       } catch (err) {
-        console.error('[KeyAuth] Failed to send code request:', err);
+        console.error('[BetterAuth] Failed to send code request:', err);
         sendResponse({ ok: false, error: 'Encryption failed' });
       }
       break;
@@ -412,7 +412,7 @@ async function handlePopupMessage(
 // ---------- Service Worker Startup ----------
 
 export default defineBackground(() => {
-  console.log('[KeyAuth] Service worker started');
+  console.log('[BetterAuth] Service worker started');
 
   // Register message listener
   chrome.runtime.onMessage.addListener(
@@ -422,7 +422,7 @@ export default defineBackground(() => {
       sendResponse: (response?: unknown) => void,
     ) => {
       handlePopupMessage(message, sendResponse).catch((err) => {
-        console.error('[KeyAuth] Message handler error:', err);
+        console.error('[BetterAuth] Message handler error:', err);
         sendResponse({ ok: false, error: String(err) });
       });
       return true;
@@ -432,12 +432,12 @@ export default defineBackground(() => {
   // Auto-reconnect if already paired or mid-pairing
   loadPairingData().then(async (pairing) => {
     if (pairing) {
-      console.log('[KeyAuth] Found existing pairing, reconnecting...');
+      console.log('[BetterAuth] Found existing pairing, reconnecting...');
       connect(pairing.roomId, pairing.relayURL);
     } else {
       const pending = await getSessionState<{ roomId: string; privateKey: string }>('pendingPairing');
       if (pending) {
-        console.log('[KeyAuth] Found pending pairing, reconnecting to room:', pending.roomId);
+        console.log('[BetterAuth] Found pending pairing, reconnecting to room:', pending.roomId);
         connect(pending.roomId, RELAY_URL);
       } else {
         setConnectionState('unpaired');

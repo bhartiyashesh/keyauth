@@ -37,7 +37,7 @@ struct ContentView: View {
                 }
             }
             .background(Color(.systemGroupedBackground))
-            .navigationTitle("KeyAuth")
+            .navigationTitle("Better Authenticator")
             .searchable(text: $searchText, prompt: "Search accounts")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -116,7 +116,7 @@ struct ContentView: View {
                     .font(.title3)
                     .fontWeight(.semibold)
 
-                Text("Add a 2FA account to get started.\nYour codes will also appear in the\nKeyAuth keyboard.")
+                Text("Add a 2FA account to get started.\nYour codes will also appear in the\nBetter Authenticator keyboard.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
