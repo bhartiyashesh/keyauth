@@ -23,6 +23,7 @@
 		134541E376DBA37C916368BC /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53ED4B44041710EEC7EE82C7 /* Account.swift */; };
 		140FCBAC17D3AB6F9E090BD1 /* TOTPGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB90502401FD358C36BAA33 /* TOTPGenerator.swift */; };
 		1C81C526D208F5CD89FF8C41 /* MockKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21BF8AD08CE52AB890A8681B /* MockKeychain.swift */; };
+		1D65228B1B7B515C16873BEF /* SyncScopeIsolationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F33A224B6A75D63A754689 /* SyncScopeIsolationTests.swift */; };
 		1DD2443D7ED78FDBB9052247 /* SyncPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE022AD51946B21D67526F8 /* SyncPreference.swift */; };
 		2DF26270B453948910DB4BBA /* AccountStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A617D6A6675B66C43394F4 /* AccountStore.swift */; };
 		303CC5F2ED328FAA1D84AF91 /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A363B81015F05C5B3C0DC5A7 /* QRScannerView.swift */; };
@@ -86,6 +87,7 @@
 
 /* Begin PBXFileReference section */
 		0B936E7530F6ED79DACBA353 /* SharedDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedDefaults.swift; sourceTree = "<group>"; };
+		14F33A224B6A75D63A754689 /* SyncScopeIsolationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SyncScopeIsolationTests.swift; sourceTree = "<group>"; };
 		1EEDE7031D24FC0865882CD7 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		21BF8AD08CE52AB890A8681B /* MockKeychain.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockKeychain.swift; sourceTree = "<group>"; };
 		257BEB070E267733198F5ECB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -196,6 +198,7 @@
 				02DD99BD1559847317105DBE /* Mocks */,
 				3C8A1FCEC7A81E2D24A80E79 /* Fixtures */,
 				C8BD77D6D56F165FDBDF81F4 /* KeychainManagerSyncTests.swift */,
+				14F33A224B6A75D63A754689 /* SyncScopeIsolationTests.swift */,
 			);
 			name = KeyAuthTests;
 			path = KeyAuthTests;
@@ -308,6 +311,7 @@
 				D602CA9AA1933FA22594EF89 /* Sources */,
 				461E2888993FFA8C30DD1B9C /* Frameworks */,
 				E30DA0D537F337BEBE46E3AC /* Resources */,
+				361A730FB06AD3A5056BF2B1 /* Copy Shared Sources For Isolation Tests */,
 			);
 			buildRules = (
 			);
@@ -367,6 +371,33 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		361A730FB06AD3A5056BF2B1 /* Copy Shared Sources For Isolation Tests */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Shared/PairingStore.swift",
+				"$(SRCROOT)/Shared/CryptoBoxManager.swift",
+				"$(SRCROOT)/Shared/KeychainManager.swift",
+			);
+			name = "Copy Shared Sources For Isolation Tests";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/PairingStore.swift.txt",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/CryptoBoxManager.swift.txt",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/KeychainManager.swift.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nSRC_DIR=\"${SRCROOT}/Shared\"\nDST_DIR=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\nmkdir -p \"${DST_DIR}\"\nfor name in PairingStore.swift CryptoBoxManager.swift KeychainManager.swift; do\n  cp \"${SRC_DIR}/${name}\" \"${DST_DIR}/${name}.txt\"\ndone\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		8EAEA92F87BDAB2F34B0312E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -397,6 +428,7 @@
 				1C81C526D208F5CD89FF8C41 /* MockKeychain.swift in Sources */,
 				45C549C784C3C53F8FBFDD18 /* AccountFixtures.swift in Sources */,
 				A2C4414CA9210130F972AEE4 /* KeychainManagerSyncTests.swift in Sources */,
+				1D65228B1B7B515C16873BEF /* SyncScopeIsolationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
