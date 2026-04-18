@@ -19,9 +19,11 @@
 		08A71829AAB1C2D3E4F5A6B7 /* PairedDeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A718293A4B5C6D7E8F900112 /* PairedDeviceView.swift */; };
 		09B8293ABBC2D3E4F5A6B7C8 /* CodeApprovalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8293A4B5C6D7E8F90011234 /* CodeApprovalView.swift */; };
 		09DE7701F174F6FCB2FEDC68 /* KeyAuthApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3B10022A6CA17C6EA7903ED /* KeyAuthApp.swift */; };
+		1125BC4B99F63A77FCEC9E9F /* KeychainProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0067AC09E052201723A167 /* KeychainProviding.swift */; };
 		134541E376DBA37C916368BC /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53ED4B44041710EEC7EE82C7 /* Account.swift */; };
 		140FCBAC17D3AB6F9E090BD1 /* TOTPGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB90502401FD358C36BAA33 /* TOTPGenerator.swift */; };
 		1C81C526D208F5CD89FF8C41 /* MockKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21BF8AD08CE52AB890A8681B /* MockKeychain.swift */; };
+		1DD2443D7ED78FDBB9052247 /* SyncPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE022AD51946B21D67526F8 /* SyncPreference.swift */; };
 		2DF26270B453948910DB4BBA /* AccountStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A617D6A6675B66C43394F4 /* AccountStore.swift */; };
 		303CC5F2ED328FAA1D84AF91 /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A363B81015F05C5B3C0DC5A7 /* QRScannerView.swift */; };
 		31653C12560562042FF28D1D /* KeyAuthTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3E6E0A119F9F10DD6ACEFF8 /* KeyAuthTests.swift */; };
@@ -379,6 +381,8 @@
 				397D030A94C9EE738A01D917 /* SharedDefaults.swift in Sources */,
 				D721933D74AAA1C5D5ED1A8C /* TOTPCodeCell.swift in Sources */,
 				39235F8317E8D416D9E56670 /* TOTPGenerator.swift in Sources */,
+				1125BC4B99F63A77FCEC9E9F /* KeychainProviding.swift in Sources */,
+				1DD2443D7ED78FDBB9052247 /* SyncPreference.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
