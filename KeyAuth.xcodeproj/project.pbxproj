@@ -37,6 +37,7 @@
 		7C45AA2094BB85C02DE7E25C /* AccountStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A617D6A6675B66C43394F4 /* AccountStore.swift */; };
 		8F508CB2D15D9E973EDA238C /* BiometricAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77D894396423F137C83BE1B /* BiometricAuthManager.swift */; };
 		90126D11E1B5F3FE14878A63 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FD2A0722CD350CFC3C3977 /* KeyboardViewController.swift */; };
+		A2C4414CA9210130F972AEE4 /* KeychainManagerSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8BD77D6D56F165FDBDF81F4 /* KeychainManagerSyncTests.swift */; };
 		A6E4292AEC1EB61B57497759 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFE1B0C62EDF21CB35A71B9 /* ContentView.swift */; };
 		B7FEAA83061573BF32207988 /* KeychainProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0067AC09E052201723A167 /* KeychainProviding.swift */; };
 		BB344AE911CC122A3823EC21 /* KeyAuthKeyboard.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5C819D47267678FE6AAF9834 /* KeyAuthKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -108,6 +109,7 @@
 		C3B10022A6CA17C6EA7903ED /* KeyAuthApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyAuthApp.swift; sourceTree = "<group>"; };
 		C3D4E5F60718293A4B5C6D7E /* RelayClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelayClient.swift; sourceTree = "<group>"; };
 		C50EFF20EB1E88A94EE865FB /* KeyAuthKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KeyAuthKeyboard.entitlements; sourceTree = "<group>"; };
+		C8BD77D6D56F165FDBDF81F4 /* KeychainManagerSyncTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = KeychainManagerSyncTests.swift; sourceTree = "<group>"; };
 		CD58D52B0B77FD05FA679468 /* TOTPCodeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TOTPCodeCell.swift; sourceTree = "<group>"; };
 		CE19BE23449F4C4E145E3DDE /* KeyAuthTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeyAuthTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4E5F60718293A4B5C6D7E8F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -193,6 +195,7 @@
 				F3E6E0A119F9F10DD6ACEFF8 /* KeyAuthTests.swift */,
 				02DD99BD1559847317105DBE /* Mocks */,
 				3C8A1FCEC7A81E2D24A80E79 /* Fixtures */,
+				C8BD77D6D56F165FDBDF81F4 /* KeychainManagerSyncTests.swift */,
 			);
 			name = KeyAuthTests;
 			path = KeyAuthTests;
@@ -393,6 +396,7 @@
 				31653C12560562042FF28D1D /* KeyAuthTests.swift in Sources */,
 				1C81C526D208F5CD89FF8C41 /* MockKeychain.swift in Sources */,
 				45C549C784C3C53F8FBFDD18 /* AccountFixtures.swift in Sources */,
+				A2C4414CA9210130F972AEE4 /* KeychainManagerSyncTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
