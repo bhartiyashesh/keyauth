@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-04-18T13:42:54.834Z"
+stopped_at: Completed 06-02-PLAN.md
+last_updated: "2026-04-18T13:56:04.346Z"
 last_activity: 2026-04-18
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 16
-  completed_plans: 10
-  percent: 63
+  completed_plans: 11
+  percent: 69
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-14)
 ## Current Position
 
 Phase: 06 (icloud-keychain-sync) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-04-18
 
@@ -61,6 +61,7 @@ Progress: [██████████] 100%
 | Phase 03 P01 | 6min | 2 tasks | 15 files |
 | Phase 03 P02 | 5min | 2 tasks | 6 files |
 | Phase 06 P01 | 8min | 6 tasks | 12 files |
+| Phase 06 P02 | 8min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,10 @@ Recent decisions affecting current work:
 - [Phase 06]: KeyAuthTests added as TestableReference inside existing 'KeyAuth' scheme (no standalone scheme) — matches downstream plans 02-06
 - [Phase 06]: KeychainProviding protocol declared in Shared/ with zero conformances; KeychainManager extension deferred to Plan 02
 - [Phase 06]: Ruby xcodeproj gem used for all project.pbxproj edits to preserve UUIDs/scheme XML integrity
+- [Phase 06]: [Phase 06]: service/accessGroup on KeychainManager changed from let to var to enable #if DEBUG test-only overrides; production API still immutable
+- [Phase 06]: [Phase 06]: transient save(_:) shim retained in KeychainManager so AccountStore keeps compiling — TODO(Plan 03) removes it
+- [Phase 06]: [Phase 06]: ICLOUD-13 static tests read Shared/*.swift via Bundle(for:).url(forResource:withExtension: 'swift.txt') — Run-Script build phase copies sources into the test bundle to bypass simulator sandbox
+- [Phase 06]: [Phase 06]: KeychainProviding.swift and SyncPreference.swift wired into KeyAuthKeyboard target so the extension can compile the sync-aware KeychainManager
 
 ### Pending Todos
 
@@ -116,6 +121,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-18T13:42:54.831Z
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-04-18T13:56:04.343Z
+Stopped at: Completed 06-02-PLAN.md
 Resume file: None
