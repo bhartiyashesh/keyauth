@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-03-PLAN.md
-last_updated: "2026-04-18T14:14:30.815Z"
+stopped_at: Completed 06-04-PLAN.md
+last_updated: "2026-04-18T14:32:35.627Z"
 last_activity: 2026-04-18
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 16
-  completed_plans: 12
-  percent: 75
+  completed_plans: 13
+  percent: 81
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-14)
 ## Current Position
 
 Phase: 06 (icloud-keychain-sync) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Ready to execute
 Last activity: 2026-04-18
 
@@ -63,6 +63,7 @@ Progress: [██████████] 100%
 | Phase 06 P01 | 8min | 6 tasks | 12 files |
 | Phase 06 P02 | 8min | 3 tasks | 4 files |
 | Phase 06 P03 | 11min | 5 tasks | 9 files |
+| Phase 06 P04 | 12min | 5 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -111,6 +112,10 @@ Recent decisions affecting current work:
 - [Phase 06]: Plan 03: ICloudStateObserver.previousIdentityToken typed AnyObject? (Apple opaque-token pattern) not the Swift 6-unfriendly existential composition
 - [Phase 06]: Plan 03: Added com.apple.developer.ubiquity-kvstore-identifier entitlement (Rule 2) — required for KVS counter-ping to function in production and tests
 - [Phase 06]: Plan 03: onChange(of:) uses iOS 16-compatible single-parameter form; project deployment target is 16.0 not 17.0
+- [Phase 06]: Plan 04: D-05 per-option descriptions composed into .confirmationDialog message: closure as a multiline Text literal — SwiftUI cannot render per-Button inline descriptions
+- [Phase 06]: Plan 04: Gear + Menu toolbar ordering via source-order (second source item appears LEFT due to Apple's right-to-left .primaryAction layout)
+- [Phase 06]: Plan 04: SettingsView confirmationDialog action handlers are STUBS (setEnabled false + log for Stop syncing; log + bounce toggle ON for Remove) — Plan 06-05 wires MigrationCoordinator
+- [Phase 06]: Plan 04: SettingsViewTests loads source via Bundle(for:).url(forResource:withExtension: 'swift.txt') — simulator sandbox blocks absolute #filePath reads; Run-Script build phase extended to copy the View files
 
 ### Pending Todos
 
@@ -127,6 +132,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-18T14:14:30.809Z
-Stopped at: Completed 06-03-PLAN.md
+Last session: 2026-04-18T14:32:35.625Z
+Stopped at: Completed 06-04-PLAN.md
 Resume file: None
