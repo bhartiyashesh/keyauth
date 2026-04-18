@@ -20,6 +20,7 @@
 		090E176EC59228ADBFAF4B4A /* ICloudStateObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F2BCEE9018B227CAF93AEAD /* ICloudStateObserverTests.swift */; };
 		09B8293ABBC2D3E4F5A6B7C8 /* CodeApprovalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8293A4B5C6D7E8F90011234 /* CodeApprovalView.swift */; };
 		41C1774C02244DFC994DA61F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22F835ABFB64081A09A1D00 /* SettingsView.swift */; };
+		B1888D7E276B4B1C8DB79495 /* FirstLaunchSyncCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A160140CCA496993F9B687 /* FirstLaunchSyncCard.swift */; };
 		09DE7701F174F6FCB2FEDC68 /* KeyAuthApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3B10022A6CA17C6EA7903ED /* KeyAuthApp.swift */; };
 		1125BC4B99F63A77FCEC9E9F /* KeychainProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0067AC09E052201723A167 /* KeychainProviding.swift */; };
 		134541E376DBA37C916368BC /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53ED4B44041710EEC7EE82C7 /* Account.swift */; };
@@ -120,6 +121,7 @@
 		C50EFF20EB1E88A94EE865FB /* KeyAuthKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KeyAuthKeyboard.entitlements; sourceTree = "<group>"; };
 		C8BD77D6D56F165FDBDF81F4 /* KeychainManagerSyncTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = KeychainManagerSyncTests.swift; sourceTree = "<group>"; };
 		D22F835ABFB64081A09A1D00 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		B0A160140CCA496993F9B687 /* FirstLaunchSyncCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstLaunchSyncCard.swift; sourceTree = "<group>"; };
 		CD58D52B0B77FD05FA679468 /* TOTPCodeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TOTPCodeCell.swift; sourceTree = "<group>"; };
 		CE19BE23449F4C4E145E3DDE /* KeyAuthTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeyAuthTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2BFCC4627B98C62566737E4 /* AccountStoreTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AccountStoreTests.swift; sourceTree = "<group>"; };
@@ -237,6 +239,7 @@
 				F60718293A4B5C6D7E8F9001 /* PairingQRScannerView.swift */,
 				B8293A4B5C6D7E8F90011234 /* CodeApprovalView.swift */,
 				D22F835ABFB64081A09A1D00 /* SettingsView.swift */,
+				B0A160140CCA496993F9B687 /* FirstLaunchSyncCard.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -474,6 +477,7 @@
 				08A71829AAB1C2D3E4F5A6B7 /* PairedDeviceView.swift in Sources */,
 				09B8293ABBC2D3E4F5A6B7C8 /* CodeApprovalView.swift in Sources */,
 				41C1774C02244DFC994DA61F /* SettingsView.swift in Sources */,
+				B1888D7E276B4B1C8DB79495 /* FirstLaunchSyncCard.swift in Sources */,
 				B7FEAA83061573BF32207988 /* KeychainProviding.swift in Sources */,
 				4C990E25D567C010E13C3F54 /* SyncPreference.swift in Sources */,
 				4932A600C06FB65F03EC0932 /* DedupKey.swift in Sources */,
