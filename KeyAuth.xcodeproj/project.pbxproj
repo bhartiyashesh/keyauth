@@ -67,6 +67,7 @@
 		EA50FC6FE863B6FC2771CA3A /* Base32.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBDB95C539BA582A5BA3C248 /* Base32.swift */; };
 		F5B0DD36B290D188D1F35A53 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E7857BFF38538BDFBD953CB /* Foundation.framework */; };
 		F965CB2D35812D90E4B87865 /* DedupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F431A29721C71204675845D6 /* DedupTests.swift */; };
+		D9298754667C669455520CEF /* KeyboardPropagationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C42BF0A5EE050AFC308974F /* KeyboardPropagationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -149,6 +150,7 @@
 		F275264BB696FBD4F3AE1F3E /* KeyAuth.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeyAuth.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F3E6E0A119F9F10DD6ACEFF8 /* KeyAuthTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = KeyAuthTests.swift; sourceTree = "<group>"; };
 		F431A29721C71204675845D6 /* DedupTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DedupTests.swift; sourceTree = "<group>"; };
+		3C42BF0A5EE050AFC308974F /* KeyboardPropagationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = KeyboardPropagationTests.swift; sourceTree = "<group>"; };
 		F60718293A4B5C6D7E8F9001 /* PairingQRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingQRScannerView.swift; sourceTree = "<group>"; };
 		F6A4BC3FC29DD88F3A3F4603 /* AccountRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRowView.swift; sourceTree = "<group>"; };
 		FBDB95C539BA582A5BA3C248 /* Base32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Base32.swift; sourceTree = "<group>"; };
@@ -234,6 +236,7 @@
 				EC70246AA5056F92E1D26B79 /* MigrationTests.swift */,
 				F431A29721C71204675845D6 /* DedupTests.swift */,
 				B1B87D7FDD50FED1F07CBC6C /* RestoringStateTests.swift */,
+				3C42BF0A5EE050AFC308974F /* KeyboardPropagationTests.swift */,
 			);
 			name = KeyAuthTests;
 			path = KeyAuthTests;
@@ -481,6 +484,7 @@
 				E6969EC9396FC357D510DF67 /* MigrationTests.swift in Sources */,
 				F965CB2D35812D90E4B87865 /* DedupTests.swift in Sources */,
 				D570E90BFDE51539D5BD89A9 /* RestoringStateTests.swift in Sources */,
+				D9298754667C669455520CEF /* KeyboardPropagationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
