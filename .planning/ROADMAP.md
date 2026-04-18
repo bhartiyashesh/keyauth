@@ -118,4 +118,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 3. Chrome Extension Core | 0/3 | Not started | - |
 | 4. Auto-Fill + Domain Matching | 0/TBD | Not started | - |
 | 5. Resilience | 0/TBD | Not started | - |
-| 6. iCloud Keychain Sync | 0/TBD | Not started | - |
+| 6. iCloud Keychain Sync | 3/6 | In Progress | - |

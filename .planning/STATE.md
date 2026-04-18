@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-02-PLAN.md
-last_updated: "2026-04-18T13:56:04.346Z"
+stopped_at: Completed 06-03-PLAN.md
+last_updated: "2026-04-18T14:14:30.815Z"
 last_activity: 2026-04-18
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 16
-  completed_plans: 11
-  percent: 69
+  completed_plans: 12
+  percent: 75
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-14)
 ## Current Position
 
 Phase: 06 (icloud-keychain-sync) — EXECUTING
-Plan: 3 of 6
+Plan: 4 of 6
 Status: Ready to execute
 Last activity: 2026-04-18
 
@@ -62,6 +62,7 @@ Progress: [██████████] 100%
 | Phase 03 P02 | 5min | 2 tasks | 6 files |
 | Phase 06 P01 | 8min | 6 tasks | 12 files |
 | Phase 06 P02 | 8min | 3 tasks | 4 files |
+| Phase 06 P03 | 11min | 5 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -105,6 +106,11 @@ Recent decisions affecting current work:
 - [Phase 06]: [Phase 06]: transient save(_:) shim retained in KeychainManager so AccountStore keeps compiling — TODO(Plan 03) removes it
 - [Phase 06]: [Phase 06]: ICLOUD-13 static tests read Shared/*.swift via Bundle(for:).url(forResource:withExtension: 'swift.txt') — Run-Script build phase copies sources into the test bundle to bypass simulator sandbox
 - [Phase 06]: [Phase 06]: KeychainProviding.swift and SyncPreference.swift wired into KeyAuthKeyboard target so the extension can compile the sync-aware KeychainManager
+- [Phase 06]: Plan 03: AccountStore accepts injected KeychainProviding for testability; default remains KeychainManager.shared
+- [Phase 06]: Plan 03: NSUbiquitousKeyValueStore accounts-version counter only bumps when SyncPreference.isEnabled (RESEARCH Open Q #6)
+- [Phase 06]: Plan 03: ICloudStateObserver.previousIdentityToken typed AnyObject? (Apple opaque-token pattern) not the Swift 6-unfriendly existential composition
+- [Phase 06]: Plan 03: Added com.apple.developer.ubiquity-kvstore-identifier entitlement (Rule 2) — required for KVS counter-ping to function in production and tests
+- [Phase 06]: Plan 03: onChange(of:) uses iOS 16-compatible single-parameter form; project deployment target is 16.0 not 17.0
 
 ### Pending Todos
 
@@ -121,6 +127,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-18T13:56:04.343Z
-Stopped at: Completed 06-02-PLAN.md
+Last session: 2026-04-18T14:14:30.809Z
+Stopped at: Completed 06-03-PLAN.md
 Resume file: None
