@@ -23,6 +23,7 @@
 		140FCBAC17D3AB6F9E090BD1 /* TOTPGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB90502401FD358C36BAA33 /* TOTPGenerator.swift */; };
 		2DF26270B453948910DB4BBA /* AccountStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A617D6A6675B66C43394F4 /* AccountStore.swift */; };
 		303CC5F2ED328FAA1D84AF91 /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A363B81015F05C5B3C0DC5A7 /* QRScannerView.swift */; };
+		31653C12560562042FF28D1D /* KeyAuthTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3E6E0A119F9F10DD6ACEFF8 /* KeyAuthTests.swift */; };
 		36BAC07D5DCB4254476B546B /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2F607D627AF74A81912E77B /* KeychainManager.swift */; };
 		39235F8317E8D416D9E56670 /* TOTPGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB90502401FD358C36BAA33 /* TOTPGenerator.swift */; };
 		397D030A94C9EE738A01D917 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B936E7530F6ED79DACBA353 /* SharedDefaults.swift */; };
@@ -41,9 +42,17 @@
 		DC263CDF241B877ED7E67208 /* BiometricAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77D894396423F137C83BE1B /* BiometricAuthManager.swift */; };
 		E3A35868FCE3BB9A54CB5C51 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B936E7530F6ED79DACBA353 /* SharedDefaults.swift */; };
 		EA50FC6FE863B6FC2771CA3A /* Base32.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBDB95C539BA582A5BA3C248 /* Base32.swift */; };
+		F5B0DD36B290D188D1F35A53 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E7857BFF38538BDFBD953CB /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		A7448E601B13E0FB91156C64 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E712C809ACA7252446AAB40E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 81963171A87C4E3E2B5E48B4;
+			remoteInfo = KeyAuth;
+		};
 		B3639613976AB1C4F73DDA2D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E712C809ACA7252446AAB40E /* Project object */;
@@ -69,7 +78,9 @@
 
 /* Begin PBXFileReference section */
 		0B936E7530F6ED79DACBA353 /* SharedDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedDefaults.swift; sourceTree = "<group>"; };
+		1EEDE7031D24FC0865882CD7 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		257BEB070E267733198F5ECB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		3E7857BFF38538BDFBD953CB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		53ED4B44041710EEC7EE82C7 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		5C819D47267678FE6AAF9834 /* KeyAuthKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = KeyAuthKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		66FD2A0722CD350CFC3C3977 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
@@ -87,19 +98,40 @@
 		C3D4E5F60718293A4B5C6D7E /* RelayClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelayClient.swift; sourceTree = "<group>"; };
 		C50EFF20EB1E88A94EE865FB /* KeyAuthKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KeyAuthKeyboard.entitlements; sourceTree = "<group>"; };
 		CD58D52B0B77FD05FA679468 /* TOTPCodeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TOTPCodeCell.swift; sourceTree = "<group>"; };
+		CE19BE23449F4C4E145E3DDE /* KeyAuthTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeyAuthTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4E5F60718293A4B5C6D7E8F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D77D894396423F137C83BE1B /* BiometricAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuthManager.swift; sourceTree = "<group>"; };
 		E5F60718293A4B5C6D7E8F90 /* PairingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingView.swift; sourceTree = "<group>"; };
 		E9B0F9F5608AEF29BF6D1379 /* ManualEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualEntryView.swift; sourceTree = "<group>"; };
 		F261A828F30652E01C0E9158 /* KeyAuth.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KeyAuth.entitlements; sourceTree = "<group>"; };
 		F275264BB696FBD4F3AE1F3E /* KeyAuth.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeyAuth.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F3E6E0A119F9F10DD6ACEFF8 /* KeyAuthTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = KeyAuthTests.swift; sourceTree = "<group>"; };
 		F60718293A4B5C6D7E8F9001 /* PairingQRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingQRScannerView.swift; sourceTree = "<group>"; };
 		F6A4BC3FC29DD88F3A3F4603 /* AccountRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRowView.swift; sourceTree = "<group>"; };
 		FBDB95C539BA582A5BA3C248 /* Base32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Base32.swift; sourceTree = "<group>"; };
 		FD66B74369598846CBD85FE9 /* LockScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockScreenView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFrameworksBuildPhase section */
+		461E2888993FFA8C30DD1B9C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F5B0DD36B290D188D1F35A53 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
 /* Begin PBXGroup section */
+		02DD99BD1559847317105DBE /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Mocks;
+			path = Mocks;
+			sourceTree = "<group>";
+		};
 		25B3032FB0B5EA3576383B92 = {
 			isa = PBXGroup;
 			children = (
@@ -107,6 +139,8 @@
 				CA7D4A26F0D5904BAB4D1150 /* KeyboardExtension */,
 				2C1E04F976ABCC2AF0E06142 /* Shared */,
 				DD466FE661F9A5B6C0240C43 /* Products */,
+				405D9D2ABBA44DDBCF244C58 /* KeyAuthTests */,
+				AE9C83D0EF4288C702E96599 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -125,6 +159,34 @@
 				9FB90502401FD358C36BAA33 /* TOTPGenerator.swift */,
 			);
 			path = Shared;
+			sourceTree = "<group>";
+		};
+		3C8A1FCEC7A81E2D24A80E79 /* Fixtures */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Fixtures;
+			path = Fixtures;
+			sourceTree = "<group>";
+		};
+		405D9D2ABBA44DDBCF244C58 /* KeyAuthTests */ = {
+			isa = PBXGroup;
+			children = (
+				1EEDE7031D24FC0865882CD7 /* Info.plist */,
+				F3E6E0A119F9F10DD6ACEFF8 /* KeyAuthTests.swift */,
+				02DD99BD1559847317105DBE /* Mocks */,
+				3C8A1FCEC7A81E2D24A80E79 /* Fixtures */,
+			);
+			name = KeyAuthTests;
+			path = KeyAuthTests;
+			sourceTree = "<group>";
+		};
+		4A80CC9838185D19D54384C7 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				3E7857BFF38538BDFBD953CB /* Foundation.framework */,
+			);
+			name = iOS;
 			sourceTree = "<group>";
 		};
 		4D66AD27B6FB506960EC6F83 /* Views */ = {
@@ -155,6 +217,14 @@
 			path = App;
 			sourceTree = "<group>";
 		};
+		AE9C83D0EF4288C702E96599 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4A80CC9838185D19D54384C7 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		CA7D4A26F0D5904BAB4D1150 /* KeyboardExtension */ = {
 			isa = PBXGroup;
 			children = (
@@ -171,6 +241,7 @@
 			children = (
 				F275264BB696FBD4F3AE1F3E /* KeyAuth.app */,
 				5C819D47267678FE6AAF9834 /* KeyAuthKeyboard.appex */,
+				CE19BE23449F4C4E145E3DDE /* KeyAuthTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -189,8 +260,6 @@
 			dependencies = (
 			);
 			name = KeyAuthKeyboard;
-			packageProductDependencies = (
-			);
 			productName = KeyAuthKeyboard;
 			productReference = 5C819D47267678FE6AAF9834 /* KeyAuthKeyboard.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -208,11 +277,27 @@
 				72F97163FC94662E0608F999 /* PBXTargetDependency */,
 			);
 			name = KeyAuth;
-			packageProductDependencies = (
-			);
 			productName = KeyAuth;
 			productReference = F275264BB696FBD4F3AE1F3E /* KeyAuth.app */;
 			productType = "com.apple.product-type.application";
+		};
+		C2EB6995DED535682DCAEA67 /* KeyAuthTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B62DC844D517D5A477E10E27 /* Build configuration list for PBXNativeTarget "KeyAuthTests" */;
+			buildPhases = (
+				D602CA9AA1933FA22594EF89 /* Sources */,
+				461E2888993FFA8C30DD1B9C /* Frameworks */,
+				E30DA0D537F337BEBE46E3AC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3757F35A5FF9529A6BE6F70A /* PBXTargetDependency */,
+			);
+			name = KeyAuthTests;
+			productName = KeyAuthTests;
+			productReference = CE19BE23449F4C4E145E3DDE /* KeyAuthTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -247,9 +332,20 @@
 			targets = (
 				81963171A87C4E3E2B5E48B4 /* KeyAuth */,
 				048D7EB74B14F4A02C6D1482 /* KeyAuthKeyboard */,
+				C2EB6995DED535682DCAEA67 /* KeyAuthTests */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E30DA0D537F337BEBE46E3AC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8EAEA92F87BDAB2F34B0312E /* Sources */ = {
@@ -268,6 +364,14 @@
 				397D030A94C9EE738A01D917 /* SharedDefaults.swift in Sources */,
 				D721933D74AAA1C5D5ED1A8C /* TOTPCodeCell.swift in Sources */,
 				39235F8317E8D416D9E56670 /* TOTPGenerator.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D602CA9AA1933FA22594EF89 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				31653C12560562042FF28D1D /* KeyAuthTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -302,6 +406,12 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		3757F35A5FF9529A6BE6F70A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = KeyAuth;
+			target = 81963171A87C4E3E2B5E48B4 /* KeyAuth */;
+			targetProxy = A7448E601B13E0FB91156C64 /* PBXContainerItemProxy */;
+		};
 		72F97163FC94662E0608F999 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 048D7EB74B14F4A02C6D1482 /* KeyAuthKeyboard */;
@@ -427,6 +537,55 @@
 			};
 			name = Release;
 		};
+		748D3AA0FB69C3A5C3CD4DE8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = W646UCTVQV;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = KeyAuthTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.keyauth.KeyAuthTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KeyAuth.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/KeyAuth";
+			};
+			name = Debug;
+		};
+		778C413317EB099526835C6A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = W646UCTVQV;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = KeyAuthTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.keyauth.KeyAuthTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KeyAuth.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/KeyAuth";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		A5BC38F892D35F662988AE47 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -532,6 +691,15 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
+		};
+		B62DC844D517D5A477E10E27 /* Build configuration list for PBXNativeTarget "KeyAuthTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				778C413317EB099526835C6A /* Release */,
+				748D3AA0FB69C3A5C3CD4DE8 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

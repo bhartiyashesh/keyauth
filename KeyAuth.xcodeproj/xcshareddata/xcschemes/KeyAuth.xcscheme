@@ -51,6 +51,16 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "C2EB6995DED535682DCAEA67"
+               BuildableName = "KeyAuthTests.xctest"
+               BlueprintName = "KeyAuthTests"
+               ReferencedContainer = "container:KeyAuth.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
