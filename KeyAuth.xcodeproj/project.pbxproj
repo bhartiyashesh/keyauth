@@ -22,6 +22,7 @@
 		41C1774C02244DFC994DA61F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22F835ABFB64081A09A1D00 /* SettingsView.swift */; };
 		B1888D7E276B4B1C8DB79495 /* FirstLaunchSyncCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A160140CCA496993F9B687 /* FirstLaunchSyncCard.swift */; };
 		84723F00B3AE433AAC8827DB /* TransientToastOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B11C70565A244CB9B7FE900 /* TransientToastOverlay.swift */; };
+		1C2D89075EE44D52825B650A /* SettingsViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F5F40BD9A2740518C06CF87 /* SettingsViewTests.swift */; };
 		09DE7701F174F6FCB2FEDC68 /* KeyAuthApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3B10022A6CA17C6EA7903ED /* KeyAuthApp.swift */; };
 		1125BC4B99F63A77FCEC9E9F /* KeychainProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0067AC09E052201723A167 /* KeychainProviding.swift */; };
 		134541E376DBA37C916368BC /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53ED4B44041710EEC7EE82C7 /* Account.swift */; };
@@ -124,6 +125,7 @@
 		D22F835ABFB64081A09A1D00 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B0A160140CCA496993F9B687 /* FirstLaunchSyncCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstLaunchSyncCard.swift; sourceTree = "<group>"; };
 		6B11C70565A244CB9B7FE900 /* TransientToastOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransientToastOverlay.swift; sourceTree = "<group>"; };
+		0F5F40BD9A2740518C06CF87 /* SettingsViewTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsViewTests.swift; sourceTree = "<group>"; };
 		CD58D52B0B77FD05FA679468 /* TOTPCodeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TOTPCodeCell.swift; sourceTree = "<group>"; };
 		CE19BE23449F4C4E145E3DDE /* KeyAuthTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeyAuthTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2BFCC4627B98C62566737E4 /* AccountStoreTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AccountStoreTests.swift; sourceTree = "<group>"; };
@@ -215,6 +217,7 @@
 				14F33A224B6A75D63A754689 /* SyncScopeIsolationTests.swift */,
 				D2BFCC4627B98C62566737E4 /* AccountStoreTests.swift */,
 				5F2BCEE9018B227CAF93AEAD /* ICloudStateObserverTests.swift */,
+				0F5F40BD9A2740518C06CF87 /* SettingsViewTests.swift */,
 			);
 			name = KeyAuthTests;
 			path = KeyAuthTests;
@@ -402,6 +405,8 @@
 				"$(SRCROOT)/Shared/PairingStore.swift",
 				"$(SRCROOT)/Shared/CryptoBoxManager.swift",
 				"$(SRCROOT)/Shared/KeychainManager.swift",
+				"$(SRCROOT)/App/Views/SettingsView.swift",
+				"$(SRCROOT)/App/Views/FirstLaunchSyncCard.swift",
 			);
 			name = "Copy Shared Sources For Isolation Tests";
 			outputFileListPaths = (
@@ -410,10 +415,12 @@
 				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/PairingStore.swift.txt",
 				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/CryptoBoxManager.swift.txt",
 				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/KeychainManager.swift.txt",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/SettingsView.swift.txt",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/FirstLaunchSyncCard.swift.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\nSRC_DIR=\"${SRCROOT}/Shared\"\nDST_DIR=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\nmkdir -p \"${DST_DIR}\"\nfor name in PairingStore.swift CryptoBoxManager.swift KeychainManager.swift; do\n  cp \"${SRC_DIR}/${name}\" \"${DST_DIR}/${name}.txt\"\ndone\n";
+			shellScript = "set -e\nSHARED_DIR=\"${SRCROOT}/Shared\"\nVIEWS_DIR=\"${SRCROOT}/App/Views\"\nDST_DIR=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\nmkdir -p \"${DST_DIR}\"\nfor name in PairingStore.swift CryptoBoxManager.swift KeychainManager.swift; do\n  cp \"${SHARED_DIR}/${name}\" \"${DST_DIR}/${name}.txt\"\ndone\nfor name in SettingsView.swift FirstLaunchSyncCard.swift; do\n  cp \"${VIEWS_DIR}/${name}\" \"${DST_DIR}/${name}.txt\"\ndone\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -451,6 +458,7 @@
 				1D65228B1B7B515C16873BEF /* SyncScopeIsolationTests.swift in Sources */,
 				60561DC3663A9C696ACDC0BE /* AccountStoreTests.swift in Sources */,
 				090E176EC59228ADBFAF4B4A /* ICloudStateObserverTests.swift in Sources */,
+				1C2D89075EE44D52825B650A /* SettingsViewTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
