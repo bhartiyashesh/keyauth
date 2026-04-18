@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 06-05-PLAN.md
-last_updated: "2026-04-18T17:19:17.013Z"
+status: verifying
+stopped_at: Completed 06-06-PLAN.md — Phase 6 automated gate complete, awaiting manual QA sign-off
+last_updated: "2026-04-18T17:31:52.146Z"
 last_activity: 2026-04-18
 progress:
   total_phases: 6
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 16
-  completed_plans: 14
-  percent: 88
+  completed_plans: 15
+  percent: 94
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-14)
 
 Phase: 06 (icloud-keychain-sync) — EXECUTING
 Plan: 6 of 6
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-18
 
 Progress: [██████████] 100%
@@ -65,6 +65,7 @@ Progress: [██████████] 100%
 | Phase 06 P03 | 11min | 5 tasks | 9 files |
 | Phase 06 P04 | 12min | 5 tasks | 6 files |
 | Phase 06-icloud-keychain-sync P05 | 159min | 7 tasks | 11 files |
+| Phase 06-icloud-keychain-sync P06 | 6min | 5 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -121,6 +122,9 @@ Recent decisions affecting current work:
 - [Phase 06-icloud-keychain-sync]: Plan 05: MigrationCoordinator created lazily in KeyAuthApp.onAppear via @State Optional + 'if let migration' body gate — works around SwiftUI's prohibition on cross-@StateObject references during View.init
 - [Phase 06-icloud-keychain-sync]: Plan 05: RestoringFromCloudView.restoringTimeoutSeconds=30 is overridable via ContentView.evaluateRestoringState(timeout:) default parameter; RestoringStateTests injects 50ms for deterministic .restoring→.timedOut coverage (Blocker-3 closed)
 - [Phase 06-icloud-keychain-sync]: Plan 05: DedupKey.swift added to KeyAuthKeyboard target (was missing from Plan 06-01) — AccountStore now references DedupKey and AccountStore is in the keyboard target
+- [Phase 06-icloud-keychain-sync]: Plan 06: Hybrid coverage status vocabulary — Complete (automated) vs Complete (unit: TEST) / Manual QA pending 2-DEV-NN — preserves truth-in-claims while capturing real unit baselines for cross-device behaviors
+- [Phase 06-icloud-keychain-sync]: Plan 06: TransientToastOverlay placement deferred to a polish plan — documented as non-orphan in TRACEABILITY.md Known Gaps since core dedup-count behavior is tested
+- [Phase 06-icloud-keychain-sync]: Plan 06: ICLOUD-10 and ICLOUD-16 remain [ ] / Manual QA pending in REQUIREMENTS.md; 14 of 16 flipped to Complete (automated). ROADMAP Phase 6 does NOT flip to [x] until manual QA signs off 06-QA-CHECKLIST.md
 
 ### Pending Todos
 
@@ -137,6 +141,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-18T17:19:17.010Z
-Stopped at: Completed 06-05-PLAN.md
+Last session: 2026-04-18T17:31:52.143Z
+Stopped at: Completed 06-06-PLAN.md — Phase 6 automated gate complete, awaiting manual QA sign-off
 Resume file: None
