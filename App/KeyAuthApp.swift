@@ -6,8 +6,11 @@ struct KeyAuthApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var store = AccountStore()
     @StateObject private var pairingStore = PairingStore.shared
+    @StateObject private var icloudState = ICloudStateObserver.shared
+    @Environment(\.scenePhase) private var scenePhase
     @State private var isUnlocked = false
     @State private var deviceToken: String?
+    @State private var didBootstrapSyncPreference = false
 
     var body: some Scene {
         WindowGroup {
@@ -16,6 +19,7 @@ struct KeyAuthApp: App {
                     ContentView()
                         .environmentObject(store)
                         .environmentObject(pairingStore)
+                        .environmentObject(icloudState)
                 } else {
                     LockScreenView {
                         isUnlocked = true
@@ -23,8 +27,17 @@ struct KeyAuthApp: App {
                 }
             }
             .onAppear {
+                bootstrapSyncPreferenceOnce()
                 setupAppDelegate()
                 requestPushPermissionAndRegister()
+                // Ensure KVS has latest state cached locally.
+                NSUbiquitousKeyValueStore.default.synchronize()
+            }
+            .onChange(of: scenePhase) { newPhase in
+                if newPhase == .active {
+                    store.reload()
+                    NSUbiquitousKeyValueStore.default.synchronize()
+                }
             }
             .onReceive(
                 NotificationCenter.default.publisher(
@@ -44,6 +57,15 @@ struct KeyAuthApp: App {
                 RelayClient.shared.disconnect()
             }
         }
+    }
+
+    private func bootstrapSyncPreferenceOnce() {
+        guard !didBootstrapSyncPreference else { return }
+        didBootstrapSyncPreference = true
+        // Bootstrap needs the existing account count to differentiate new users (D-01) from
+        // existing users (D-02). Read SharedDefaults directly to avoid instantiating AccountStore twice.
+        let existingCount = SharedDefaults.loadAccounts().count
+        SyncPreference.bootstrap(existingAccountCount: existingCount)
     }
 
     private func setupAppDelegate() {
