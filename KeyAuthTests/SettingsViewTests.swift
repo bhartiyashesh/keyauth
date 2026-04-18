@@ -135,11 +135,16 @@ final class SettingsViewTests: XCTestCase {
     /// Create a SettingsView with env objects wired in — proves the View's stored properties
     /// resolve, the body tree constructs, and no initializer branch crashes. Wrapping in a
     /// UIHostingController forces SwiftUI to evaluate the body graph once.
+    ///
+    /// Plan 06-05: SettingsView now declares `@EnvironmentObject var migration: MigrationCoordinator`,
+    /// so the test must inject one alongside AccountStore + ICloudStateObserver.
     func testSettingsViewInstantiationDoesNotCrash() {
         let store = AccountStore(keychain: MockKeychain())
+        let migration = MigrationCoordinator(keychain: MockKeychain(), store: store)
         let view = SettingsView()
             .environmentObject(store)
             .environmentObject(ICloudStateObserver.shared)
+            .environmentObject(migration)
         let host = UIHostingController(rootView: view)
         XCTAssertNotNil(host.view, "SettingsView hosting controller must materialize its root view")
     }

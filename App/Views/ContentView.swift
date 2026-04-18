@@ -1,5 +1,10 @@
 import SwiftUI
 
+/// ICLOUD-16 state machine for the "Restoring from iCloud" empty-state.
+/// Transitions are driven by `ContentView.evaluateRestoringState(timeout:)` + the
+/// `onChange(of: store.accounts)` observer in ContentView.body.
+enum SyncState { case idle, restoring, restored, timedOut }
+
 struct ContentView: View {
     @EnvironmentObject var store: AccountStore
     @ObservedObject private var relayClient = RelayClient.shared
@@ -7,6 +12,8 @@ struct ContentView: View {
     @State private var showingManualEntry = false
     @State private var searchText = ""
     @State private var navigateToSettings = false
+    @State private var syncState: SyncState = .idle
+    @State private var restoringStartedAt: Date? = nil
 
     var filteredAccounts: [Account] {
         if searchText.isEmpty { return store.accounts }
@@ -22,20 +29,25 @@ struct ContentView: View {
                 if store.accounts.isEmpty {
                     ScrollView {
                         VStack(spacing: 16) {
-                            if SyncPreference.shouldShowFirstLaunchCard(accountsIsEmpty: true) {
-                                FirstLaunchSyncCard(
-                                    onDismiss: {
-                                        SyncPreference.markFirstLaunchCardSeen()
-                                    },
-                                    onManage: {
-                                        SyncPreference.markFirstLaunchCardSeen()
-                                        navigateToSettings = true
-                                    }
-                                )
-                                .padding(.top, 24)
+                            if syncState == .restoring {
+                                RestoringFromCloudView()
+                                    .padding(.top, 80)
+                            } else {
+                                if SyncPreference.shouldShowFirstLaunchCard(accountsIsEmpty: true) {
+                                    FirstLaunchSyncCard(
+                                        onDismiss: {
+                                            SyncPreference.markFirstLaunchCardSeen()
+                                        },
+                                        onManage: {
+                                            SyncPreference.markFirstLaunchCardSeen()
+                                            navigateToSettings = true
+                                        }
+                                    )
+                                    .padding(.top, 24)
+                                }
+                                emptyState
+                                    .padding(.top, SyncPreference.shouldShowFirstLaunchCard(accountsIsEmpty: true) ? 24 : 80)
                             }
-                            emptyState
-                                .padding(.top, SyncPreference.shouldShowFirstLaunchCard(accountsIsEmpty: true) ? 24 : 80)
                         }
                     }
                 } else {
@@ -116,6 +128,45 @@ struct ContentView: View {
                 }
                 .environmentObject(store)
             }
+            .onAppear {
+                evaluateRestoringState()
+            }
+            .onChange(of: store.accounts) { newAccounts in
+                if !newAccounts.isEmpty && syncState == .restoring {
+                    syncState = .restored
+                }
+            }
+        }
+    }
+
+    /// ICLOUD-16 restoring state machine.
+    ///
+    /// Trigger conditions for the `.idle → .restoring` transition: sync is enabled AND
+    /// accounts are still empty (fresh install / KVS not yet delivered). Enters `.restoring`
+    /// immediately, schedules a `timeout`-second delayed fallthrough to `.timedOut` if
+    /// accounts are still empty when the timer fires. If accounts arrive before the timer,
+    /// `onChange(of: store.accounts)` flips state to `.restored` instead.
+    ///
+    /// `timeout` defaults to `RestoringFromCloudView.restoringTimeoutSeconds` (30s production
+    /// value per D-09). `RestoringStateTests` injects sub-second values (50ms) to
+    /// deterministically exercise the `.restoring → .timedOut` transition without waiting
+    /// half a minute per test.
+    ///
+    /// Method is `internal` (default) so `@testable import KeyAuth` can reach it.
+    func evaluateRestoringState(timeout: TimeInterval = RestoringFromCloudView.restoringTimeoutSeconds) {
+        guard syncState == .idle else { return }
+        if SyncPreference.isEnabled && store.accounts.isEmpty {
+            syncState = .restoring
+            restoringStartedAt = Date()
+            let timeoutNanos = UInt64(timeout * 1_000_000_000)
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: timeoutNanos)
+                if syncState == .restoring && store.accounts.isEmpty {
+                    syncState = .timedOut
+                }
+            }
+        } else if !store.accounts.isEmpty && syncState == .restoring {
+            syncState = .restored
         }
     }
 

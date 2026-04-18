@@ -11,22 +11,36 @@ struct KeyAuthApp: App {
     @State private var isUnlocked = false
     @State private var deviceToken: String?
     @State private var didBootstrapSyncPreference = false
+    // MigrationCoordinator is constructed lazily in `.onAppear` because its init requires
+    // AccountStore; @StateObject init cannot reference other @StateObjects (SwiftUI prohibits
+    // that access during View init). Once created, we inject it via .environmentObject so
+    // SettingsView reads it as @EnvironmentObject var migration: MigrationCoordinator.
+    @State private var migration: MigrationCoordinator?
 
     var body: some Scene {
         WindowGroup {
             Group {
-                if isUnlocked {
-                    ContentView()
-                        .environmentObject(store)
-                        .environmentObject(pairingStore)
-                        .environmentObject(icloudState)
-                } else {
-                    LockScreenView {
-                        isUnlocked = true
+                if let migration {
+                    if isUnlocked {
+                        ContentView()
+                            .environmentObject(store)
+                            .environmentObject(pairingStore)
+                            .environmentObject(icloudState)
+                            .environmentObject(migration)
+                    } else {
+                        LockScreenView {
+                            isUnlocked = true
+                        }
                     }
+                } else {
+                    // Brief init flash before MigrationCoordinator is created in onAppear.
+                    Color.clear
                 }
             }
             .onAppear {
+                if migration == nil {
+                    migration = MigrationCoordinator(store: store)
+                }
                 bootstrapSyncPreferenceOnce()
                 setupAppDelegate()
                 requestPushPermissionAndRegister()

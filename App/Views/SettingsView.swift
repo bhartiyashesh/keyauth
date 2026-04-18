@@ -1,24 +1,23 @@
 import SwiftUI
 
-/// Phase 6 Settings surface — ICLOUD-04/05/06/14.
+/// Phase 6 Settings surface — ICLOUD-04/05/06/07/14/16.
 ///
 /// Copy strings below are VERBATIM from the UI-SPEC Copywriting Contract
 /// (.planning/phases/06-icloud-keychain-sync/06-UI-SPEC.md lines 131-170).
 /// Any change to these literals MUST update the UI-SPEC in the same commit —
 /// SettingsViewTests.swift grep-asserts each string for regression safety.
 ///
-/// NOTE (Plan 06-05 TODO): The two `confirmationDialog` action handlers are
-/// intentionally stubbed. "Stop syncing this device" flips `SyncPreference` off
-/// and logs — Plan 06-05 replaces this body with `MigrationCoordinator.stopSyncingThisDevice()`.
-/// "Remove from iCloud on all devices" currently logs and bounces the toggle
-/// back to ON (no state commit) — Plan 06-05 replaces this body with
-/// `MigrationCoordinator.removeFromICloudAllDevices()`.
+/// Plan 06-05 wired the three formerly-stubbed call sites (OFF→ON migration in
+/// `handleToggleChange`, `Stop syncing this device`, `Remove from iCloud on all devices`)
+/// to the real `MigrationCoordinator`. The toggle is now `.disabled` during migration
+/// AND during the 10-second destructive cooldown. A migration-progress Section renders
+/// when `total > 10`.
 struct SettingsView: View {
     @EnvironmentObject var store: AccountStore
     @EnvironmentObject var icloud: ICloudStateObserver
+    @EnvironmentObject var migration: MigrationCoordinator
     @State private var syncEnabled: Bool = SyncPreference.isEnabled
     @State private var showingDisableDialog = false
-    @State private var toggleCooldownUntil: Date? = nil
 
     // UI-SPEC Copywriting Contract — VERBATIM strings. Do not alter without updating UI-SPEC.
     private let disclosureD03 = "Your 2FA accounts sync to your other Apple devices using iCloud Keychain. Protected by your Apple ID and device passcode. Apple can't read them."
@@ -37,6 +36,10 @@ struct SettingsView: View {
         Form {
             syncSection
 
+            if migration.isRunning && migration.progress.total > 10 {
+                migrationProgressSection
+            }
+
             if !icloud.isICloudSignedIn {
                 openSettingsSection
             }
@@ -51,16 +54,20 @@ struct SettingsView: View {
             titleVisibility: .visible
         ) {
             Button("Stop syncing this device") {
-                // Plan 06-05 replaces this stub with MigrationCoordinator.stopSyncingThisDevice()
-                print("[Settings] Stop syncing this device tapped — stub; Plan 06-05 wires MigrationCoordinator")
-                SyncPreference.setEnabled(false)
-                syncEnabled = false
+                Task {
+                    await migration.stopSyncingThisDevice()
+                    syncEnabled = false
+                }
             }
             Button("Remove from iCloud on all devices", role: .destructive) {
-                // Plan 06-05 replaces this stub with MigrationCoordinator.removeFromICloudAllDevices()
-                print("[Settings] Remove from iCloud on all devices tapped — stub; Plan 06-05 wires MigrationCoordinator")
-                // Stub semantics: do NOT commit OFF — bounce the toggle back to ON.
-                syncEnabled = true
+                Task {
+                    do {
+                        try await migration.removeFromICloudAllDevices()
+                    } catch {
+                        // Error already surfaced via AccountStore.error.
+                    }
+                    syncEnabled = false
+                }
             }
             Button("Cancel", role: .cancel) {
                 // Cancel: toggle snaps back to ON (it was already forced back in handleToggleChange).
@@ -82,7 +89,7 @@ struct SettingsView: View {
     private var syncSection: some View {
         Section {
             Toggle("Sync with iCloud Keychain", isOn: $syncEnabled)
-                .disabled(!icloud.isICloudSignedIn || isInCooldown)
+                .disabled(!icloud.isICloudSignedIn || isInCooldown || migration.isRunning)
                 .onChange(of: syncEnabled) { newValue in
                     handleToggleChange(newValue: newValue)
                 }
@@ -92,6 +99,26 @@ struct SettingsView: View {
             Text(footerCopy)
                 .font(.footnote)
                 .foregroundStyle(.secondary)
+        }
+    }
+
+    /// Rendered in `body` when `migration.isRunning && migration.progress.total > 10`.
+    /// Header copy is VERBATIM per UI-SPEC Migration Progress section.
+    private var migrationProgressSection: some View {
+        Section {
+            HStack {
+                ProgressView(
+                    value: Double(migration.progress.done) / Double(max(migration.progress.total, 1))
+                )
+                Text("\(migration.progress.done) of \(migration.progress.total)")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .accessibilityLabel(
+                        "Migrating \(migration.progress.done) of \(migration.progress.total) accounts"
+                    )
+            }
+        } header: {
+            Text("Moving your accounts to iCloud…")
         }
     }
 
@@ -124,15 +151,16 @@ struct SettingsView: View {
     }
 
     private var isInCooldown: Bool {
-        guard let until = toggleCooldownUntil else { return false }
+        guard let until = migration.toggleCooldownUntil else { return false }
         return until > Date()
     }
 
     /// OFF-intercept state machine (UI-SPEC "Toggle interaction state machine"):
     /// - Old = ON, new = OFF → snap back to ON visually and open confirmation dialog; the
     ///   dialog's action buttons commit the final state.
-    /// - Old = OFF, new = ON → flip SyncPreference on. Plan 06-05 will hook
-    ///   MigrationCoordinator.migrateAllToSync() here.
+    /// - Old = OFF, new = ON → kick off `MigrationCoordinator.migrateAllToSync()`. The
+    ///   coordinator sets `SyncPreference.setEnabled(true)` after the bulk re-save loop,
+    ///   updates `store.lastDedupCount`, and exposes `isRunning`/`progress` for the UI.
     private func handleToggleChange(newValue: Bool) {
         let previousPreference = SyncPreference.isEnabled
         if previousPreference == true && newValue == false {
@@ -142,7 +170,11 @@ struct SettingsView: View {
             return
         }
         if previousPreference == false && newValue == true {
-            SyncPreference.setEnabled(true)
+            Task {
+                _ = await migration.migrateAllToSync()
+                // Dedup count is surfaced via store.lastDedupCount; downstream toast UI may
+                // be rendered by ContentView overlay or a future Settings footer.
+            }
         }
     }
 }
