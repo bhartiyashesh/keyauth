@@ -1,10 +1,11 @@
 ---
 phase: 6
 slug: icloud-keychain-sync
-status: draft
+status: approved
 shadcn_initialized: false
 preset: not applicable
 created: 2026-04-17
+reviewed_at: 2026-04-18
 platform: native-ios
 ui_framework: SwiftUI
 min_deployment: iOS 17+
@@ -232,6 +233,7 @@ ToolbarItem(placement: .primaryAction) {
         Image(systemName: "gearshape")
             .font(.title3)
     }
+    .accessibilityLabel("Settings")
 }
 // existing Menu stays as a second .primaryAction ToolbarItem
 ```
@@ -282,6 +284,7 @@ Required for every Phase 6 surface. Checker will audit.
 
 | Element | VoiceOver label | Trait / role | Dynamic Type |
 |---------|-----------------|--------------|--------------|
+| `ContentView` toolbar gear button | `.accessibilityLabel("Settings")` | `.isButton` (default from `NavigationLink`) | Yes |
 | Sync toggle | Inherits from `Toggle`: "Sync with iCloud Keychain, switch button, on/off" | `.isToggle` (default) | Yes (text style-based) |
 | Disclosure footer | Inherits from `Text` inside `Section` footer | `.isStaticText` | Yes |
 | "How is this secured?" DisclosureGroup | "How is this secured, collapsed/expanded" | `.isHeader` + `.isButton` (default) | Yes |
