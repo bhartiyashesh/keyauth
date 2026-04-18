@@ -30,13 +30,6 @@ final class KeychainManager {
 
     // MARK: - CRUD (sync-aware)
 
-    /// Transient shim so `AccountStore.add` / `AccountStore.move` continue to compile during
-    /// Plan 06-02 execution. Routes to the explicit API using the per-device sync preference.
-    /// TODO(Plan 03): remove after AccountStore migrates to `save(_:synchronizable:)`.
-    func save(_ account: Account) throws {
-        try save(account, synchronizable: SyncPreference.isEnabled)
-    }
-
     func save(_ account: Account, synchronizable: Bool) throws {
         let data = try JSONEncoder().encode(account)
         let key = account.id.uuidString
