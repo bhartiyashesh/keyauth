@@ -6,6 +6,7 @@ struct ContentView: View {
     @State private var showingScanner = false
     @State private var showingManualEntry = false
     @State private var searchText = ""
+    @State private var navigateToSettings = false
 
     var filteredAccounts: [Account] {
         if searchText.isEmpty { return store.accounts }
@@ -20,8 +21,22 @@ struct ContentView: View {
             Group {
                 if store.accounts.isEmpty {
                     ScrollView {
-                        emptyState
-                            .padding(.top, 80)
+                        VStack(spacing: 16) {
+                            if SyncPreference.shouldShowFirstLaunchCard(accountsIsEmpty: true) {
+                                FirstLaunchSyncCard(
+                                    onDismiss: {
+                                        SyncPreference.markFirstLaunchCardSeen()
+                                    },
+                                    onManage: {
+                                        SyncPreference.markFirstLaunchCardSeen()
+                                        navigateToSettings = true
+                                    }
+                                )
+                                .padding(.top, 24)
+                            }
+                            emptyState
+                                .padding(.top, SyncPreference.shouldShowFirstLaunchCard(accountsIsEmpty: true) ? 24 : 80)
+                        }
                     }
                 } else {
                     List {
@@ -70,6 +85,18 @@ struct ContentView: View {
                             .font(.title3)
                     }
                 }
+                ToolbarItem(placement: .primaryAction) {
+                    NavigationLink {
+                        SettingsView()
+                    } label: {
+                        Image(systemName: "gearshape")
+                            .font(.title3)
+                    }
+                    .accessibilityLabel("Settings")
+                }
+            }
+            .navigationDestination(isPresented: $navigateToSettings) {
+                SettingsView()
             }
             .sheet(isPresented: $showingScanner) {
                 QRScannerView { account in
