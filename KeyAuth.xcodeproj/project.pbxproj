@@ -21,12 +21,14 @@
 		09DE7701F174F6FCB2FEDC68 /* KeyAuthApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3B10022A6CA17C6EA7903ED /* KeyAuthApp.swift */; };
 		134541E376DBA37C916368BC /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53ED4B44041710EEC7EE82C7 /* Account.swift */; };
 		140FCBAC17D3AB6F9E090BD1 /* TOTPGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB90502401FD358C36BAA33 /* TOTPGenerator.swift */; };
+		1C81C526D208F5CD89FF8C41 /* MockKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21BF8AD08CE52AB890A8681B /* MockKeychain.swift */; };
 		2DF26270B453948910DB4BBA /* AccountStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A617D6A6675B66C43394F4 /* AccountStore.swift */; };
 		303CC5F2ED328FAA1D84AF91 /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A363B81015F05C5B3C0DC5A7 /* QRScannerView.swift */; };
 		31653C12560562042FF28D1D /* KeyAuthTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3E6E0A119F9F10DD6ACEFF8 /* KeyAuthTests.swift */; };
 		36BAC07D5DCB4254476B546B /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2F607D627AF74A81912E77B /* KeychainManager.swift */; };
 		39235F8317E8D416D9E56670 /* TOTPGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB90502401FD358C36BAA33 /* TOTPGenerator.swift */; };
 		397D030A94C9EE738A01D917 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B936E7530F6ED79DACBA353 /* SharedDefaults.swift */; };
+		45C549C784C3C53F8FBFDD18 /* AccountFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C8051142210AE88F41293B4 /* AccountFixtures.swift */; };
 		4844D244BD9520D76C35F9E4 /* AccountRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A4BC3FC29DD88F3A3F4603 /* AccountRowView.swift */; };
 		4932A600C06FB65F03EC0932 /* DedupKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE7D51430B679250C2B0E8C /* DedupKey.swift */; };
 		4C990E25D567C010E13C3F54 /* SyncPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE022AD51946B21D67526F8 /* SyncPreference.swift */; };
@@ -82,9 +84,11 @@
 /* Begin PBXFileReference section */
 		0B936E7530F6ED79DACBA353 /* SharedDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedDefaults.swift; sourceTree = "<group>"; };
 		1EEDE7031D24FC0865882CD7 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		21BF8AD08CE52AB890A8681B /* MockKeychain.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockKeychain.swift; sourceTree = "<group>"; };
 		257BEB070E267733198F5ECB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		3E7857BFF38538BDFBD953CB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		53ED4B44041710EEC7EE82C7 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
+		5C8051142210AE88F41293B4 /* AccountFixtures.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AccountFixtures.swift; sourceTree = "<group>"; };
 		5C819D47267678FE6AAF9834 /* KeyAuthKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = KeyAuthKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		66FD2A0722CD350CFC3C3977 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
 		7CFE1B0C62EDF21CB35A71B9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -133,6 +137,7 @@
 		02DD99BD1559847317105DBE /* Mocks */ = {
 			isa = PBXGroup;
 			children = (
+				21BF8AD08CE52AB890A8681B /* MockKeychain.swift */,
 			);
 			name = Mocks;
 			path = Mocks;
@@ -173,6 +178,7 @@
 		3C8A1FCEC7A81E2D24A80E79 /* Fixtures */ = {
 			isa = PBXGroup;
 			children = (
+				5C8051142210AE88F41293B4 /* AccountFixtures.swift */,
 			);
 			name = Fixtures;
 			path = Fixtures;
@@ -381,6 +387,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				31653C12560562042FF28D1D /* KeyAuthTests.swift in Sources */,
+				1C81C526D208F5CD89FF8C41 /* MockKeychain.swift in Sources */,
+				45C549C784C3C53F8FBFDD18 /* AccountFixtures.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
