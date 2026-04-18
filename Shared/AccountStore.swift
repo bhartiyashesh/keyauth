@@ -42,21 +42,60 @@ final class AccountStore: ObservableObject {
         SharedDefaults.saveAccounts(accounts)
     }
 
-    /// In-memory dedup pass (ICLOUD-08) — collapses duplicate accounts that share a
-    /// normalized (issuer, label, secret) `DedupKey`. Losers are DELETED from the Keychain
-    /// via `keychain.delete(id:)` (which removes BOTH sync and non-sync variants for that id).
+    /// In-memory dedup pass (ICLOUD-08).
     ///
-    /// D-08 tiebreak: EARLIEST `createdAt` wins (ASCENDING sort). If `createdAt` ties,
-    /// lexicographically smallest `id.uuidString` wins.
+    /// Two-phase pipeline:
+    ///
+    /// **Phase 1 — same-id collapse (post-D-06 / post-migration in-flight):**
+    /// After `MigrationCoordinator.stopSyncingThisDevice()`, the Keychain holds BOTH a
+    /// `synchronizable:true` variant and a `synchronizable:false` variant for the same
+    /// `account.id`. `loadAll()` with `kSecAttrSynchronizableAny` returns BOTH variants as
+    /// distinct Account objects that share the same `id`. We collapse these IN-MEMORY ONLY
+    /// (no Keychain mutation) — calling `keychain.delete(id:)` here would destroy both
+    /// variants and violate D-06's "other devices keep their copies" contract.
+    ///
+    /// This phase resolves the RESEARCH.md line 459 "Open question for the planner" in the
+    /// RESEARCH-sanctioned direction: "the dedup pass prefers one copy for display and does
+    /// NOT delete the synced copy."
+    ///
+    /// **Phase 2 — cross-id content dedup (ICLOUD-08):**
+    /// Group the id-deduped list by `DedupKey` (normalized issuer, label, secret). Groups
+    /// with >1 members are truly-separate accounts that happen to have the same 2FA content
+    /// (e.g. user added the same site on two devices before sync). D-08 tiebreak: EARLIEST
+    /// `createdAt` wins (ASCENDING sort). Tiebreak ties by `id.uuidString` ascending.
+    /// Losers get `keychain.delete(id:)` which purges both variants — correct for cross-id
+    /// dedup because the loser id is a genuinely-distinct account to merge away.
     ///
     /// CRITICAL: the comparator below uses `$0.createdAt < $1.createdAt` (ascending).
     /// A regression to `>` (descending / latest-wins) would violate D-08 and is caught by
     /// the `grep -F` fixed-string verification in Plan 06-05 Task 2.
     ///
-    /// Returns the number of duplicates deleted — `0` when no group has >1 member.
+    /// Returns the number of CROSS-ID dedup losers deleted from the Keychain. Same-id
+    /// variant collapses are NOT counted toward this number — they are not "duplicates" in
+    /// the user-visible sense, they are a Keychain storage artifact of the sync-toggle state
+    /// machine.
     private func dedupInMemory(_ list: inout [Account]) -> Int {
-        var groups: [DedupKey: [Account]] = [:]
+        // Phase 1: collapse same-id variants in-memory (no Keychain delete). If an account
+        // id appears more than once, keep exactly one representative. Prefer the non-sync
+        // variant when available (per RESEARCH line 459) — that's the copy we want the UI
+        // to reflect after reverse migration. If tied, keep the one with lowest sortOrder.
+        var idGroups: [UUID: [Account]] = [:]
         for account in list {
+            idGroups[account.id, default: []].append(account)
+        }
+        let idDeduped: [Account] = idGroups.values.map { variants in
+            guard variants.count > 1 else { return variants[0] }
+            // Deterministic tiebreak by sortOrder then createdAt — identical variants
+            // (same id, same content) mean this choice is UI-cosmetic, not data-destructive.
+            return variants.sorted {
+                if $0.sortOrder != $1.sortOrder { return $0.sortOrder < $1.sortOrder }
+                return $0.createdAt < $1.createdAt
+            }[0]
+        }
+
+        // Phase 2: cross-id content dedup via DedupKey (ICLOUD-08).
+        var groups: [DedupKey: [Account]] = [:]
+        for account in idDeduped {
             groups[DedupKey(account), default: []].append(account)
         }
         var deletedCount = 0
