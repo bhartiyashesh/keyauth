@@ -5,6 +5,10 @@ import Combine
 final class AccountStore: ObservableObject {
     @Published var accounts: [Account] = []
     @Published var error: String?
+    /// Number of duplicate accounts collapsed in the most recent `reload()` pass.
+    /// Consumed by SettingsView / ContentView for toast gating — silent when 0.
+    /// Populated by `dedupInMemory(_:)` per D-08 (earliest-createdAt wins, uuidString tiebreak).
+    @Published var lastDedupCount: Int = 0
 
     private let keychain: KeychainProviding
     private var reloadDebounceTask: Task<Void, Never>?
@@ -26,13 +30,56 @@ final class AccountStore: ObservableObject {
 
     func reload() {
         do {
-            accounts = try keychain.loadAll()
+            var loaded = try keychain.loadAll()
+            lastDedupCount = dedupInMemory(&loaded)
+            accounts = loaded
             error = nil
         } catch {
             self.error = error.localizedDescription
             accounts = []
+            lastDedupCount = 0
         }
         SharedDefaults.saveAccounts(accounts)
+    }
+
+    /// In-memory dedup pass (ICLOUD-08) — collapses duplicate accounts that share a
+    /// normalized (issuer, label, secret) `DedupKey`. Losers are DELETED from the Keychain
+    /// via `keychain.delete(id:)` (which removes BOTH sync and non-sync variants for that id).
+    ///
+    /// D-08 tiebreak: EARLIEST `createdAt` wins (ASCENDING sort). If `createdAt` ties,
+    /// lexicographically smallest `id.uuidString` wins.
+    ///
+    /// CRITICAL: the comparator below uses `$0.createdAt < $1.createdAt` (ascending).
+    /// A regression to `>` (descending / latest-wins) would violate D-08 and is caught by
+    /// the `grep -F` fixed-string verification in Plan 06-05 Task 2.
+    ///
+    /// Returns the number of duplicates deleted — `0` when no group has >1 member.
+    private func dedupInMemory(_ list: inout [Account]) -> Int {
+        var groups: [DedupKey: [Account]] = [:]
+        for account in list {
+            groups[DedupKey(account), default: []].append(account)
+        }
+        var deletedCount = 0
+        var keep: [Account] = []
+        for (_, group) in groups {
+            if group.count == 1 {
+                keep.append(group[0])
+                continue
+            }
+            // D-08: EARLIEST createdAt wins — ASCENDING sort. DO NOT reverse to latest-wins.
+            // Tiebreak by id.uuidString ascending.
+            let sorted = group.sorted {
+                if $0.createdAt != $1.createdAt { return $0.createdAt < $1.createdAt }
+                return $0.id.uuidString < $1.id.uuidString
+            }
+            keep.append(sorted[0])
+            for loser in sorted.dropFirst() {
+                try? keychain.delete(id: loser.id)
+                deletedCount += 1
+            }
+        }
+        list = keep.sorted { $0.sortOrder < $1.sortOrder }
+        return deletedCount
     }
 
     /// Debounced reload — coalesces bursty KVS notifications per RESEARCH.md lines 624-634.
