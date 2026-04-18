@@ -62,13 +62,13 @@
 - [x] **ICLOUD-07**: Flipping the toggle OFF→ON migrates all local-only accounts to synced storage by re-saving each with `synchronizable=true` and deleting the original non-sync copy, continuing on partial failure and surfacing the final count
 - [x] **ICLOUD-08**: After migration or fresh-sync, accounts with identical `(normalized issuer, normalized label, canonicalized secret)` are deduplicated to the one with the earliest `createdAt`; a toast shows "Merged N duplicate accounts" when N > 0
 - [x] **ICLOUD-09**: The "Remove from iCloud on all devices" action executes `SecItemDelete` with `kSecAttrSynchronizable: true` (not `SynchronizableAny`), preserving any non-synchronizable copies on the current device
-- [x] **ICLOUD-10**: When the app's `scenePhase` becomes `.active`, `AccountStore.reload()` is invoked and `NSUbiquitousKeyValueStore.synchronize()` is called
+- [ ] **ICLOUD-10**: When the app's `scenePhase` becomes `.active`, `AccountStore.reload()` is invoked and `NSUbiquitousKeyValueStore.synchronize()` is called
 - [x] **ICLOUD-11**: On every `KeychainManager.save` or `.delete` with sync enabled, an `accounts-version` Int64 counter in `NSUbiquitousKeyValueStore` is incremented; an observer on `didChangeExternallyNotification` triggers a coalesced (300ms debounce) `AccountStore.reload()` on `ServerChange` or `InitialSyncChange` reasons
 - [x] **ICLOUD-12**: After `AccountStore.reload()` completes, the updated account list is written to `SharedDefaults` so the keyboard extension's next activation reads fresh data
 - [x] **ICLOUD-13**: `PairingStore`, `CryptoBoxManager`, APNs device token storage, and any other per-device state do NOT set `kSecAttrSynchronizable=true` on their Keychain items; these items remain local to each device
 - [x] **ICLOUD-14**: When `FileManager.default.ubiquityIdentityToken` is nil, the sync toggle is disabled and shows the D-11 inline copy with a functional "Open iOS Settings" deep-link button
 - [x] **ICLOUD-15**: On `NSUbiquityIdentityDidChangeNotification` when the token becomes nil, the sync toggle flips to OFF and the D-12 inline copy is shown; when the token changes to a different non-nil value, the app treats this as a new iCloud account (clears SyncPreference, shows D-12 copy)
-- [x] **ICLOUD-16**: Fresh install with `syncPreference.enabled=true` AND empty accounts list shows "Restoring your accounts from iCloud…" state for up to a configurable timeout (default 30 seconds, overridable for tests via `RestoringFromCloudView.restoringTimeoutSeconds`); if `accounts-version` changes or accounts arrive within the window, transition to normal state; otherwise fall through to normal empty state
+- [ ] **ICLOUD-16**: Fresh install with `syncPreference.enabled=true` AND empty accounts list shows "Restoring your accounts from iCloud…" state for up to a configurable timeout (default 30 seconds, overridable for tests via `RestoringFromCloudView.restoringTimeoutSeconds`); if `accounts-version` changes or accounts arrive within the window, transition to normal state; otherwise fall through to normal empty state
 
 ## v2 Requirements
 
@@ -132,22 +132,22 @@
 | RESIL-03 | Phase 5 | Pending |
 | RESIL-04 | Phase 5 | Pending |
 | RESIL-05 | Phase 5 | Pending |
-| ICLOUD-01 | Phase 6 | Complete |
-| ICLOUD-02 | Phase 6 | Complete |
-| ICLOUD-03 | Phase 6 | Complete |
-| ICLOUD-04 | Phase 6 | Complete |
-| ICLOUD-05 | Phase 6 | Complete |
-| ICLOUD-06 | Phase 6 | Complete |
-| ICLOUD-07 | Phase 6 | Complete |
-| ICLOUD-08 | Phase 6 | Complete |
-| ICLOUD-09 | Phase 6 | Complete |
-| ICLOUD-10 | Phase 6 | Complete |
-| ICLOUD-11 | Phase 6 | Complete |
-| ICLOUD-12 | Phase 6 | Complete |
-| ICLOUD-13 | Phase 6 | Complete |
-| ICLOUD-14 | Phase 6 | Complete |
-| ICLOUD-15 | Phase 6 | Complete |
-| ICLOUD-16 | Phase 6 | Complete |
+| ICLOUD-01 | Phase 6 | Complete (automated) |
+| ICLOUD-02 | Phase 6 | Complete (automated) |
+| ICLOUD-03 | Phase 6 | Complete (automated) |
+| ICLOUD-04 | Phase 6 | Complete (automated) |
+| ICLOUD-05 | Phase 6 | Complete (automated) |
+| ICLOUD-06 | Phase 6 | Complete (automated) |
+| ICLOUD-07 | Phase 6 | Complete (automated) |
+| ICLOUD-08 | Phase 6 | Complete (automated) |
+| ICLOUD-09 | Phase 6 | Complete (automated) |
+| ICLOUD-10 | Phase 6 | Complete (unit) / Manual QA pending 2-DEV-06 |
+| ICLOUD-11 | Phase 6 | Complete (automated) |
+| ICLOUD-12 | Phase 6 | Complete (automated) |
+| ICLOUD-13 | Phase 6 | Complete (automated) |
+| ICLOUD-14 | Phase 6 | Complete (automated) |
+| ICLOUD-15 | Phase 6 | Complete (automated) |
+| ICLOUD-16 | Phase 6 | Complete (unit: RestoringStateTests.testTimeoutTransition) / Manual QA pending 2-DEV-05 |
 
 **Coverage:**
 - v1 requirements: 44 total
@@ -156,4 +156,4 @@
 
 ---
 *Requirements defined: 2026-04-15*
-*Last updated: 2026-04-18 — added ICLOUD-01..16 for Phase 6*
+*Last updated: 2026-04-18 — Phase 6 automated coverage complete (14 of 16 ICLOUD-NN `Complete (automated)`; ICLOUD-10 and ICLOUD-16 remain `Complete (unit) / Manual QA pending` for 2-DEV-06 and 2-DEV-05 respectively). ICLOUD-16 unit baseline provided by RestoringStateTests.testTimeoutTransition (Plan 06-05 Task 7).*
