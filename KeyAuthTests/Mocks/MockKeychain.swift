@@ -8,6 +8,7 @@ final class MockKeychain: KeychainProviding {
     var store: [Entry] = []
     var failSaveForIDs: Set<UUID> = []
     var failDeleteForIDs: Set<UUID> = []
+    var loadAllCallCount: Int = 0
 
     func save(_ account: Account, synchronizable: Bool) throws {
         if failSaveForIDs.contains(account.id) {
@@ -22,7 +23,8 @@ final class MockKeychain: KeychainProviding {
     }
 
     func loadAll() throws -> [Account] {
-        store.map(\.account).sorted { $0.sortOrder < $1.sortOrder }
+        loadAllCallCount += 1
+        return store.map(\.account).sorted { $0.sortOrder < $1.sortOrder }
     }
 
     func loadAllIncludingVariants() throws -> [(account: Account, isSync: Bool)] {

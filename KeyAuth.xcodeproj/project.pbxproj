@@ -36,6 +36,7 @@
 		4844D244BD9520D76C35F9E4 /* AccountRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A4BC3FC29DD88F3A3F4603 /* AccountRowView.swift */; };
 		4932A600C06FB65F03EC0932 /* DedupKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE7D51430B679250C2B0E8C /* DedupKey.swift */; };
 		4C990E25D567C010E13C3F54 /* SyncPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE022AD51946B21D67526F8 /* SyncPreference.swift */; };
+		60561DC3663A9C696ACDC0BE /* AccountStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2BFCC4627B98C62566737E4 /* AccountStoreTests.swift */; };
 		7C45AA2094BB85C02DE7E25C /* AccountStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A617D6A6675B66C43394F4 /* AccountStore.swift */; };
 		8AB8CA9FFB686759877B44F3 /* ICloudStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB8C9CBBAF5CF9C05346890 /* ICloudStateObserver.swift */; };
 		8F508CB2D15D9E973EDA238C /* BiometricAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77D894396423F137C83BE1B /* BiometricAuthManager.swift */; };
@@ -117,6 +118,7 @@
 		C8BD77D6D56F165FDBDF81F4 /* KeychainManagerSyncTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = KeychainManagerSyncTests.swift; sourceTree = "<group>"; };
 		CD58D52B0B77FD05FA679468 /* TOTPCodeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TOTPCodeCell.swift; sourceTree = "<group>"; };
 		CE19BE23449F4C4E145E3DDE /* KeyAuthTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeyAuthTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D2BFCC4627B98C62566737E4 /* AccountStoreTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AccountStoreTests.swift; sourceTree = "<group>"; };
 		D4E5F60718293A4B5C6D7E8F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D77D894396423F137C83BE1B /* BiometricAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuthManager.swift; sourceTree = "<group>"; };
 		DBE022AD51946B21D67526F8 /* SyncPreference.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SyncPreference.swift; sourceTree = "<group>"; };
@@ -203,6 +205,7 @@
 				3C8A1FCEC7A81E2D24A80E79 /* Fixtures */,
 				C8BD77D6D56F165FDBDF81F4 /* KeychainManagerSyncTests.swift */,
 				14F33A224B6A75D63A754689 /* SyncScopeIsolationTests.swift */,
+				D2BFCC4627B98C62566737E4 /* AccountStoreTests.swift */,
 			);
 			name = KeyAuthTests;
 			path = KeyAuthTests;
@@ -434,6 +437,7 @@
 				45C549C784C3C53F8FBFDD18 /* AccountFixtures.swift in Sources */,
 				A2C4414CA9210130F972AEE4 /* KeychainManagerSyncTests.swift in Sources */,
 				1D65228B1B7B515C16873BEF /* SyncScopeIsolationTests.swift in Sources */,
+				60561DC3663A9C696ACDC0BE /* AccountStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
