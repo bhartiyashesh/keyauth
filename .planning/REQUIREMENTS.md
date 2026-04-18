@@ -51,6 +51,25 @@
 - [ ] **IOS-03**: iOS app presents a TOTP approval sheet (account name, site, approve/deny + Face ID)
 - [x] **IOS-04**: iOS app includes a pairing management screen (view paired devices, unpair)
 
+### iCloud Keychain Sync
+
+- [ ] **ICLOUD-01**: `KeychainManager.save` accepts a `synchronizable: Bool` parameter and sets `kSecAttrSynchronizable` accordingly on SecItemAdd
+- [ ] **ICLOUD-02**: All Keychain read queries (`loadAll`, `load`) include `kSecAttrSynchronizable: kSecAttrSynchronizableAny` so both synced and non-synced items are matched
+- [ ] **ICLOUD-03**: `KeychainManager.delete(id:)` removes both the synced and non-synced copies of the specified account
+- [ ] **ICLOUD-04**: A Settings screen is accessible from the main toolbar via a gear button and contains a "Sync with iCloud Keychain" toggle with the D-03 disclosure footer verbatim
+- [ ] **ICLOUD-05**: New users (with no prior `hasSeenSyncFirstLaunchCard` flag) see a first-launch card above the accounts empty state with the D-03 copy and a "Got it" dismiss action
+- [ ] **ICLOUD-06**: Turning the sync toggle OFF opens a confirmation with two explicit options: "Stop syncing this device" (default) and "Remove from iCloud on all devices" (destructive, `role: .destructive`)
+- [ ] **ICLOUD-07**: Flipping the toggle OFF→ON migrates all local-only accounts to synced storage by re-saving each with `synchronizable=true` and deleting the original non-sync copy, continuing on partial failure and surfacing the final count
+- [ ] **ICLOUD-08**: After migration or fresh-sync, accounts with identical `(normalized issuer, normalized label, canonicalized secret)` are deduplicated to the one with the earliest `createdAt`; a toast shows "Merged N duplicate accounts" when N > 0
+- [ ] **ICLOUD-09**: The "Remove from iCloud on all devices" action executes `SecItemDelete` with `kSecAttrSynchronizable: true` (not `SynchronizableAny`), preserving any non-synchronizable copies on the current device
+- [ ] **ICLOUD-10**: When the app's `scenePhase` becomes `.active`, `AccountStore.reload()` is invoked and `NSUbiquitousKeyValueStore.synchronize()` is called
+- [ ] **ICLOUD-11**: On every `KeychainManager.save` or `.delete` with sync enabled, an `accounts-version` Int64 counter in `NSUbiquitousKeyValueStore` is incremented; an observer on `didChangeExternallyNotification` triggers a coalesced (300ms debounce) `AccountStore.reload()` on `ServerChange` or `InitialSyncChange` reasons
+- [ ] **ICLOUD-12**: After `AccountStore.reload()` completes, the updated account list is written to `SharedDefaults` so the keyboard extension's next activation reads fresh data
+- [ ] **ICLOUD-13**: `PairingStore`, `CryptoBoxManager`, APNs device token storage, and any other per-device state do NOT set `kSecAttrSynchronizable=true` on their Keychain items; these items remain local to each device
+- [ ] **ICLOUD-14**: When `FileManager.default.ubiquityIdentityToken` is nil, the sync toggle is disabled and shows the D-11 inline copy with a functional "Open iOS Settings" deep-link button
+- [ ] **ICLOUD-15**: On `NSUbiquityIdentityDidChangeNotification` when the token becomes nil, the sync toggle flips to OFF and the D-12 inline copy is shown; when the token changes to a different non-nil value, the app treats this as a new iCloud account (clears SyncPreference, shows D-12 copy)
+- [ ] **ICLOUD-16**: Fresh install with `syncPreference.enabled=true` AND empty accounts list shows "Restoring your accounts from iCloud…" state for up to a configurable timeout (default 30 seconds, overridable for tests via `RestoringFromCloudView.restoringTimeoutSeconds`); if `accounts-version` changes or accounts arrive within the window, transition to normal state; otherwise fall through to normal empty state
+
 ## v2 Requirements
 
 ### Security
@@ -113,12 +132,28 @@
 | RESIL-03 | Phase 5 | Pending |
 | RESIL-04 | Phase 5 | Pending |
 | RESIL-05 | Phase 5 | Pending |
+| ICLOUD-01 | Phase 6 | Pending |
+| ICLOUD-02 | Phase 6 | Pending |
+| ICLOUD-03 | Phase 6 | Pending |
+| ICLOUD-04 | Phase 6 | Pending |
+| ICLOUD-05 | Phase 6 | Pending |
+| ICLOUD-06 | Phase 6 | Pending |
+| ICLOUD-07 | Phase 6 | Pending |
+| ICLOUD-08 | Phase 6 | Pending |
+| ICLOUD-09 | Phase 6 | Pending |
+| ICLOUD-10 | Phase 6 | Pending |
+| ICLOUD-11 | Phase 6 | Pending |
+| ICLOUD-12 | Phase 6 | Pending |
+| ICLOUD-13 | Phase 6 | Pending |
+| ICLOUD-14 | Phase 6 | Pending |
+| ICLOUD-15 | Phase 6 | Pending |
+| ICLOUD-16 | Phase 6 | Pending |
 
 **Coverage:**
-- v1 requirements: 28 total
-- Mapped to phases: 28
+- v1 requirements: 44 total
+- Mapped to phases: 44
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-15*
-*Last updated: 2026-04-14 — corrected count to 28; traceability confirmed against ROADMAP.md*
+*Last updated: 2026-04-18 — added ICLOUD-01..16 for Phase 6*

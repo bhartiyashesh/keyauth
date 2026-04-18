@@ -98,7 +98,7 @@ Plans:
 ### Phase 6: iCloud Keychain Sync
 **Goal**: TOTP account secrets sync automatically across the user's Apple devices (iPhones, iPads) via iCloud Keychain — a new device restores all 2FA accounts after signing into Apple ID, with no extra setup
 **Depends on**: Phase 5 (can be executed in parallel if isolated to iOS components)
-**Requirements**: TBD
+**Requirements**: ICLOUD-01, ICLOUD-02, ICLOUD-03, ICLOUD-04, ICLOUD-05, ICLOUD-06, ICLOUD-07, ICLOUD-08, ICLOUD-09, ICLOUD-10, ICLOUD-11, ICLOUD-12, ICLOUD-13, ICLOUD-14, ICLOUD-15, ICLOUD-16
 **Success Criteria** (what must be TRUE):
   1. With iCloud sync enabled, TOTP accounts added on device A appear on device B (same Apple ID) within typical iCloud Keychain propagation time, without re-pairing or re-scanning QR codes
   2. The user is shown a clear disclosure of what iCloud sync means (secrets stored in iCloud, protected by Apple ID + device passcode) before enabling, and can toggle it off at any time in Settings
@@ -106,7 +106,7 @@ Plans:
   4. Disabling sync gives the user a clear choice: stop syncing this device only, or remove all synced copies from iCloud across all devices
   5. The keyboard extension continues to see the same accounts as the app (via shared App Group) whether sync is enabled or not
   6. Device-bound data (pairings, identity keys, APNs tokens) explicitly does NOT sync — only TOTP account secrets do
-**Plans**: TBD
+**Plans**: 6 plans (06-01..06-06)
 
 **Execution Order:**
 Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6

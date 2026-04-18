@@ -19,8 +19,8 @@ created: 2026-04-18
 |----------|-------|
 | **Framework** | XCTest (via Xcode — target does not yet exist, Wave 0 creates it) |
 | **Config file** | `KeyAuth.xcodeproj` (test target to be added in Wave 0) |
-| **Quick run command** | `xcodebuild test -project KeyAuth.xcodeproj -scheme KeyAuthTests -destination 'platform=iOS Simulator,name=iPhone 15' -only-testing:KeyAuthTests/{TestClass}` |
-| **Full suite command** | `xcodebuild test -project KeyAuth.xcodeproj -scheme KeyAuthTests -destination 'platform=iOS Simulator,name=iPhone 15'` |
+| **Quick run command** | `xcodebuild test -project KeyAuth.xcodeproj -scheme KeyAuth -destination 'platform=iOS Simulator,name=iPhone 15' -only-testing:KeyAuthTests/{TestClass}` |
+| **Full suite command** | `xcodebuild test -project KeyAuth.xcodeproj -scheme KeyAuth -destination 'platform=iOS Simulator,name=iPhone 15' -only-testing:KeyAuthTests` |
 | **Estimated runtime** | ~30-60 seconds (unit tests only — integration + two-device QA is out-of-band) |
 
 ---
