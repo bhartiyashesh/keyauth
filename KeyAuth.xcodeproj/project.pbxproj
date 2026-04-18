@@ -17,6 +17,7 @@
 		06E5F607A8B9C0D1E2F3A4B5 /* PairingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F60718293A4B5C6D7E8F90 /* PairingView.swift */; };
 		07F60718A9B0C1D2E3F4A5B6 /* PairingQRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60718293A4B5C6D7E8F9001 /* PairingQRScannerView.swift */; };
 		08A71829AAB1C2D3E4F5A6B7 /* PairedDeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A718293A4B5C6D7E8F900112 /* PairedDeviceView.swift */; };
+		090E176EC59228ADBFAF4B4A /* ICloudStateObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F2BCEE9018B227CAF93AEAD /* ICloudStateObserverTests.swift */; };
 		09B8293ABBC2D3E4F5A6B7C8 /* CodeApprovalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8293A4B5C6D7E8F90011234 /* CodeApprovalView.swift */; };
 		09DE7701F174F6FCB2FEDC68 /* KeyAuthApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3B10022A6CA17C6EA7903ED /* KeyAuthApp.swift */; };
 		1125BC4B99F63A77FCEC9E9F /* KeychainProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0067AC09E052201723A167 /* KeychainProviding.swift */; };
@@ -99,6 +100,7 @@
 		53ED4B44041710EEC7EE82C7 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		5C8051142210AE88F41293B4 /* AccountFixtures.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AccountFixtures.swift; sourceTree = "<group>"; };
 		5C819D47267678FE6AAF9834 /* KeyAuthKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = KeyAuthKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		5F2BCEE9018B227CAF93AEAD /* ICloudStateObserverTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ICloudStateObserverTests.swift; sourceTree = "<group>"; };
 		66FD2A0722CD350CFC3C3977 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
 		7CFE1B0C62EDF21CB35A71B9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		96A617D6A6675B66C43394F4 /* AccountStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountStore.swift; sourceTree = "<group>"; };
@@ -206,6 +208,7 @@
 				C8BD77D6D56F165FDBDF81F4 /* KeychainManagerSyncTests.swift */,
 				14F33A224B6A75D63A754689 /* SyncScopeIsolationTests.swift */,
 				D2BFCC4627B98C62566737E4 /* AccountStoreTests.swift */,
+				5F2BCEE9018B227CAF93AEAD /* ICloudStateObserverTests.swift */,
 			);
 			name = KeyAuthTests;
 			path = KeyAuthTests;
@@ -438,6 +441,7 @@
 				A2C4414CA9210130F972AEE4 /* KeychainManagerSyncTests.swift in Sources */,
 				1D65228B1B7B515C16873BEF /* SyncScopeIsolationTests.swift in Sources */,
 				60561DC3663A9C696ACDC0BE /* AccountStoreTests.swift in Sources */,
+				090E176EC59228ADBFAF4B4A /* ICloudStateObserverTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
