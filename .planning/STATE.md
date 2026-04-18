@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 6 context gathered
-last_updated: "2026-04-18T01:22:31.322Z"
-last_activity: 2026-04-15
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-04-18T13:42:54.834Z"
+last_activity: 2026-04-18
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 10
-  completed_plans: 9
-  percent: 90
+  total_plans: 16
+  completed_plans: 10
+  percent: 63
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-14)
 
 **Core value:** One-click TOTP code delivery from phone to browser — secrets never leave the phone
-**Current focus:** Phase 03 — chrome-extension-core
+**Current focus:** Phase 06 — icloud-keychain-sync
 
 ## Current Position
 
-Phase: 03 (chrome-extension-core) — EXECUTING
-Plan: 3 of 3
+Phase: 06 (icloud-keychain-sync) — EXECUTING
+Plan: 2 of 6
 Status: Ready to execute
-Last activity: 2026-04-15
+Last activity: 2026-04-18
 
 Progress: [██████████] 100%
 
@@ -60,6 +60,7 @@ Progress: [██████████] 100%
 | Phase 02 P02 | 5min | 2 tasks | 6 files |
 | Phase 03 P01 | 6min | 2 tasks | 15 files |
 | Phase 03 P02 | 5min | 2 tasks | 6 files |
+| Phase 06 P01 | 8min | 6 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -95,6 +96,10 @@ Recent decisions affecting current work:
 - [Phase 03]: defineBackground used as WXT auto-imported global (not from wxt/sandbox)
 - [Phase 03]: QR payload JSON matches iOS PairingQRPayload: { roomId, relayURL, publicKey }
 - [Phase 03]: Service worker owns WebSocket; popup communicates via chrome.runtime.sendMessage only
+- [Phase 06]: SyncPreference uses UserDefaults.standard (not App Group) — per-device UX state, not cross-process data
+- [Phase 06]: KeyAuthTests added as TestableReference inside existing 'KeyAuth' scheme (no standalone scheme) — matches downstream plans 02-06
+- [Phase 06]: KeychainProviding protocol declared in Shared/ with zero conformances; KeychainManager extension deferred to Plan 02
+- [Phase 06]: Ruby xcodeproj gem used for all project.pbxproj edits to preserve UUIDs/scheme XML integrity
 
 ### Pending Todos
 
@@ -111,6 +116,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-18T01:22:31.313Z
-Stopped at: Phase 6 context gathered
-Resume file: .planning/phases/06-icloud-keychain-sync/06-CONTEXT.md
+Last session: 2026-04-18T13:42:54.831Z
+Stopped at: Completed 06-01-PLAN.md
+Resume file: None
