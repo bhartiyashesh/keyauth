@@ -105,6 +105,10 @@ None yet.
 - APNs p8 key and Team ID required before Phase 1 relay can send pushes — obtain from Apple Developer portal before starting Phase 2 work
 - ~~Railway project must be created and CLI configured before Phase 1 deploy step~~ RESOLVED: deployed to cooperative-respect-production-29f8.up.railway.app
 
+### Roadmap Evolution
+
+- 2026-04-17: Phase 6 added — iCloud Keychain Sync (TOTP seed sync across Apple devices, user opt-in with migration)
+
 ## Session Continuity
 
 Last session: 2026-04-15T19:57:23.292Z

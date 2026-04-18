@@ -17,6 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 3: Chrome Extension Core** - Build the popup, service worker, and full request-to-code flow end-to-end
 - [ ] **Phase 4: Auto-Fill + Domain Matching** - Detect TOTP fields in the browser and inject received codes automatically
 - [ ] **Phase 5: Resilience** - Harden reconnection, session rebuild, and stale token handling across all three runtimes
+- [ ] **Phase 6: iCloud Keychain Sync** - Sync TOTP seeds across Apple devices via iCloud Keychain with user opt-in and migration
 
 ## Phase Details
 
@@ -94,10 +95,21 @@ Plans:
   5. If the extension's WebSocket drops unexpectedly, it reconnects and rejoins its room automatically so the next code request succeeds without the user reparing
 **Plans**: TBD
 
-## Progress
+### Phase 6: iCloud Keychain Sync
+**Goal**: TOTP account secrets sync automatically across the user's Apple devices (iPhones, iPads) via iCloud Keychain — a new device restores all 2FA accounts after signing into Apple ID, with no extra setup
+**Depends on**: Phase 5 (can be executed in parallel if isolated to iOS components)
+**Requirements**: TBD
+**Success Criteria** (what must be TRUE):
+  1. With iCloud sync enabled, TOTP accounts added on device A appear on device B (same Apple ID) within typical iCloud Keychain propagation time, without re-pairing or re-scanning QR codes
+  2. The user is shown a clear disclosure of what iCloud sync means (secrets stored in iCloud, protected by Apple ID + device passcode) before enabling, and can toggle it off at any time in Settings
+  3. Existing users who already have local-only accounts can migrate them to iCloud sync with a single confirmation, without losing any accounts or creating duplicates
+  4. Disabling sync gives the user a clear choice: stop syncing this device only, or remove all synced copies from iCloud across all devices
+  5. The keyboard extension continues to see the same accounts as the app (via shared App Group) whether sync is enabled or not
+  6. Device-bound data (pairings, identity keys, APNs tokens) explicitly does NOT sync — only TOTP account secrets do
+**Plans**: TBD
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -106,3 +118,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 3. Chrome Extension Core | 0/3 | Not started | - |
 | 4. Auto-Fill + Domain Matching | 0/TBD | Not started | - |
 | 5. Resilience | 0/TBD | Not started | - |
+| 6. iCloud Keychain Sync | 0/TBD | Not started | - |
