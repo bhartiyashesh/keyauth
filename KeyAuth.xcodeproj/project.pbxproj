@@ -28,6 +28,7 @@
 		39235F8317E8D416D9E56670 /* TOTPGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB90502401FD358C36BAA33 /* TOTPGenerator.swift */; };
 		397D030A94C9EE738A01D917 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B936E7530F6ED79DACBA353 /* SharedDefaults.swift */; };
 		4844D244BD9520D76C35F9E4 /* AccountRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A4BC3FC29DD88F3A3F4603 /* AccountRowView.swift */; };
+		4932A600C06FB65F03EC0932 /* DedupKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE7D51430B679250C2B0E8C /* DedupKey.swift */; };
 		4C990E25D567C010E13C3F54 /* SyncPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE022AD51946B21D67526F8 /* SyncPreference.swift */; };
 		7C45AA2094BB85C02DE7E25C /* AccountStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A617D6A6675B66C43394F4 /* AccountStore.swift */; };
 		8F508CB2D15D9E973EDA238C /* BiometricAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77D894396423F137C83BE1B /* BiometricAuthManager.swift */; };
@@ -93,6 +94,7 @@
 		A363B81015F05C5B3C0DC5A7 /* QRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerView.swift; sourceTree = "<group>"; };
 		A718293A4B5C6D7E8F900112 /* PairedDeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairedDeviceView.swift; sourceTree = "<group>"; };
 		AB0067AC09E052201723A167 /* KeychainProviding.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = KeychainProviding.swift; sourceTree = "<group>"; };
+		AFE7D51430B679250C2B0E8C /* DedupKey.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DedupKey.swift; sourceTree = "<group>"; };
 		B2C3D4E5F60718293A4B5C6D /* PairingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingStore.swift; sourceTree = "<group>"; };
 		B8293A4B5C6D7E8F90011234 /* CodeApprovalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeApprovalView.swift; sourceTree = "<group>"; };
 		BF6A6B00B9DA3EE988C03876 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -163,6 +165,7 @@
 				9FB90502401FD358C36BAA33 /* TOTPGenerator.swift */,
 				AB0067AC09E052201723A167 /* KeychainProviding.swift */,
 				DBE022AD51946B21D67526F8 /* SyncPreference.swift */,
+				AFE7D51430B679250C2B0E8C /* DedupKey.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -408,6 +411,7 @@
 				09B8293ABBC2D3E4F5A6B7C8 /* CodeApprovalView.swift in Sources */,
 				B7FEAA83061573BF32207988 /* KeychainProviding.swift in Sources */,
 				4C990E25D567C010E13C3F54 /* SyncPreference.swift in Sources */,
+				4932A600C06FB65F03EC0932 /* DedupKey.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
