@@ -170,25 +170,25 @@
 | ICLOUD-14 | Phase 6 | Complete (automated) |
 | ICLOUD-15 | Phase 6 | Complete (automated) |
 | ICLOUD-16 | Phase 6 | Complete (unit: RestoringStateTests.testTimeoutTransition) / Manual QA pending 2-DEV-05 |
-| FIDO-01 | Phase 7 | Pending |
-| FIDO-02 | Phase 7 | Pending |
-| FIDO-03 | Phase 7 | Pending |
-| FIDO-04 | Phase 7 | Pending |
-| FIDO-05 | Phase 7 | Pending |
-| FIDO-06 | Phase 7 | Pending |
-| FIDO-07 | Phase 7 | Pending |
-| FIDO-08 | Phase 7 | Pending |
-| FIDO-09 | Phase 7 | Pending |
-| FIDO-10 | Phase 7 | Pending |
-| FIDO-11 | Phase 7 | Pending |
-| FIDO-12 | Phase 7 | Pending |
-| FIDO-13 | Phase 7 | Pending |
-| FIDO-14 | Phase 7 | Pending |
-| FIDO-15 | Phase 7 | Pending |
-| FIDO-16 | Phase 7 | Pending |
-| FIDO-17 | Phase 7 | Pending |
-| FIDO-18 | Phase 7 | Pending |
-| FIDO-19 | Phase 7 | Pending |
+| FIDO-01 | Phase 7 | Complete (automated) |
+| FIDO-02 | Phase 7 | Complete (automated) |
+| FIDO-03 | Phase 7 | Complete (automated) |
+| FIDO-04 | Phase 7 | Complete (automated) |
+| FIDO-05 | Phase 7 | Complete (automated) |
+| FIDO-06 | Phase 7 | Complete (automated) |
+| FIDO-07 | Phase 7 | Complete (automated) |
+| FIDO-08 | Phase 7 | Complete (automated) |
+| FIDO-09 | Phase 7 | Complete (automated) |
+| FIDO-10 | Phase 7 | Complete (automated) |
+| FIDO-11 | Phase 7 | Complete (automated) |
+| FIDO-12 | Phase 7 | Complete (automated) |
+| FIDO-13 | Phase 7 | Complete (automated) |
+| FIDO-14 | Phase 7 | Complete (automated) |
+| FIDO-15 | Phase 7 | Complete (automated) |
+| FIDO-16 | Phase 7 | Complete (automated) |
+| FIDO-17 | Phase 7 | Complete (automated) |
+| FIDO-18 | Phase 7 | Manual QA pending 2-DEV-TW-01 |
+| FIDO-19 | Phase 7 | Manual QA pending 2-DEV-TW-02 |
 
 **Coverage:**
 - v1 requirements: 63 total
@@ -197,4 +197,4 @@
 
 ---
 *Requirements defined: 2026-04-15*
-*Last updated: 2026-04-19 — added FIDO-01..19 for Phase 7 (FaceID Capability Tokens).*
+*Last updated: 2026-04-19 — Phase 7 automated coverage complete (17 of 19 FIDO-NN `Complete (automated)`; FIDO-18 and FIDO-19 remain `Manual QA pending` for 2-DEV-TW-01 and 2-DEV-TW-02 respectively).*
