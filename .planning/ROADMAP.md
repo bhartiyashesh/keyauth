@@ -141,4 +141,4 @@ Plans:
 - [x] 07-05-PLAN.md — TransientToastOverlay duration parameterization + CodeApprovalView mint + delete startAutoRefresh
 - [x] 07-06-PLAN.md — KeyAuthApp wiring: @StateObject, EnvironmentObject, bootstrap, resolver closure
 - [x] 07-07-PLAN.md — SettingsView toggle + ContentView overlay mount + extend SettingsViewTests
-- [ ] 07-08-PLAN.md — Traceability flip, QA checklist, STATE.md update
+- [x] 07-08-PLAN.md — Traceability flip, QA checklist, STATE.md update
