@@ -27,6 +27,7 @@
 		1C81C526D208F5CD89FF8C41 /* MockKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21BF8AD08CE52AB890A8681B /* MockKeychain.swift */; };
 		1D65228B1B7B515C16873BEF /* SyncScopeIsolationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F33A224B6A75D63A754689 /* SyncScopeIsolationTests.swift */; };
 		1DD2443D7ED78FDBB9052247 /* SyncPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE022AD51946B21D67526F8 /* SyncPreference.swift */; };
+		1EF2EEFFCD66040E1644538C /* CodeRequestFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58AC46A3D01F68F5421CF7E9 /* CodeRequestFixtures.swift */; };
 		2A5C33EAD7AEF9993A943C24 /* MigrationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83B1535245138F0D15FDFB6 /* MigrationCoordinator.swift */; };
 		2DF26270B453948910DB4BBA /* AccountStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A617D6A6675B66C43394F4 /* AccountStore.swift */; };
 		303CC5F2ED328FAA1D84AF91 /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A363B81015F05C5B3C0DC5A7 /* QRScannerView.swift */; };
@@ -43,13 +44,16 @@
 		4C990E25D567C010E13C3F54 /* SyncPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE022AD51946B21D67526F8 /* SyncPreference.swift */; };
 		57E1486F5EA0B9FBF8A2875B /* RestoringFromCloudView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 036E0D43962D2204DC56B64D /* RestoringFromCloudView.swift */; };
 		60561DC3663A9C696ACDC0BE /* AccountStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2BFCC4627B98C62566737E4 /* AccountStoreTests.swift */; };
+		61CC4E609B27D652D81F9F69 /* TrustWindowManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6753FEAEAA7C45F78993C4CA /* TrustWindowManagerTests.swift */; };
 		7B29368E0F781CFDCA108985 /* MigrationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83B1535245138F0D15FDFB6 /* MigrationCoordinator.swift */; };
 		7C45AA2094BB85C02DE7E25C /* AccountStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A617D6A6675B66C43394F4 /* AccountStore.swift */; };
 		84723F00B3AE433AAC8827DB /* TransientToastOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B11C70565A244CB9B7FE900 /* TransientToastOverlay.swift */; };
 		8AB8CA9FFB686759877B44F3 /* ICloudStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB8C9CBBAF5CF9C05346890 /* ICloudStateObserver.swift */; };
 		8F508CB2D15D9E973EDA238C /* BiometricAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77D894396423F137C83BE1B /* BiometricAuthManager.swift */; };
 		90126D11E1B5F3FE14878A63 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FD2A0722CD350CFC3C3977 /* KeyboardViewController.swift */; };
+		9B85464F34CE6B4994CA0184 /* TrustWindowPreferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0603D3BB0BC31E8894954A /* TrustWindowPreferenceTests.swift */; };
 		A2C4414CA9210130F972AEE4 /* KeychainManagerSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8BD77D6D56F165FDBDF81F4 /* KeychainManagerSyncTests.swift */; };
+		A6ABF3F04878C3DA2BA1C9FB /* RelayClientSilentSendTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B8575CB228C2521A93AF2B /* RelayClientSilentSendTests.swift */; };
 		A6E4292AEC1EB61B57497759 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFE1B0C62EDF21CB35A71B9 /* ContentView.swift */; };
 		B1888D7E276B4B1C8DB79495 /* FirstLaunchSyncCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A160140CCA496993F9B687 /* FirstLaunchSyncCard.swift */; };
 		B7FEAA83061573BF32207988 /* KeychainProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0067AC09E052201723A167 /* KeychainProviding.swift */; };
@@ -60,6 +64,7 @@
 		D570E90BFDE51539D5BD89A9 /* RestoringStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B87D7FDD50FED1F07CBC6C /* RestoringStateTests.swift */; };
 		D721933D74AAA1C5D5ED1A8C /* TOTPCodeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD58D52B0B77FD05FA679468 /* TOTPCodeCell.swift */; };
 		D7C2C2457F00C2A913C3CDD8 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53ED4B44041710EEC7EE82C7 /* Account.swift */; };
+		D9298754667C669455520CEF /* KeyboardPropagationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C42BF0A5EE050AFC308974F /* KeyboardPropagationTests.swift */; };
 		DAB02D5464CB2FFC0179B960 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2F607D627AF74A81912E77B /* KeychainManager.swift */; };
 		DC263CDF241B877ED7E67208 /* BiometricAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77D894396423F137C83BE1B /* BiometricAuthManager.swift */; };
 		E3A35868FCE3BB9A54CB5C51 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B936E7530F6ED79DACBA353 /* SharedDefaults.swift */; };
@@ -67,7 +72,6 @@
 		EA50FC6FE863B6FC2771CA3A /* Base32.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBDB95C539BA582A5BA3C248 /* Base32.swift */; };
 		F5B0DD36B290D188D1F35A53 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E7857BFF38538BDFBD953CB /* Foundation.framework */; };
 		F965CB2D35812D90E4B87865 /* DedupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F431A29721C71204675845D6 /* DedupTests.swift */; };
-		D9298754667C669455520CEF /* KeyboardPropagationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C42BF0A5EE050AFC308974F /* KeyboardPropagationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -108,14 +112,18 @@
 		14F33A224B6A75D63A754689 /* SyncScopeIsolationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SyncScopeIsolationTests.swift; sourceTree = "<group>"; };
 		1CB8C9CBBAF5CF9C05346890 /* ICloudStateObserver.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ICloudStateObserver.swift; sourceTree = "<group>"; };
 		1EEDE7031D24FC0865882CD7 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		20B8575CB228C2521A93AF2B /* RelayClientSilentSendTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RelayClientSilentSendTests.swift; sourceTree = "<group>"; };
 		21BF8AD08CE52AB890A8681B /* MockKeychain.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockKeychain.swift; sourceTree = "<group>"; };
 		257BEB070E267733198F5ECB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		3C42BF0A5EE050AFC308974F /* KeyboardPropagationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = KeyboardPropagationTests.swift; sourceTree = "<group>"; };
 		3E7857BFF38538BDFBD953CB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		53ED4B44041710EEC7EE82C7 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
+		58AC46A3D01F68F5421CF7E9 /* CodeRequestFixtures.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CodeRequestFixtures.swift; sourceTree = "<group>"; };
 		5C8051142210AE88F41293B4 /* AccountFixtures.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AccountFixtures.swift; sourceTree = "<group>"; };
 		5C819D47267678FE6AAF9834 /* KeyAuthKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = KeyAuthKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F2BCEE9018B227CAF93AEAD /* ICloudStateObserverTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ICloudStateObserverTests.swift; sourceTree = "<group>"; };
 		66FD2A0722CD350CFC3C3977 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
+		6753FEAEAA7C45F78993C4CA /* TrustWindowManagerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TrustWindowManagerTests.swift; sourceTree = "<group>"; };
 		6B11C70565A244CB9B7FE900 /* TransientToastOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransientToastOverlay.swift; sourceTree = "<group>"; };
 		7CFE1B0C62EDF21CB35A71B9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		96A617D6A6675B66C43394F4 /* AccountStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountStore.swift; sourceTree = "<group>"; };
@@ -142,6 +150,7 @@
 		D2BFCC4627B98C62566737E4 /* AccountStoreTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AccountStoreTests.swift; sourceTree = "<group>"; };
 		D4E5F60718293A4B5C6D7E8F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D77D894396423F137C83BE1B /* BiometricAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuthManager.swift; sourceTree = "<group>"; };
+		DA0603D3BB0BC31E8894954A /* TrustWindowPreferenceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TrustWindowPreferenceTests.swift; sourceTree = "<group>"; };
 		DBE022AD51946B21D67526F8 /* SyncPreference.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SyncPreference.swift; sourceTree = "<group>"; };
 		E5F60718293A4B5C6D7E8F90 /* PairingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingView.swift; sourceTree = "<group>"; };
 		E9B0F9F5608AEF29BF6D1379 /* ManualEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualEntryView.swift; sourceTree = "<group>"; };
@@ -150,7 +159,6 @@
 		F275264BB696FBD4F3AE1F3E /* KeyAuth.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeyAuth.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F3E6E0A119F9F10DD6ACEFF8 /* KeyAuthTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = KeyAuthTests.swift; sourceTree = "<group>"; };
 		F431A29721C71204675845D6 /* DedupTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DedupTests.swift; sourceTree = "<group>"; };
-		3C42BF0A5EE050AFC308974F /* KeyboardPropagationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = KeyboardPropagationTests.swift; sourceTree = "<group>"; };
 		F60718293A4B5C6D7E8F9001 /* PairingQRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingQRScannerView.swift; sourceTree = "<group>"; };
 		F6A4BC3FC29DD88F3A3F4603 /* AccountRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRowView.swift; sourceTree = "<group>"; };
 		FBDB95C539BA582A5BA3C248 /* Base32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Base32.swift; sourceTree = "<group>"; };
@@ -216,6 +224,7 @@
 			isa = PBXGroup;
 			children = (
 				5C8051142210AE88F41293B4 /* AccountFixtures.swift */,
+				58AC46A3D01F68F5421CF7E9 /* CodeRequestFixtures.swift */,
 			);
 			name = Fixtures;
 			path = Fixtures;
@@ -237,6 +246,9 @@
 				F431A29721C71204675845D6 /* DedupTests.swift */,
 				B1B87D7FDD50FED1F07CBC6C /* RestoringStateTests.swift */,
 				3C42BF0A5EE050AFC308974F /* KeyboardPropagationTests.swift */,
+				6753FEAEAA7C45F78993C4CA /* TrustWindowManagerTests.swift */,
+				DA0603D3BB0BC31E8894954A /* TrustWindowPreferenceTests.swift */,
+				20B8575CB228C2521A93AF2B /* RelayClientSilentSendTests.swift */,
 			);
 			name = KeyAuthTests;
 			path = KeyAuthTests;
@@ -485,6 +497,10 @@
 				F965CB2D35812D90E4B87865 /* DedupTests.swift in Sources */,
 				D570E90BFDE51539D5BD89A9 /* RestoringStateTests.swift in Sources */,
 				D9298754667C669455520CEF /* KeyboardPropagationTests.swift in Sources */,
+				61CC4E609B27D652D81F9F69 /* TrustWindowManagerTests.swift in Sources */,
+				9B85464F34CE6B4994CA0184 /* TrustWindowPreferenceTests.swift in Sources */,
+				A6ABF3F04878C3DA2BA1C9FB /* RelayClientSilentSendTests.swift in Sources */,
+				1EF2EEFFCD66040E1644538C /* CodeRequestFixtures.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
