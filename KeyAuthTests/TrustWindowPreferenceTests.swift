@@ -2,7 +2,8 @@ import XCTest
 import Foundation
 @testable import KeyAuth
 
-/// Wave 0 scaffold — filled in Plan 07-02 (TrustWindowPreference helper).
+/// Plan 07-02: FIDO-14 and FIDO-16 unit tests — bootstrap default ON,
+/// setEnabled round-trip persistence, bootstrap idempotency.
 @MainActor
 final class TrustWindowPreferenceTests: XCTestCase {
 
@@ -20,16 +21,25 @@ final class TrustWindowPreferenceTests: XCTestCase {
 
     // FIDO-16: fresh-install bootstrap defaults to ON
     func testBootstrapDefaultsToEnabled() throws {
-        throw XCTSkip("Wave 0 scaffold — filled in Plan 07-02.")
+        TrustWindowPreference.bootstrap()
+        XCTAssertTrue(TrustWindowPreference.isEnabled,
+            "FIDO-16 / D-16: fresh install must default trust_window_enabled = true")
     }
 
     // FIDO-14: setEnabled persists through a re-read
     func testSetEnabledPersistsInUserDefaults() throws {
-        throw XCTSkip("Wave 0 scaffold — filled in Plan 07-02.")
+        TrustWindowPreference.setEnabled(false)
+        XCTAssertFalse(TrustWindowPreference.isEnabled)
+        TrustWindowPreference.setEnabled(true)
+        XCTAssertTrue(TrustWindowPreference.isEnabled)
     }
 
-    // FIDO-14: bootstrap is idempotent — second call after setEnabled(false) does not flip back to ON
+    // FIDO-14 / Pitfall 6: bootstrap is idempotent — does NOT overwrite user's manual OFF
     func testBootstrapIsIdempotentAfterManualSet() throws {
-        throw XCTSkip("Wave 0 scaffold — filled in Plan 07-02.")
+        TrustWindowPreference.bootstrap()       // first launch — sets ON
+        TrustWindowPreference.setEnabled(false) // user toggles OFF in Settings
+        TrustWindowPreference.bootstrap()       // subsequent launch — MUST be a no-op
+        XCTAssertFalse(TrustWindowPreference.isEnabled,
+            "bootstrap() must not re-enable after a manual setEnabled(false)")
     }
 }
