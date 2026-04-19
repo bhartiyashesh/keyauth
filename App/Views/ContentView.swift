@@ -7,6 +7,7 @@ enum SyncState { case idle, restoring, restored, timedOut }
 
 struct ContentView: View {
     @EnvironmentObject var store: AccountStore
+    @EnvironmentObject var trustWindow: TrustWindowManager
     @ObservedObject private var relayClient = RelayClient.shared
     @State private var showingScanner = false
     @State private var showingManualEntry = false
@@ -128,6 +129,19 @@ struct ContentView: View {
                 }
                 .environmentObject(store)
             }
+            .overlay(alignment: .top) {
+                if let toast = trustWindow.pendingToast {
+                    TransientToastOverlay(
+                        message: toast.text,
+                        icon: "paperplane.fill",
+                        iconColor: .secondary,
+                        duration: 2.0,
+                        isPresented: .constant(true)
+                    )
+                    .padding(.top, 8)
+                }
+            }
+            .animation(.easeInOut(duration: 0.2), value: trustWindow.pendingToast)
             .onAppear {
                 evaluateRestoringState()
             }

@@ -17,6 +17,7 @@ struct SettingsView: View {
     @EnvironmentObject var icloud: ICloudStateObserver
     @EnvironmentObject var migration: MigrationCoordinator
     @State private var syncEnabled: Bool = SyncPreference.isEnabled
+    @State private var trustWindowEnabled: Bool = TrustWindowPreference.isEnabled
     @State private var showingDisableDialog = false
 
     // UI-SPEC Copywriting Contract — VERBATIM strings. Do not alter without updating UI-SPEC.
@@ -35,6 +36,7 @@ struct SettingsView: View {
     var body: some View {
         Form {
             syncSection
+            trustWindowSection
 
             if migration.isRunning && migration.progress.total > 10 {
                 migrationProgressSection
@@ -97,6 +99,25 @@ struct SettingsView: View {
             Text("Sync")
         } footer: {
             Text(footerCopy)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    /// Phase 7 FIDO-15: 2-minute trust window after FaceID toggle.
+    /// Copy strings below are VERBATIM from UI-SPEC Copywriting Contract (lines 144-156).
+    /// Changes to these literals MUST update the UI-SPEC in the same commit —
+    /// SettingsViewTests.swift grep-asserts each string.
+    private var trustWindowSection: some View {
+        Section {
+            Toggle("Allow 2-minute trust window after FaceID", isOn: $trustWindowEnabled)
+                .onChange(of: trustWindowEnabled) { newValue in
+                    TrustWindowPreference.setEnabled(newValue)
+                }
+        } header: {
+            Text("Security")
+        } footer: {
+            Text("Skip FaceID for requests within 2 minutes of approval. Each new FaceID starts a fresh 2 minutes. The window ends when the app goes to the background.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
         }
