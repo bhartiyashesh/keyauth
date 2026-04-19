@@ -139,6 +139,6 @@ Plans:
 - [x] 07-03-PLAN.md — TrustWindowManager core singleton (mint, revoke, isInWindow, toast) + fill manager tests
 - [x] 07-04-PLAN.md — RelayClient silent-send branch + accountResolver closure + fill silent-send tests
 - [x] 07-05-PLAN.md — TransientToastOverlay duration parameterization + CodeApprovalView mint + delete startAutoRefresh
-- [ ] 07-06-PLAN.md — KeyAuthApp wiring: @StateObject, EnvironmentObject, bootstrap, resolver closure
-- [ ] 07-07-PLAN.md — SettingsView toggle + ContentView overlay mount + extend SettingsViewTests
+- [x] 07-06-PLAN.md — KeyAuthApp wiring: @StateObject, EnvironmentObject, bootstrap, resolver closure
+- [x] 07-07-PLAN.md — SettingsView toggle + ContentView overlay mount + extend SettingsViewTests
 - [ ] 07-08-PLAN.md — Traceability flip, QA checklist, STATE.md update
