@@ -16,6 +16,12 @@ final class RelayClient: ObservableObject {
     /// Called once after WebSocket connection is established. Set by pairing flow to send ack.
     var onConnected: (() -> Void)?
 
+    /// Resolves a decoded `CodeRequest` to a concrete `Account`. Set ONCE by KeyAuthApp.onAppear.
+    /// Returns `nil` when the request is ambiguous — the silent-send branch falls through to FaceID.
+    /// Anti-drift with `CodeApprovalView.onAppear` is guaranteed by Plan 07-05 routing both
+    /// call sites through `AccountStore.resolve(for:)`.
+    var accountResolver: ((CodeRequest) -> Account?)?
+
     private var webSocketTask: URLSessionWebSocketTask?
     private var session: URLSession?
     private(set) var roomId: String?
@@ -161,7 +167,7 @@ final class RelayClient: ObservableObject {
                       let request = try? JSONDecoder().decode(CodeRequest.self, from: plaintext)
                 else { return }
 
-                pendingCodeRequest = request
+                handleDecodedRequest(request)
             }
 
         case .data:
@@ -170,6 +176,34 @@ final class RelayClient: ObservableObject {
         @unknown default:
             break
         }
+    }
+
+    /// Silent-send gate (Phase 7 FIDO-09 / FIDO-10). Extracted from the `default:` clause so
+    /// unit tests can call it directly with a CodeRequestFixtures-built `CodeRequest` without
+    /// needing a live WebSocket or PairingStore.
+    ///
+    /// Silent path (ALL must hold):
+    ///   - `TrustWindowManager.shared.isInWindow == true` (FIDO-02 + Pitfall 7 lazy check)
+    ///   - `TrustWindowPreference.isEnabled == true` (FIDO-03 / D-17 redundant guard)
+    ///   - `accountResolver != nil`
+    ///   - `accountResolver(request)` returns a non-nil `Account`
+    ///   - `TOTPGenerator.generate(for: account)` returns a code
+    ///
+    /// Any failure → fall through to the existing `pendingCodeRequest = request` behavior
+    /// (CodeApprovalView will present to the user).
+    internal func handleDecodedRequest(_ request: CodeRequest) {
+        if TrustWindowManager.shared.isInWindow,
+           TrustWindowPreference.isEnabled,
+           let resolver = accountResolver,
+           let account = resolver(request),
+           let code = TOTPGenerator.generate(for: account) {
+            sendEncryptedCode(code, requestId: request.id,
+                              issuer: account.issuer, label: account.label)
+            TrustWindowManager.shared.showToast(for: account.issuer)
+            return
+        }
+
+        pendingCodeRequest = request
     }
 
     // MARK: - Reconnection

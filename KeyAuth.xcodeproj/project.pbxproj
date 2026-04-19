@@ -47,6 +47,7 @@
 		60561DC3663A9C696ACDC0BE /* AccountStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2BFCC4627B98C62566737E4 /* AccountStoreTests.swift */; };
 		61CC4E609B27D652D81F9F69 /* TrustWindowManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6753FEAEAA7C45F78993C4CA /* TrustWindowManagerTests.swift */; };
 		70A1D62A984AB106092D2C9B /* TrustWindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A5BC8822DEB7279C12015C4 /* TrustWindowManager.swift */; };
+		70A1D62A984AB106092D2C9C /* TrustWindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A5BC8822DEB7279C12015C4 /* TrustWindowManager.swift */; };
 		7B29368E0F781CFDCA108985 /* MigrationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83B1535245138F0D15FDFB6 /* MigrationCoordinator.swift */; };
 		7C45AA2094BB85C02DE7E25C /* AccountStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A617D6A6675B66C43394F4 /* AccountStore.swift */; };
 		84723F00B3AE433AAC8827DB /* TransientToastOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B11C70565A244CB9B7FE900 /* TransientToastOverlay.swift */; };
@@ -486,6 +487,7 @@
 				2A5C33EAD7AEF9993A943C24 /* MigrationCoordinator.swift in Sources */,
 				3F5AEA8E74494AB5ADB8C320 /* DedupKey.swift in Sources */,
 				2D95F23CC78A987AFAD1B18E /* TrustWindowPreference.swift in Sources */,
+				70A1D62A984AB106092D2C9C /* TrustWindowManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
