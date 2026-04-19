@@ -138,6 +138,7 @@ None yet.
 ### Roadmap Evolution
 
 - 2026-04-17: Phase 6 added — iCloud Keychain Sync (TOTP seed sync across Apple devices, user opt-in with migration)
+- 2026-04-19: Phase 7 added — FaceID Capability Tokens (CTAP-inspired scoped+TTL authorization; mint after FaceID, reuse across {origin, account_id} for 5 min; eliminates re-prompts during re-auth loops without weakening phishing resistance)
 
 ## Session Continuity
 

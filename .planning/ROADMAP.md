@@ -109,13 +109,29 @@ Plans:
 **Plans**: 6 plans (06-01..06-06)
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Relay Server | 4/4 | Complete | 2026-04-15 |
 | 2. iOS Relay Client + Pairing | 3/3 | Complete | 2026-04-15 |
-| 3. Chrome Extension Core | 0/3 | Not started | - |
+| 3. Chrome Extension Core | 2/3 | In Progress | - |
 | 4. Auto-Fill + Domain Matching | 0/TBD | Not started | - |
 | 5. Resilience | 0/TBD | Not started | - |
-| 6. iCloud Keychain Sync | 3/6 | In Progress | - |
+| 6. iCloud Keychain Sync | 6/6 | Conditional Pass (manual QA pending) | - |
+| 7. FaceID Capability Tokens | 0/TBD | Not planned | - |
+
+### Phase 7: FaceID Capability Tokens
+
+**Goal:** Replace per-fetch FaceID with scoped, TTL'd authorization tokens (CTAP-inspired) to eliminate prompts during re-auth loops on the same login page, without weakening phishing resistance.
+
+**Description:**
+After a FaceID-approved fetch, mint an in-memory capability token scoped to `{origin, account_id}` with a 5-minute TTL. Subsequent fetches matching the same scope skip FaceID; any mismatch (different origin, different account, expired TTL) re-prompts. iOS side holds a long-lived `LAContext` using `touchIDAuthenticationAllowableReuseDuration`, with an app-level scope map layered on top. The relay envelope must carry a verified origin captured by the Chrome extension via `chrome.tabs` (not user-supplied) so phishing sites cannot reuse tokens minted for real sites. Revocation paths: app background > N seconds, iCloud account change (already tracked by `ICloudStateObserver` from Phase 6), or explicit "Lock now" action. A Settings toggle disables the feature entirely; per-fetch FaceID remains the default-safe fallback.
+
+**Requirements:** TBD (to be registered as FIDO-NN rows during planning)
+**Depends on:** Phase 6 (reuses `ICloudStateObserver` for revocation on iCloud account change)
+**Directory:** `.planning/phases/07-faceid-capability-tokens/`
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run `/gsd-plan-phase 7` to break down)
