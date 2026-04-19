@@ -70,6 +70,28 @@
 - [x] **ICLOUD-15**: On `NSUbiquityIdentityDidChangeNotification` when the token becomes nil, the sync toggle flips to OFF and the D-12 inline copy is shown; when the token changes to a different non-nil value, the app treats this as a new iCloud account (clears SyncPreference, shows D-12 copy)
 - [ ] **ICLOUD-16**: Fresh install with `syncPreference.enabled=true` AND empty accounts list shows "Restoring your accounts from iCloud…" state for up to a configurable timeout (default 30 seconds, overridable for tests via `RestoringFromCloudView.restoringTimeoutSeconds`); if `accounts-version` changes or accounts arrive within the window, transition to normal state; otherwise fall through to normal empty state
 
+### FaceID Capability Tokens
+
+- [ ] **FIDO-01**: `TrustWindowManager.shared` is an `@MainActor` ObservableObject singleton exposing `isInWindow: Bool` derived from `windowExpiresAt: Date?`. State is transient — not persisted to Keychain or UserDefaults, reset to `isInWindow == false` on app launch.
+- [ ] **FIDO-02**: `TrustWindowManager.mint()` sets `windowExpiresAt = Date().addingTimeInterval(120)` when `TrustWindowPreference.isEnabled == true`.
+- [ ] **FIDO-03**: When `TrustWindowPreference.isEnabled == false`, `TrustWindowManager.mint()` is a no-op and `isInWindow` remains `false` (D-17 enforcement).
+- [ ] **FIDO-04**: TTL is fixed-from-mint: calling `mint()` twice within 2 minutes replaces the expiry with `t2 + 120s` (fresh 2 min), not extended beyond a single mint (D-03, D-04).
+- [ ] **FIDO-05**: `TrustWindowManager.isInWindow` returns `false` automatically after `windowExpiresAt` passes, via a lazy `now() < exp` check on every access (belt-and-suspenders for Pitfall 7 — D-07).
+- [ ] **FIDO-06**: Receiving `UIApplication.didEnterBackgroundNotification` revokes the window: `windowExpiresAt = nil` (D-05).
+- [ ] **FIDO-07**: Observing `ICloudStateObserver.shared.$didAccountChange == true` revokes the window (D-06).
+- [ ] **FIDO-08**: `CodeApprovalView.approveAndSend` calls `TrustWindowManager.shared.mint()` after `BiometricAuthManager.authenticate` returns `true` AND before the `Task.sleep` that dismisses the sheet (D-01).
+- [ ] **FIDO-09**: `RelayClient.handleMessage` silent-send branch: when `TrustWindowManager.shared.isInWindow == true` AND `accountResolver` returns a non-nil account, it generates a TOTP code, calls `sendEncryptedCode`, fires the toast via `TrustWindowManager.shared.showToast(for:)`, and does NOT set `pendingCodeRequest` (D-11, D-09).
+- [ ] **FIDO-10**: Silent-send falls back to FaceID (normal `pendingCodeRequest = request` flow) when `accountResolver` returns `nil` (ambiguous multi-match or no-match).
+- [ ] **FIDO-11**: Toast emits `"Code sent for <issuer>"` when `account.issuer` is non-empty; falls back to `"Code sent"` when issuer is empty (D-09, UI-SPEC Copywriting Contract).
+- [ ] **FIDO-12**: Toast self-dismisses after exactly 2.0 seconds (D-09, UI-SPEC Interaction Patterns toast lifecycle).
+- [ ] **FIDO-13**: `CodeApprovalView.startAutoRefresh(account:)` is deleted and no caller remains. A grep of `App/` and `Shared/` returns zero matches for `startAutoRefresh` (D-12).
+- [ ] **FIDO-14**: `TrustWindowPreference` (Shared/TrustWindowPreference.swift) mirrors `SyncPreference` shape: UserDefaults-backed `Bool` with `isEnabled`, `setEnabled`, and `bootstrap()` (no parameter) using separate `trust_window_enabled` and `hasLaunchedBeforeTrustWindow` keys.
+- [ ] **FIDO-15**: `SettingsView` exposes a Toggle with the exact label `"Allow 2-minute trust window after FaceID"` bound to `TrustWindowPreference.isEnabled`, with footer helper text verbatim from UI-SPEC Copywriting Contract (D-16).
+- [ ] **FIDO-16**: On fresh install, `TrustWindowPreference.bootstrap()` defaults `isEnabled == true` (D-16 — default ON for both new and existing users).
+- [ ] **FIDO-17**: `TrustWindowManager.windowExpiresAt` is NOT persisted; after a force-quit or relaunch, `isInWindow == false` (Claude's Discretion — not persisted).
+- [ ] **FIDO-18**: Toast overlay remains visible above `ContentView` after the `CodeApprovalView` sheet is dismissed from the mint moment (manual QA per UI-SPEC Interaction Patterns sheet/overlay invariant).
+- [ ] **FIDO-19**: The Chrome extension (`extension/`) source is NOT modified. Origin continues to travel in `CodeRequest.domain` only; no new envelope fields added (D-15).
+
 ## v2 Requirements
 
 ### Security
@@ -148,12 +170,31 @@
 | ICLOUD-14 | Phase 6 | Complete (automated) |
 | ICLOUD-15 | Phase 6 | Complete (automated) |
 | ICLOUD-16 | Phase 6 | Complete (unit: RestoringStateTests.testTimeoutTransition) / Manual QA pending 2-DEV-05 |
+| FIDO-01 | Phase 7 | Pending |
+| FIDO-02 | Phase 7 | Pending |
+| FIDO-03 | Phase 7 | Pending |
+| FIDO-04 | Phase 7 | Pending |
+| FIDO-05 | Phase 7 | Pending |
+| FIDO-06 | Phase 7 | Pending |
+| FIDO-07 | Phase 7 | Pending |
+| FIDO-08 | Phase 7 | Pending |
+| FIDO-09 | Phase 7 | Pending |
+| FIDO-10 | Phase 7 | Pending |
+| FIDO-11 | Phase 7 | Pending |
+| FIDO-12 | Phase 7 | Pending |
+| FIDO-13 | Phase 7 | Pending |
+| FIDO-14 | Phase 7 | Pending |
+| FIDO-15 | Phase 7 | Pending |
+| FIDO-16 | Phase 7 | Pending |
+| FIDO-17 | Phase 7 | Pending |
+| FIDO-18 | Phase 7 | Pending |
+| FIDO-19 | Phase 7 | Pending |
 
 **Coverage:**
-- v1 requirements: 44 total
-- Mapped to phases: 44
+- v1 requirements: 63 total
+- Mapped to phases: 63
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-15*
-*Last updated: 2026-04-18 — Phase 6 automated coverage complete (14 of 16 ICLOUD-NN `Complete (automated)`; ICLOUD-10 and ICLOUD-16 remain `Complete (unit) / Manual QA pending` for 2-DEV-06 and 2-DEV-05 respectively). ICLOUD-16 unit baseline provided by RestoringStateTests.testTimeoutTransition (Plan 06-05 Task 7).*
+*Last updated: 2026-04-19 — added FIDO-01..19 for Phase 7 (FaceID Capability Tokens).*

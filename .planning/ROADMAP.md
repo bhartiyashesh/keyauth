@@ -128,10 +128,17 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 **Description:**
 After a FaceID-approved fetch, mint an in-memory capability token scoped to `{origin, account_id}` with a 5-minute TTL. Subsequent fetches matching the same scope skip FaceID; any mismatch (different origin, different account, expired TTL) re-prompts. iOS side holds a long-lived `LAContext` using `touchIDAuthenticationAllowableReuseDuration`, with an app-level scope map layered on top. The relay envelope must carry a verified origin captured by the Chrome extension via `chrome.tabs` (not user-supplied) so phishing sites cannot reuse tokens minted for real sites. Revocation paths: app background > N seconds, iCloud account change (already tracked by `ICloudStateObserver` from Phase 6), or explicit "Lock now" action. A Settings toggle disables the feature entirely; per-fetch FaceID remains the default-safe fallback.
 
-**Requirements:** TBD (to be registered as FIDO-NN rows during planning)
+**Requirements:** FIDO-01, FIDO-02, FIDO-03, FIDO-04, FIDO-05, FIDO-06, FIDO-07, FIDO-08, FIDO-09, FIDO-10, FIDO-11, FIDO-12, FIDO-13, FIDO-14, FIDO-15, FIDO-16, FIDO-17, FIDO-18, FIDO-19
 **Depends on:** Phase 6 (reuses `ICloudStateObserver` for revocation on iCloud account change)
 **Directory:** `.planning/phases/07-faceid-capability-tokens/`
-**Plans:** 0 plans
+**Plans:** 8 plans (07-01..07-08)
 
 Plans:
-- [ ] TBD (run `/gsd-plan-phase 7` to break down)
+- [ ] 07-01-PLAN.md — Foundation: register FIDO-01..19, create Wave 0 test scaffolds, CodeRequestFixtures
+- [ ] 07-02-PLAN.md — TrustWindowPreference helper (UserDefaults-backed toggle state, default ON)
+- [ ] 07-03-PLAN.md — TrustWindowManager core singleton (mint, revoke, isInWindow, toast) + fill manager tests
+- [ ] 07-04-PLAN.md — RelayClient silent-send branch + accountResolver closure + fill silent-send tests
+- [ ] 07-05-PLAN.md — TransientToastOverlay duration parameterization + CodeApprovalView mint + delete startAutoRefresh
+- [ ] 07-06-PLAN.md — KeyAuthApp wiring: @StateObject, EnvironmentObject, bootstrap, resolver closure
+- [ ] 07-07-PLAN.md — SettingsView toggle + ContentView overlay mount + extend SettingsViewTests
+- [ ] 07-08-PLAN.md — Traceability flip, QA checklist, STATE.md update
