@@ -7,10 +7,12 @@ struct KeyAuthApp: App {
     @StateObject private var store = AccountStore()
     @StateObject private var pairingStore = PairingStore.shared
     @StateObject private var icloudState = ICloudStateObserver.shared
+    @StateObject private var trustWindow = TrustWindowManager.shared
     @Environment(\.scenePhase) private var scenePhase
     @State private var isUnlocked = false
     @State private var deviceToken: String?
     @State private var didBootstrapSyncPreference = false
+    @State private var didBootstrapTrustWindowPreference = false
     // MigrationCoordinator is constructed lazily in `.onAppear` because its init requires
     // AccountStore; @StateObject init cannot reference other @StateObjects (SwiftUI prohibits
     // that access during View init). Once created, we inject it via .environmentObject so
@@ -27,6 +29,7 @@ struct KeyAuthApp: App {
                             .environmentObject(pairingStore)
                             .environmentObject(icloudState)
                             .environmentObject(migration)
+                            .environmentObject(trustWindow)
                     } else {
                         LockScreenView {
                             isUnlocked = true
@@ -42,6 +45,7 @@ struct KeyAuthApp: App {
                     migration = MigrationCoordinator(store: store)
                 }
                 bootstrapSyncPreferenceOnce()
+                bootstrapTrustWindowPreferenceOnce()
                 setupAppDelegate()
                 requestPushPermissionAndRegister()
                 // Ensure KVS has latest state cached locally.
@@ -80,6 +84,19 @@ struct KeyAuthApp: App {
         // existing users (D-02). Read SharedDefaults directly to avoid instantiating AccountStore twice.
         let existingCount = SharedDefaults.loadAccounts().count
         SyncPreference.bootstrap(existingAccountCount: existingCount)
+    }
+
+    private func bootstrapTrustWindowPreferenceOnce() {
+        guard !didBootstrapTrustWindowPreference else { return }
+        didBootstrapTrustWindowPreference = true
+        TrustWindowPreference.bootstrap()
+        trustWindow.bootstrap()
+        // Wire the silent-send account resolver (Plan 07-04 introduced the property;
+        // this is the one place in the app it's assigned). Weak capture of `store` — it
+        // is a class, and we must not extend its lifetime beyond the KeyAuthApp scene.
+        RelayClient.shared.accountResolver = { [weak store] request in
+            return store?.resolve(for: request)
+        }
     }
 
     private func setupAppDelegate() {
