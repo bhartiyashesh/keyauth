@@ -29,6 +29,7 @@
 		1DD2443D7ED78FDBB9052247 /* SyncPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE022AD51946B21D67526F8 /* SyncPreference.swift */; };
 		1EF2EEFFCD66040E1644538C /* CodeRequestFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58AC46A3D01F68F5421CF7E9 /* CodeRequestFixtures.swift */; };
 		2A5C33EAD7AEF9993A943C24 /* MigrationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83B1535245138F0D15FDFB6 /* MigrationCoordinator.swift */; };
+		2D95F23CC78A987AFAD1B18E /* TrustWindowPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DC82639560BA8AB1C04855C /* TrustWindowPreference.swift */; };
 		2DF26270B453948910DB4BBA /* AccountStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A617D6A6675B66C43394F4 /* AccountStore.swift */; };
 		303CC5F2ED328FAA1D84AF91 /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A363B81015F05C5B3C0DC5A7 /* QRScannerView.swift */; };
 		31653C12560562042FF28D1D /* KeyAuthTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3E6E0A119F9F10DD6ACEFF8 /* KeyAuthTests.swift */; };
@@ -56,6 +57,7 @@
 		A6ABF3F04878C3DA2BA1C9FB /* RelayClientSilentSendTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B8575CB228C2521A93AF2B /* RelayClientSilentSendTests.swift */; };
 		A6E4292AEC1EB61B57497759 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFE1B0C62EDF21CB35A71B9 /* ContentView.swift */; };
 		B1888D7E276B4B1C8DB79495 /* FirstLaunchSyncCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A160140CCA496993F9B687 /* FirstLaunchSyncCard.swift */; };
+		B1A10F3410E820A6A49F0846 /* TrustWindowPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DC82639560BA8AB1C04855C /* TrustWindowPreference.swift */; };
 		B7FEAA83061573BF32207988 /* KeychainProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0067AC09E052201723A167 /* KeychainProviding.swift */; };
 		BB344AE911CC122A3823EC21 /* KeyAuthKeyboard.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5C819D47267678FE6AAF9834 /* KeyAuthKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BE3AD9668FA809B8DFB41302 /* ManualEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B0F9F5608AEF29BF6D1379 /* ManualEntryView.swift */; };
@@ -115,6 +117,7 @@
 		20B8575CB228C2521A93AF2B /* RelayClientSilentSendTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RelayClientSilentSendTests.swift; sourceTree = "<group>"; };
 		21BF8AD08CE52AB890A8681B /* MockKeychain.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockKeychain.swift; sourceTree = "<group>"; };
 		257BEB070E267733198F5ECB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		2DC82639560BA8AB1C04855C /* TrustWindowPreference.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TrustWindowPreference.swift; sourceTree = "<group>"; };
 		3C42BF0A5EE050AFC308974F /* KeyboardPropagationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = KeyboardPropagationTests.swift; sourceTree = "<group>"; };
 		3E7857BFF38538BDFBD953CB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		53ED4B44041710EEC7EE82C7 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
@@ -216,6 +219,7 @@
 				AFE7D51430B679250C2B0E8C /* DedupKey.swift */,
 				1CB8C9CBBAF5CF9C05346890 /* ICloudStateObserver.swift */,
 				B83B1535245138F0D15FDFB6 /* MigrationCoordinator.swift */,
+				2DC82639560BA8AB1C04855C /* TrustWindowPreference.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -478,6 +482,7 @@
 				34CC6B7B519FC6FB625BB29A /* ICloudStateObserver.swift in Sources */,
 				2A5C33EAD7AEF9993A943C24 /* MigrationCoordinator.swift in Sources */,
 				3F5AEA8E74494AB5ADB8C320 /* DedupKey.swift in Sources */,
+				2D95F23CC78A987AFAD1B18E /* TrustWindowPreference.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -538,6 +543,7 @@
 				8AB8CA9FFB686759877B44F3 /* ICloudStateObserver.swift in Sources */,
 				7B29368E0F781CFDCA108985 /* MigrationCoordinator.swift in Sources */,
 				57E1486F5EA0B9FBF8A2875B /* RestoringFromCloudView.swift in Sources */,
+				B1A10F3410E820A6A49F0846 /* TrustWindowPreference.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
