@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 7 UI-SPEC approved
-last_updated: "2026-04-19T15:43:10.413Z"
-last_activity: 2026-04-19 -- Phase 07 execution started
+stopped_at: Phase 7 complete — ready for manual QA
+last_updated: "2026-04-19T16:45:00.000Z"
+last_activity: 2026-04-19 -- Phase 07 complete (manual QA pending 2-DEV-TW-01, 2-DEV-TW-02)
 progress:
   total_phases: 7
-  completed_phases: 3
-  total_plans: 24
-  completed_plans: 15
-  percent: 63
+  completed_phases: 4
+  total_plans: 32
+  completed_plans: 23
+  percent: 72
 ---
 
 # Project State
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-14)
 
 ## Current Position
 
-Phase: 07 (FaceID Capability Tokens) — EXECUTING
-Plan: 1 of 8
-Status: Executing Phase 07
-Last activity: 2026-04-19 -- Phase 07 execution started
+Phase: 07-faceid-capability-tokens — Conditional Pass (manual QA pending)
+Plan: 8 of 8
+Status: Phase complete — ready for manual QA (2-DEV-TW-01, 2-DEV-TW-02)
+Last activity: 2026-04-19 -- Phase 07 complete (manual QA pending)
 
 Progress: [██████████] 100%
 
@@ -66,6 +66,14 @@ Progress: [██████████] 100%
 | Phase 06 P04 | 12min | 5 tasks | 6 files |
 | Phase 06-icloud-keychain-sync P05 | 159min | 7 tasks | 11 files |
 | Phase 06-icloud-keychain-sync P06 | 6min | 5 tasks | 5 files |
+| Phase 07-faceid-capability-tokens P01 | 3min | 2 tasks | 7 files |
+| Phase 07-faceid-capability-tokens P02 | 4min | 2 tasks | 3 files |
+| Phase 07-faceid-capability-tokens P03 | 5min | 2 tasks | 3 files |
+| Phase 07-faceid-capability-tokens P04 | 25min | 3 tasks | 4 files |
+| Phase 07-faceid-capability-tokens P05 | 4min | 3 tasks | 3 files |
+| Phase 07-faceid-capability-tokens P06 | 6min | 1 tasks | 1 files |
+| Phase 07-faceid-capability-tokens P07 | 7min | 3 tasks | 3 files |
+| Phase 07-faceid-capability-tokens P08 | 10min | 5 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -125,6 +133,13 @@ Recent decisions affecting current work:
 - [Phase 06-icloud-keychain-sync]: Plan 06: Hybrid coverage status vocabulary — Complete (automated) vs Complete (unit: TEST) / Manual QA pending 2-DEV-NN — preserves truth-in-claims while capturing real unit baselines for cross-device behaviors
 - [Phase 06-icloud-keychain-sync]: Plan 06: TransientToastOverlay placement deferred to a polish plan — documented as non-orphan in TRACEABILITY.md Known Gaps since core dedup-count behavior is tested
 - [Phase 06-icloud-keychain-sync]: Plan 06: ICLOUD-10 and ICLOUD-16 remain [ ] / Manual QA pending in REQUIREMENTS.md; 14 of 16 flipped to Complete (automated). ROADMAP Phase 6 does NOT flip to [x] until manual QA signs off 06-QA-CHECKLIST.md
+- [Phase 07-faceid-capability-tokens]: D-01 — 2-minute trust window opens after FaceID success; subsequent requests from paired extension silent-send
+- [Phase 07-faceid-capability-tokens]: D-02 — Global-per-pairing scope (no per-account/per-origin refinement); user explicitly chose simplicity
+- [Phase 07-faceid-capability-tokens]: D-03 — TTL is fixed-from-mint (2 min); additional uses do NOT extend the window (re-mint replaces with fresh 120s)
+- [Phase 07-faceid-capability-tokens]: D-12 — Deleted CodeApprovalView.startAutoRefresh 5-minute Timer (request-driven silent-send model replaces it)
+- [Phase 07-faceid-capability-tokens]: D-14 — Accepted phishing-origin replay risk within 2-min window; visible toast (D-09) is the user-awareness mitigation
+- [Phase 07-faceid-capability-tokens]: D-16 — Trust-window preference defaults ON for all users (both new and existing) — feature is strictly less restrictive than today's per-fetch FaceID
+- [Phase 07-faceid-capability-tokens]: Plan 07-08: Phase 7 hybrid-vocabulary traceability — 17 of 19 FIDO-NN flipped to Complete (automated); FIDO-18 and FIDO-19 remain Manual QA pending 2-DEV-TW-01 / 2-DEV-TW-02. ROADMAP Phase 7 does NOT flip to [x] until both manual items sign off 07-QA-CHECKLIST.md.
 
 ### Pending Todos
 
@@ -142,6 +157,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-19T14:29:18.034Z
-Stopped at: Phase 7 UI-SPEC approved
-Resume file: .planning/phases/07-faceid-capability-tokens/07-UI-SPEC.md
+Last session: 2026-04-19T16:45:00.000Z
+Stopped at: Phase 7 complete — ready for manual QA (2-DEV-TW-01, 2-DEV-TW-02)
+Resume file: .planning/phases/07-faceid-capability-tokens/07-QA-CHECKLIST.md
