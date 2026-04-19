@@ -135,7 +135,7 @@ After a FaceID-approved fetch, mint an in-memory capability token scoped to `{or
 
 Plans:
 - [x] 07-01-PLAN.md — Foundation: register FIDO-01..19, create Wave 0 test scaffolds, CodeRequestFixtures
-- [ ] 07-02-PLAN.md — TrustWindowPreference helper (UserDefaults-backed toggle state, default ON)
+- [x] 07-02-PLAN.md — TrustWindowPreference helper (UserDefaults-backed toggle state, default ON)
 - [ ] 07-03-PLAN.md — TrustWindowManager core singleton (mint, revoke, isInWindow, toast) + fill manager tests
 - [ ] 07-04-PLAN.md — RelayClient silent-send branch + accountResolver closure + fill silent-send tests
 - [ ] 07-05-PLAN.md — TransientToastOverlay duration parameterization + CodeApprovalView mint + delete startAutoRefresh
