@@ -130,6 +130,26 @@ final class SettingsViewTests: XCTestCase {
             "D-12 copy must use the em-dash '—', not a hyphen")
     }
 
+    // MARK: - FIDO-15: Phase 7 trust-window toggle verbatim copy
+
+    func testTrustWindowToggleLabelMatchesUISpec() throws {
+        let src = try loadBundledSource(named: "SettingsView.swift")
+        XCTAssertTrue(src.contains("Toggle(\"Allow 2-minute trust window after FaceID\""),
+            "FIDO-15: Toggle label must be 'Allow 2-minute trust window after FaceID' (UI-SPEC line 148)")
+    }
+
+    func testTrustWindowFooterHelperTextVerbatim() throws {
+        let src = try loadBundledSource(named: "SettingsView.swift")
+        XCTAssertTrue(src.contains("Skip FaceID for requests within 2 minutes of approval. Each new FaceID starts a fresh 2 minutes. The window ends when the app goes to the background."),
+            "FIDO-15: Footer helper text must be UI-SPEC Copywriting Contract verbatim (line 150)")
+    }
+
+    func testTrustWindowSectionHeaderIsSecurity() throws {
+        let src = try loadBundledSource(named: "SettingsView.swift")
+        XCTAssertTrue(src.contains("Text(\"Security\")"),
+            "FIDO-15: trustWindowSection header must be 'Security' (UI-SPEC Open Question 1 recommendation)")
+    }
+
     // MARK: - Compile-time / init sanity
 
     /// Create a SettingsView with env objects wired in — proves the View's stored properties
