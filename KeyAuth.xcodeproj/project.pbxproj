@@ -65,6 +65,7 @@
 		BE3AD9668FA809B8DFB41302 /* ManualEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B0F9F5608AEF29BF6D1379 /* ManualEntryView.swift */; };
 		C4F35339D9DB98FF52818CD4 /* Base32.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBDB95C539BA582A5BA3C248 /* Base32.swift */; };
 		C7D6D1BDA6FE2E926F40DF77 /* LockScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD66B74369598846CBD85FE9 /* LockScreenView.swift */; };
+		CD858BA6A59C61C3149C35F0 /* CodeApprovalViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B11FF81466534132F61AB67 /* CodeApprovalViewTests.swift */; };
 		D570E90BFDE51539D5BD89A9 /* RestoringStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B87D7FDD50FED1F07CBC6C /* RestoringStateTests.swift */; };
 		D721933D74AAA1C5D5ED1A8C /* TOTPCodeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD58D52B0B77FD05FA679468 /* TOTPCodeCell.swift */; };
 		D7C2C2457F00C2A913C3CDD8 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53ED4B44041710EEC7EE82C7 /* Account.swift */; };
@@ -119,6 +120,7 @@
 		20B8575CB228C2521A93AF2B /* RelayClientSilentSendTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RelayClientSilentSendTests.swift; sourceTree = "<group>"; };
 		21BF8AD08CE52AB890A8681B /* MockKeychain.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockKeychain.swift; sourceTree = "<group>"; };
 		257BEB070E267733198F5ECB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		2B11FF81466534132F61AB67 /* CodeApprovalViewTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CodeApprovalViewTests.swift; sourceTree = "<group>"; };
 		2DC82639560BA8AB1C04855C /* TrustWindowPreference.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TrustWindowPreference.swift; sourceTree = "<group>"; };
 		3C42BF0A5EE050AFC308974F /* KeyboardPropagationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = KeyboardPropagationTests.swift; sourceTree = "<group>"; };
 		3E7857BFF38538BDFBD953CB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
@@ -257,6 +259,7 @@
 				6753FEAEAA7C45F78993C4CA /* TrustWindowManagerTests.swift */,
 				DA0603D3BB0BC31E8894954A /* TrustWindowPreferenceTests.swift */,
 				20B8575CB228C2521A93AF2B /* RelayClientSilentSendTests.swift */,
+				2B11FF81466534132F61AB67 /* CodeApprovalViewTests.swift */,
 			);
 			name = KeyAuthTests;
 			path = KeyAuthTests;
@@ -513,6 +516,7 @@
 				9B85464F34CE6B4994CA0184 /* TrustWindowPreferenceTests.swift in Sources */,
 				A6ABF3F04878C3DA2BA1C9FB /* RelayClientSilentSendTests.swift in Sources */,
 				1EF2EEFFCD66040E1644538C /* CodeRequestFixtures.swift in Sources */,
+				CD858BA6A59C61C3149C35F0 /* CodeApprovalViewTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
