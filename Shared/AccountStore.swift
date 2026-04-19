@@ -221,3 +221,40 @@ final class AccountStore: ObservableObject {
         store.synchronize()
     }
 }
+
+extension AccountStore {
+    /// Deterministic account resolution for a decoded `CodeRequest`. Mirrors
+    /// `CodeApprovalView.onAppear` semantics so FaceID and silent-send paths agree on
+    /// which account a request refers to (Phase 7 RESEARCH Pattern 2 — anti-drift).
+    ///
+    /// Semantics (first match wins):
+    ///   1. Exact issuer+label match (when either field is non-empty on the request).
+    ///   2. Domain-based matching (only when both issuer AND label are empty):
+    ///      a. Single domain match → return it.
+    ///      b. Multiple domain matches → return nil (AMBIGUOUS — silent path defers to FaceID).
+    ///   3. Single-account fallback (user only has one account configured).
+    ///   4. Otherwise → nil (AMBIGUOUS or empty store).
+    ///
+    /// Returning `nil` is the sanctioned "defer to FaceID" signal — it is NOT an error.
+    func resolve(for request: CodeRequest) -> Account? {
+        // 1. Exact issuer+label
+        if !request.issuer.isEmpty || !request.label.isEmpty {
+            return accounts.first { $0.issuer == request.issuer && $0.label == request.label }
+        }
+        // 2. Domain-based
+        if let domain = request.domain, !domain.isEmpty {
+            let domainLower = domain.lowercased()
+            let matched = accounts.filter { account in
+                let issuerLower = account.issuer.lowercased()
+                return domainLower.contains(issuerLower)
+                    || issuerLower.contains(domainLower.replacingOccurrences(of: ".com", with: ""))
+            }
+            if matched.count == 1 { return matched[0] }
+            if matched.count > 1 { return nil } // AMBIGUOUS — silent path defers
+        }
+        // 3. Single-account fallback
+        if accounts.count == 1 { return accounts[0] }
+        // 4. Ambiguous or empty
+        return nil
+    }
+}
