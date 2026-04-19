@@ -447,6 +447,7 @@
 				"$(SRCROOT)/Shared/KeychainManager.swift",
 				"$(SRCROOT)/App/Views/SettingsView.swift",
 				"$(SRCROOT)/App/Views/FirstLaunchSyncCard.swift",
+				"$(SRCROOT)/App/Views/CodeApprovalView.swift",
 			);
 			name = "Copy Shared Sources For Isolation Tests";
 			outputFileListPaths = (
@@ -457,10 +458,11 @@
 				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/KeychainManager.swift.txt",
 				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/SettingsView.swift.txt",
 				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/FirstLaunchSyncCard.swift.txt",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/CodeApprovalView.swift.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\nSHARED_DIR=\"${SRCROOT}/Shared\"\nVIEWS_DIR=\"${SRCROOT}/App/Views\"\nDST_DIR=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\nmkdir -p \"${DST_DIR}\"\nfor name in PairingStore.swift CryptoBoxManager.swift KeychainManager.swift; do\n  cp \"${SHARED_DIR}/${name}\" \"${DST_DIR}/${name}.txt\"\ndone\nfor name in SettingsView.swift FirstLaunchSyncCard.swift; do\n  cp \"${VIEWS_DIR}/${name}\" \"${DST_DIR}/${name}.txt\"\ndone\n";
+			shellScript = "set -e\nSHARED_DIR=\"${SRCROOT}/Shared\"\nVIEWS_DIR=\"${SRCROOT}/App/Views\"\nDST_DIR=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\nmkdir -p \"${DST_DIR}\"\nfor name in PairingStore.swift CryptoBoxManager.swift KeychainManager.swift; do\n  cp \"${SHARED_DIR}/${name}\" \"${DST_DIR}/${name}.txt\"\ndone\nfor name in SettingsView.swift FirstLaunchSyncCard.swift CodeApprovalView.swift; do\n  cp \"${VIEWS_DIR}/${name}\" \"${DST_DIR}/${name}.txt\"\ndone\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

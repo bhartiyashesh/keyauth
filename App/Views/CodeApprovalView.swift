@@ -194,49 +194,15 @@ struct CodeApprovalView: View {
 
         codeSent = true
 
-        // Start auto-refresh: keep sending fresh codes for 5 minutes
-        startAutoRefresh(account: account)
+        // Mint the 2-minute trust window (FIDO-08 / D-01). No-op when
+        // TrustWindowPreference.isEnabled is false (FIDO-03 / D-17 gate lives
+        // inside TrustWindowManager.mint itself), so no extra guard is needed.
+        // Replaces the deleted 5-minute auto-refresh Timer (D-12).
+        TrustWindowManager.shared.mint()
 
         // Auto-dismiss after brief confirmation
         try? await Task.sleep(nanoseconds: 1_500_000_000)
         onComplete()
-    }
-
-    private func startAutoRefresh(account: Account) {
-        // Track last sent code to avoid sending duplicates
-        var lastSentCode = TOTPGenerator.generate(for: account) ?? ""
-
-        // Refresh every 1 second, check if code changed (new TOTP period)
-        // Stop after 5 minutes (300 seconds)
-        let maxDuration: TimeInterval = 300
-        let startTime = Date()
-
-        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-            Task { @MainActor in
-                // Stop after 5 minutes
-                if Date().timeIntervalSince(startTime) > maxDuration {
-                    timer.invalidate()
-                    return
-                }
-
-                // Stop if relay disconnected
-                guard RelayClient.shared.state == .connected else {
-                    timer.invalidate()
-                    return
-                }
-
-                // Check if TOTP code changed (new period)
-                guard let newCode = TOTPGenerator.generate(for: account),
-                      newCode != lastSentCode else { return }
-
-                lastSentCode = newCode
-                RelayClient.shared.sendEncryptedCode(
-                    newCode, requestId: UUID().uuidString,
-                    issuer: account.issuer, label: account.label
-                )
-                print("[CodeApproval] Auto-refreshed code for \(account.issuer)")
-            }
-        }
     }
 }
 
