@@ -1,272 +1,380 @@
 # Technology Stack
 
-**Project:** KeyAuth Chrome Extension + Relay Server
-**Researched:** 2026-04-14
-**Overall confidence:** HIGH (Chrome MV3, ws, Railway) / MEDIUM (apns2 maintenance trajectory)
+**Project:** KeyAuth v2.0 -- New Feature Stack Additions
+**Researched:** 2026-04-16
+**Overall confidence:** HIGH
 
 ---
 
 ## Context
 
-The iOS app is already built: Swift 5.9, zero third-party dependencies, URLSessionWebSocketTask for WebSocket, UserNotifications for push. This file covers only the **three new components**: Chrome extension, WebSocket relay server, and APNs push integration.
+This file covers ONLY the stack additions needed for v2.0 new features: Google Authenticator protobuf import, encrypted backup export, recency/frequency tracking, and keyboard search/filter. The existing stack (CryptoKit, CommonCrypto, UIKit, Foundation, iCloud Keychain) is validated and not re-researched.
+
+**Key constraint: Zero external iOS dependencies. All v2.0 features are achievable with system frameworks only.**
 
 ---
 
-## 1. Chrome Extension (Manifest V3)
+## 1. Google Authenticator Protobuf Import
 
-### Build Framework
+### Technology: Hand-Rolled Proto3 Decoder (~120 lines Swift)
 
-**Use WXT v0.20.x** — not raw Vite + CRXJS, not Plasmo.
+**Use Foundation `Data` only.** Do not add `apple/swift-protobuf` SPM package.
 
-| Choice | Version | Why |
-|--------|---------|-----|
-| WXT | 0.20.22 | File-based entrypoints, vanilla TypeScript support, Vite under the hood, active maintainers as of 2026, framework-agnostic |
-| TypeScript | 5.x (via WXT) | WXT ships TypeScript by default; all extension scripts typed without extra setup |
-| Vite | 6.x (via WXT) | WXT uses Vite internally; faster builds than webpack, smaller output |
+Google Auth's `otpauth-migration://` schema is trivially simple: 2 message types, 3 enums, 12 total fields. A full protobuf library (60K+ lines of code) for this is massive overkill and violates the zero-deps constraint.
 
-**Why not CRXJS:** Was unmaintained for years. New maintainers took over mid-2025 and shipped 2.0, but its long-term commitment remains uncertain. WXT is healthier.
-
-**Why not Plasmo:** In maintenance mode. React-first. Outdated dependencies flagged in 2025 ecosystem reviews.
-
-**Why not raw Vite + manifest by hand:** WXT auto-generates the `manifest.json` from file-based entrypoints, handles `web_accessible_resources`, and eliminates all the boilerplate pain of MV3 multi-entry builds.
-
-### UI (Popup)
-
-**Use vanilla TypeScript — no React, no Preact.**
-
-The popup for this extension is minimal: list accounts, show a "Request" button, display the received TOTP code. React adds ~130 KB gzipped to a popup that must render in under 50ms. Vanilla TypeScript + DOM APIs is sufficient and keeps the total extension bundle under the Chrome 4 MB limit comfortably.
-
-### WebSocket in the Service Worker
-
-**Critical constraint (Chrome 116+):** MV3 service workers terminate after 30 seconds of inactivity. Since Chrome 116, a WebSocket connection itself extends the service worker lifetime — but only while messages are actively exchanged.
-
-**Approach: ping every 20 seconds via `setInterval`.**
-
-The Chrome extension team explicitly recommends a 20-second keepalive interval (documented at `developer.chrome.com/docs/extensions/how-to/web-platform/websockets`). The service worker sends a lightweight `{"type":"ping"}` message to the relay; the relay responds with `{"type":"pong"}`. This keeps the worker alive without the complexity of the Offscreen Document API.
-
-**Do NOT use the Offscreen Document API for WebSocket keepalive** — it adds an entire hidden HTML document to the extension lifecycle for a problem solved more cleanly by a ping interval. Reserve the Offscreen API for actual audio/clipboard DOM needs.
-
-**Minimum Chrome version in manifest:** Set `"minimum_chrome_version": "116"` to guarantee WebSocket-extends-lifetime behavior.
-
-### Content Script
-
-Plain TypeScript, no framework. The content script detects TOTP input fields by heuristic (label text, `autocomplete="one-time-code"`, `inputmode="numeric"` + short `maxlength`) and auto-fills when the service worker delivers a code via `chrome.runtime.sendMessage`. Runs at `document_idle`.
-
-### Extension Summary Stack
+### Verified Proto3 Schema
 
 ```
-WXT          0.20.x   Build framework (Vite-based, file-based entrypoints)
-TypeScript   5.x      Language (via WXT)
-Vite         6.x      Bundler (via WXT)
-chrome.*     MV3      Extension APIs
+MigrationPayload {
+  repeated OtpParameters otp_parameters = 1;  // wire type 2 (LEN)
+  int32 version = 2;                          // wire type 0 (VARINT)
+  int32 batch_size = 3;                       // wire type 0 (VARINT)
+  int32 batch_index = 4;                      // wire type 0 (VARINT)
+  int32 batch_id = 5;                         // wire type 0 (VARINT)
+}
+
+OtpParameters {
+  bytes secret = 1;              // wire type 2 (LEN) -- RAW bytes, NOT base32
+  string name = 2;               // wire type 2 (LEN) -- "Issuer:label" format
+  string issuer = 3;             // wire type 2 (LEN)
+  Algorithm algorithm = 4;       // wire type 0 (VARINT)
+  DigitCount digits = 5;         // wire type 0 (VARINT)
+  OtpType type = 6;              // wire type 0 (VARINT)
+  int64 counter = 7;             // wire type 0 (VARINT) -- HOTP only
+}
+
+Algorithm:  0=UNSPECIFIED, 1=SHA1, 2=SHA256, 3=SHA512, 4=MD5
+DigitCount: 0=UNSPECIFIED, 1=SIX, 2=EIGHT
+OtpType:    0=UNSPECIFIED, 1=HOTP, 2=TOTP
 ```
 
-**No npm UI library.** No Socket.io (the extension uses the native `WebSocket` browser API directly — no library needed on the client side).
+### Wire Format Decoding Rules
+
+Only two wire types needed:
+
+| Wire Type | Number | Decoding |
+|-----------|--------|----------|
+| VARINT | 0 | Read bytes while MSB=1; combine lower 7 bits little-endian |
+| LEN | 2 | Read varint (byte count), then read N bytes |
+
+Tag decoding: `field_number = tag >> 3`, `wire_type = tag & 0x07`
+
+The decoder needs 3 functions:
+- `decodeVarint(from data: Data, at offset: inout Int) -> UInt64`
+- `decodeLengthDelimited(from data: Data, at offset: inout Int) -> Data`
+- `decodeMigrationPayload(data: Data) throws -> [GoogleAuthAccount]`
+
+### Critical Integration Details
+
+- **Secret field is RAW bytes** -- must Base32-encode before storing in `Account.secret`. Existing `Base32.swift` has `decode()` but needs `encode(Data) -> String` added (verify and add if missing).
+- **Name field format** -- `"Issuer:label"` or just `"label"`. Parse with `split(separator: ":", maxSplits: 1)` -- same logic as existing `Account.from(otpauthURL:)`.
+- **Algorithm mapping** -- Direct: 1=SHA1, 2=SHA256, 3=SHA512. Map 0 (UNSPECIFIED) to SHA1 (Google Auth default). Skip MD5 (4) -- not used in practice.
+- **Filter HOTP entries** -- KeyAuth is TOTP-only. Show warning to user if HOTP accounts found.
+- **Batch QR codes** -- Google Auth splits exports of >10 accounts across multiple QR codes. Track `batch_id` + `batch_index` to merge. Show progress ("Scanned 2 of 3 QR codes").
+- **Dedup on import** -- Run imported accounts through existing `DedupKey` before adding to avoid duplicates.
+
+### URI Decoding Pipeline
+
+```
+otpauth-migration://offline?data=<url-encoded-base64>
+  |-> URL decode the data parameter
+  |-> Base64 decode to raw bytes
+  |-> Proto3 decode to [OtpParameters]
+  |-> Map to [Account] (Base32-encode secrets, parse names, map enums)
+  |-> Dedup against existing accounts
+  |-> Add via AccountStore
+```
 
 ---
 
-## 2. WebSocket Relay Server (Railway)
+## 2. Encrypted Backup Export/Import
 
-### Runtime
+### Technology: CommonCrypto PBKDF2 + CryptoKit AES-256-GCM
 
-**Node.js 22 LTS** — Railway supports specifying major version only. Node.js 22 LTS (active until April 2027) is the correct choice: it ships with native `fetch`, improved ESM support, and the best V8 performance for long-lived WebSocket connections.
+Both frameworks are already linked in the project. No new imports needed.
 
-**Do not use Node.js 18** — it reaches EOL in April 2025. Node.js 24 (current, unstable) is not LTS yet.
-
-### Language
-
-**TypeScript compiled to JS at build time** — do not run `ts-node` in production. Use `tsc` to emit to `/dist`, then `node dist/index.js` in the Railway start command. Railway's Nixpacks builder handles this automatically if `scripts.build` and `scripts.start` are set correctly in `package.json`.
-
-Alternatively, for a tiny relay server, **`tsx` as a production runner** is acceptable (it JIT-strips types, no separate build step). Railway template for Node.js TypeScript WebSockets uses this pattern. Decision: use `tsx` for simplicity given this is a dumb relay, not a heavy service.
-
-### WebSocket Library
-
-**Use `ws` 8.20.x** — the only serious choice for a Node.js WebSocket server.
-
-| Library | Version | Why |
-|---------|---------|-----|
-| ws | 8.20.0 | RFC 6455 compliant, zero runtime dependencies, 49M weekly downloads, passes Autobahn test suite, actively maintained |
-| @types/ws | 8.18.x | TypeScript definitions, matches ws 8.x |
-
-**Why not Socket.io:** Adds protocol overhead, requires matching Socket.io client on the other end. The iOS app uses `URLSessionWebSocketTask` (native WebSocket) and the Chrome extension uses the browser `WebSocket` API — both are raw WebSocket. Socket.io is incompatible with these clients without its own client library.
-
-**Why not uWebSockets.js:** Native binding, harder to deploy in Railway's Nixpacks environment, no meaningful performance advantage at this traffic volume (two clients per room).
-
-### Room / Pairing System
-
-Implement in plain TypeScript on top of `ws`. The relay is intentionally a "dumb pipe":
-
-- Each connection registers with a `roomId` (derived from the QR pairing code)
-- Messages are forwarded to the other peer in the room
-- No persistence — rooms live only in memory (`Map<string, Set<WebSocket>>`)
-- No database needed
-
-This stateless design means Railway's single-instance deployment is sufficient. If horizontal scaling were needed, Redis pub/sub would be required — but for v1 with one active user, skip it.
-
-### HTTP Framework
-
-**Use `http` (built-in Node.js) + `ws`** — no Express needed.
-
-The relay has exactly two HTTP concerns: a `/health` endpoint for Railway's healthcheck, and the WebSocket upgrade path. Express adds 50 KB for routing that a 5-line `http.createServer` handles. Use the built-in `http` module.
+### Encryption Scheme
 
 ```
-Node.js      22 LTS   Runtime
-TypeScript   5.x      Language
-tsx          4.x      Production runner (JIT type stripping)
-ws           8.20.0   WebSocket server
-@types/ws    8.18.x   TypeScript types
+User password
+  |-> PBKDF2-HMAC-SHA256 (600,000 iterations, 16-byte random salt)
+  |-> 32-byte derived key
+  |-> SymmetricKey
+  |-> AES.GCM.seal(accountsJSON, using: key)
+  |-> .keyauth file
 ```
 
-### Railway Configuration
+### PBKDF2 Key Derivation (CommonCrypto -- already linked)
 
-- **PORT:** Always use `process.env.PORT` — Railway injects this automatically. Never hardcode 3000 or 8080.
-- **TLS:** Railway's proxy terminates TLS. The server runs plain `ws://` internally; clients connect via `wss://` to the Railway domain. Do not manage certificates in the app.
-- **Healthcheck:** Add `GET /health → 200 OK` for Railway's healthcheck. Without it, Railway cannot determine if the deploy succeeded.
-- **Dockerfile vs Nixpacks:** Nixpacks works for this project (it auto-detects Node.js + TypeScript). Only switch to Dockerfile if you need OS-level packages (not needed here).
+```swift
+import CommonCrypto
 
----
-
-## 3. APNs Push Integration (Node.js → iOS)
-
-### Library
-
-**Use `apns2` 12.2.x** — the cleanest, most current HTTP/2 APNs client for Node.js.
-
-| Library | Version | Why |
-|---------|---------|-----|
-| apns2 | 12.2.0 | TypeScript-native, HTTP/2 persistent connection, JWT/p8 auth only, actively maintained (last release May 2025), requires Node.js 16+ |
-
-**Why not `node-apn`:** Last meaningful release in 2021. Uses TLS socket connections rather than HTTP/2. The repository is effectively unmaintained.
-
-**Why not `node-apn-http2`:** A fork of `node-apn` that adds HTTP/2, but has low adoption and sparse maintenance. `apns2` covers the same ground with a cleaner API.
-
-**Why not raw `http2` module calls to APNs:** Technically possible (APNs is HTTP/2), but you'd reimplement JWT signing, connection management, and error handling that `apns2` already provides correctly.
-
-### Authentication: p8 Token-Based (JWT) — Not p12 Certificate
-
-**Use p8 exclusively.** This is unambiguous in 2025:
-
-- p8 keys do not expire (p12 certificates expire yearly and require annual rotation)
-- One p8 key covers all apps under your Apple Developer team
-- Apple's own documentation recommends token-based auth for all new APNs integrations
-- `apns2` only supports p8 — no p12 support, which enforces the right choice
-
-**What you need from Apple Developer portal:**
-1. An APNs Auth Key (`.p8` file) — generate once, store securely
-2. Key ID (10-character string shown in the portal)
-3. Team ID (10-character string from your Apple Developer account)
-4. Bundle ID for the push notification topic (`com.keyauth.app`)
-
-### Push Payload for TOTP Request
-
-The iOS app needs to receive a **background push** (silent push) to wake up and prompt Face ID:
-
-```json
-{
-  "aps": {
-    "content-available": 1
-  },
-  "type": "totp_request",
-  "room": "<roomId>",
-  "account": "<accountName>"
+func deriveKey(password: String, salt: Data, iterations: UInt32 = 600_000) -> Data {
+    var derivedKey = Data(count: 32)
+    let passwordData = Data(password.utf8)
+    derivedKey.withUnsafeMutableBytes { derivedBytes in
+        salt.withUnsafeBytes { saltBytes in
+            passwordData.withUnsafeBytes { passwordBytes in
+                CCKeyDerivationPBKDF(
+                    CCPBKDFAlgorithm(kCCPBKDF2),
+                    passwordBytes.baseAddress?.assumingMemoryBound(to: Int8.self),
+                    passwordData.count,
+                    saltBytes.baseAddress?.assumingMemoryBound(to: UInt8.self),
+                    salt.count,
+                    CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA256),
+                    iterations,
+                    derivedBytes.baseAddress?.assumingMemoryBound(to: UInt8.self),
+                    32
+                )
+            }
+        }
+    }
+    return derivedKey
 }
 ```
 
-Use `apns2`'s `SilentNotification` class. The relay server sends this when the Chrome extension sends a `{"type":"request","account":"..."}` message. iOS handles it in `application(_:didReceiveRemoteNotification:fetchCompletionHandler:)`.
+### AES-256-GCM Encryption (CryptoKit -- already linked)
 
-**APNs environment:** Use `production` environment. The `sandbox` environment is for Xcode debug builds. Since the iOS app will be distributed outside of debug builds (TestFlight or App Store), production APNs is required.
+```swift
+import CryptoKit
 
-### APNs Summary Stack
+// Encrypt
+let key = SymmetricKey(data: derivedKeyData)
+let sealed = try AES.GCM.seal(plaintext, using: key)
+// sealed.nonce (12 bytes), sealed.ciphertext, sealed.tag (16 bytes)
+
+// Decrypt
+let box = try AES.GCM.SealedBox(nonce: nonce, ciphertext: ciphertext, tag: tag)
+let decrypted = try AES.GCM.open(box, using: key)
+```
+
+### .keyauth File Format
+
+```json
+{
+  "version": 1,
+  "salt": "<base64 16-byte salt>",
+  "iterations": 600000,
+  "nonce": "<base64 12-byte nonce>",
+  "ciphertext": "<base64 encrypted accounts JSON>",
+  "tag": "<base64 16-byte GCM auth tag>"
+}
+```
+
+**Why JSON wrapper (not raw binary):**
+- `version` field enables future format evolution
+- `iterations` stored in file so we can increase later without breaking old exports
+- Human-debuggable if something goes wrong
+- Base64 overhead is negligible (accounts metadata is typically <50KB)
+
+**Why AES-GCM not ChaChaPoly:** AES-GCM is the industry standard for encrypted file formats. More universally understood and interoperable if we later add Android or web import. ChaChaPoly would also work (already used for relay E2E) but AES-GCM is the better choice for files.
+
+### Iteration Count Rationale
+
+OWASP 2025 recommends 600,000 for PBKDF2-HMAC-SHA256. Storing iterations in the file means:
+- Old exports at 600K remain decryptable forever
+- New exports can bump to 800K+ when hardware advances
+- No hardcoded assumption in the decoder
+
+### Salt Generation
+
+```swift
+var salt = Data(count: 16)
+_ = salt.withUnsafeMutableBytes { SecRandomCopyBytes(kSecRandomDefault, 16, $0.baseAddress!) }
+```
+
+`SecRandomCopyBytes` from the Security framework (already linked for Keychain operations).
+
+### File Sharing
+
+Register `.keyauth` UTI via `UniformTypeIdentifiers` framework. Export via `UIActivityViewController` (share sheet). Import via document picker or "Open In" from Files app.
+
+---
+
+## 3. Recency/Frequency Tracking
+
+### Technology: Extend Account Codable struct + SharedDefaults
+
+No new frameworks. Two new fields on the existing model.
+
+### Account Model Changes
+
+```swift
+struct Account: Codable, Identifiable, Equatable {
+    // ... existing fields (id, issuer, label, secret, algorithm, digits, period, sortOrder, createdAt) ...
+    var lastUsedAt: Date?    // nil = never used. Updated on code insertion.
+    var useCount: Int         // 0 = never used. Incremented on each use.
+}
+```
+
+**Backward compatibility:** Use `init(from decoder:)` with defaults:
+```swift
+init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    // ... decode existing fields ...
+    lastUsedAt = try container.decodeIfPresent(Date.self, forKey: .lastUsedAt)
+    useCount = try container.decodeIfPresent(Int.self, forKey: .useCount) ?? 0
+}
+```
+
+Existing accounts encoded without these fields will decode successfully with `lastUsedAt = nil` and `useCount = 0`.
+
+### Smart Sort Algorithm
+
+```swift
+func smartScore(lastUsed: Date?, useCount: Int) -> Double {
+    let recencyScore: Double
+    if let lastUsed = lastUsed {
+        let hoursSince = Date().timeIntervalSince(lastUsed) / 3600
+        recencyScore = max(0, 1.0 - (hoursSince / 168)) // Decays over 1 week
+    } else {
+        recencyScore = 0
+    }
+    let frequencyScore = min(1.0, Double(useCount) / 50.0) // Caps at 50 uses
+    return recencyScore * 0.7 + frequencyScore * 0.3 // Recency dominates
+}
+```
+
+Recency should dominate because during re-auth flows, the user needs the same account they used seconds ago. Frequency is a tiebreaker for accounts not recently used.
+
+### Update Flow
+
+1. Keyboard extension: user taps code -> `textDocumentProxy.insertText(code)` -> update `lastUsedAt = Date()` and `useCount += 1`
+2. Write updated account back to SharedDefaults (App Group) -- keyboard extension already reads from SharedDefaults
+3. On next `AccountStore.reload()`, main app picks up usage data and persists to Keychain
+
+**Important:** Keyboard extension should write usage updates to SharedDefaults, NOT directly to Keychain. Keychain writes from extensions can be slow and the extension has limited execution time. SharedDefaults write is fast. The main app syncs to Keychain on next launch.
+
+---
+
+## 4. Search/Filter in Keyboard Extension
+
+### Technology: Custom UILabel-based filter (NO UITextField)
+
+**Critical constraint: UITextField inside UIInputViewController breaks the responder chain.** Once a UITextField becomes first responder inside the keyboard extension, `textDocumentProxy.insertText()` stops working. This is confirmed across Apple Developer Forums and community reports. UISearchBar has the same problem (it contains UITextField internally).
+
+### Recommended Approach: Issuer Filter Chips + Optional Letter Search
+
+**Primary: Horizontal scrolling filter chips**
 
 ```
-apns2        12.2.0   APNs HTTP/2 client
+[ All ] [ GitHub ] [ Google ] [ AWS ] [ Discord ] [ ... ]
 ```
 
-No additional libraries. The `.p8` key file is loaded from an environment variable (base64-encoded) on Railway — never committed to the repository.
+- Show unique issuers as tappable chips, ordered by usage frequency
+- Tapping a chip filters the collection view to that issuer's accounts only
+- Tap again (or tap "All") to deselect
+- No text input needed -- avoids responder chain problem entirely
+- Better UX for keyboards: recognition over recall, one-tap filtering
+
+**Secondary (for 50+ accounts): Letter-button search bar**
+
+A custom control that mimics a text field without using UITextField:
+
+- UILabel with rounded rect background and placeholder text ("Search...")
+- Tapping reveals a horizontally scrolling row of letter buttons (A-Z, 0-9, backspace, clear)
+- Each button tap appends to a filter string stored in a plain `String` property
+- The UILabel displays the current filter text
+- The collection view filters accounts whose issuer or label contains the filter string
+- No UITextField, no UIResponder involvement, no first-responder stealing
+
+### Animated Filtering with Diffable Data Source
+
+Replace the current manual `UICollectionViewDataSource` with `UICollectionViewDiffableDataSource`:
+
+```swift
+private lazy var dataSource: UICollectionViewDiffableDataSource<Int, Account> = {
+    UICollectionViewDiffableDataSource(collectionView: collectionView) { cv, indexPath, account in
+        let cell = cv.dequeueReusableCell(withReuseIdentifier: TOTPCodeCell.reuseID, for: indexPath) as! TOTPCodeCell
+        cell.configure(with: account)
+        return cell
+    }
+}()
+
+func applyFilter(_ query: String) {
+    let filtered = query.isEmpty
+        ? accounts
+        : accounts.filter { $0.issuer.localizedCaseInsensitiveContains(query) || $0.label.localizedCaseInsensitiveContains(query) }
+    var snapshot = NSDiffableDataSourceSnapshot<Int, Account>()
+    snapshot.appendSections([0])
+    snapshot.appendItems(filtered)
+    dataSource.apply(snapshot, animatingDifferences: true)
+}
+```
+
+Requires `Account` to conform to `Hashable` (currently `Equatable` -- add `Hashable` conformance, which is trivial since all fields are hashable).
+
+### Layout Change
+
+Current keyboard layout:
+```
+[ Globe ] [ Shield ] [ KeyAuth ]
+[ --------------------------------- ]
+[ Collection View (scrollable)      ]
+[ --------------------------------- ]
+```
+
+New layout with filter:
+```
+[ Globe ] [ Shield ] [ KeyAuth ] [ Search icon ]
+[ All ] [ GitHub ] [ Google ] [ AWS ] [ ... ]    <- horizontal scroll chips
+[ --------------------------------- ]
+[ Collection View (scrollable)      ]
+[ --------------------------------- ]
+```
+
+The filter chip row adds ~32pt to keyboard height. Acceptable within the 220pt current height or bump to 260pt.
 
 ---
 
 ## Alternatives Considered
 
-| Category | Recommended | Alternative | Why Not |
-|----------|-------------|-------------|---------|
-| Extension framework | WXT 0.20.x | CRXJS 2.x | Maintenance uncertainty after 3-year hiatus; WXT more stable |
-| Extension framework | WXT 0.20.x | Plasmo | Maintenance mode, React-first, outdated deps |
-| Extension framework | WXT 0.20.x | Raw Vite + manifest | Too much boilerplate for MV3 multi-entry builds |
-| Popup UI | Vanilla TS | React 19 | 130 KB overhead for a 2-button popup; overkill |
-| WS keepalive | 20s ping | Offscreen Document | Offscreen API adds hidden HTML document; ping is simpler |
-| WebSocket server | ws 8.x | Socket.io | Protocol-incompatible with native iOS/Chrome WS clients |
-| WebSocket server | ws 8.x | uWebSockets.js | Native bindings complicate Railway Nixpacks builds |
-| HTTP server | Node built-in `http` | Express | No routing complexity; Express overhead not justified |
-| APNs client | apns2 12.x | node-apn | Unmaintained since 2021; legacy TLS socket protocol |
-| APNs auth | p8 JWT tokens | p12 certificates | p12 expires yearly; p8 is Apple's recommended path |
-| Node runtime | 22 LTS | 18 LTS | Node 18 reached EOL April 2025 |
-| Node runtime | 22 LTS | 24 Current | Not LTS; unstable for production |
+| Recommended | Alternative | Why Not |
+|-------------|-------------|---------|
+| Hand-rolled protobuf decoder | `apple/swift-protobuf` SPM | External dep. Schema is trivially simple (7 fields, 3 enums). |
+| PBKDF2 via CommonCrypto | scrypt or Argon2 via third-party lib | Would add external dep. PBKDF2 at 600K iterations is OWASP-compliant. |
+| AES-256-GCM via CryptoKit | ChaChaPoly (already used for relay) | AES-GCM is the standard for file encryption. More interoperable. |
+| Filter chips (no text input) | UITextField in keyboard extension | UITextField steals first responder, breaks textDocumentProxy. |
+| Filter chips (no text input) | UISearchBar in keyboard extension | Same problem -- contains UITextField internally. |
+| Custom UILabel search | Full mini-QWERTY inside keyboard | QWERTY-inside-QWERTY is confusing UX. Chips + letter strip is clearer. |
+| JSON .keyauth format | Raw binary format | JSON is debuggable, versionable, extensible. Negligible overhead. |
+| SharedDefaults for usage tracking | Core Data / SQLite | Overkill for 2 fields on an existing Codable struct. |
+| Diffable data source | Manual reloadData() | Animated transitions for filtering. Available iOS 13+. |
+| `useCount` + `lastUsedAt` on Account | Separate usage tracking store | Keeps model cohesive. Backward-compatible via optional decoding. |
 
----
+## What NOT to Use
+
+| Avoid | Why | Use Instead |
+|-------|-----|-------------|
+| `apple/swift-protobuf` | External dependency. Violates zero-deps constraint. 60K+ lines for a 7-field schema. | ~120 lines of hand-rolled varint + LEN decoder |
+| `CryptoSwift` | External dependency. CommonCrypto + CryptoKit cover PBKDF2 + AES-GCM. | `CommonCrypto.CCKeyDerivationPBKDF` + `CryptoKit.AES.GCM` |
+| `UITextField` in keyboard | Steals first responder. `textDocumentProxy.insertText()` stops working. | Custom UILabel-based filter or issuer chips |
+| `UISearchBar` in keyboard | Contains UITextField internally. Same responder chain problem. | Custom UILabel-based filter or issuer chips |
+| Core Data for usage tracking | Overkill. Account model is already JSON in Keychain. | Add `lastUsedAt` and `useCount` to existing `Account` struct |
+| `SwiftProtobuf` | Same as `apple/swift-protobuf`. SPM name differs but same package. | Hand-rolled decoder |
+| Argon2 / bcrypt for KDF | Not available in system frameworks. Would require external dep. | PBKDF2 via CommonCrypto at 600K+ iterations |
+
+## Version Compatibility
+
+| Component | Minimum iOS | Notes |
+|-----------|-------------|-------|
+| `AES.GCM` (CryptoKit) | iOS 13+ | Same minimum as existing ChaChaPoly usage |
+| `CCKeyDerivationPBKDF` (CommonCrypto) | iOS 2+ | System framework since the beginning |
+| `UICollectionViewDiffableDataSource` | iOS 13+ | Replaces manual `reloadData()` for animated filtering |
+| `SecRandomCopyBytes` (Security) | iOS 2+ | Already linked for Keychain operations |
+| `UniformTypeIdentifiers` | iOS 14+ | For `.keyauth` UTI registration. If targeting iOS 13, fall back to legacy UTI strings. |
+| Base32 encode (custom) | N/A | Existing `Base32.swift` -- verify it has `encode(Data) -> String` or add it |
 
 ## Installation
 
-### Chrome Extension (`/extension`)
+**No new packages to install on iOS.** All features use existing system frameworks.
 
+**Verify existing Base32.swift has encode capability:**
 ```bash
-npm create wxt@latest
-# Choose: TypeScript, no framework (vanilla)
-
-npm install
-# WXT pulls in Vite, TypeScript, all extension tooling
-
-# Dev mode (auto-reloads extension in Chrome)
-npm run dev
-
-# Production build
-npm run build
-# Output: .output/chrome-mv3/
+# Check if Base32.swift has an encode function
+grep -n "func encode" Shared/Base32.swift
 ```
-
-### Relay Server (`/relay`)
-
-```bash
-npm init -y
-npm install ws
-npm install tsx --save-dev
-npm install -D typescript @types/ws @types/node
-
-# APNs
-npm install apns2
-```
-
-`package.json` scripts:
-```json
-{
-  "scripts": {
-    "start": "tsx src/index.ts",
-    "build": "tsc",
-    "start:prod": "node dist/index.js"
-  }
-}
-```
-
-`.nvmrc` or `package.json#engines`:
-```json
-{
-  "engines": { "node": ">=22" }
-}
-```
-
----
-
-## Environment Variables (Railway)
-
-| Variable | Description | Where |
-|----------|-------------|-------|
-| `PORT` | Auto-injected by Railway | Read via `process.env.PORT` |
-| `APNS_KEY` | Base64-encoded `.p8` file content | Set in Railway dashboard |
-| `APNS_KEY_ID` | 10-char key ID from Apple portal | Set in Railway dashboard |
-| `APNS_TEAM_ID` | 10-char team ID from Apple account | Set in Railway dashboard |
-| `APNS_TOPIC` | Bundle ID: `com.keyauth.app` | Set in Railway dashboard or hardcode |
-
-Never commit `.p8` files to the repository.
+If missing, add `static func encode(_ data: Data) -> String` using RFC 4648 alphabet.
 
 ---
 
@@ -274,25 +382,31 @@ Never commit `.p8` files to the repository.
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| WXT as extension framework | HIGH | Verified: v0.20.22 current, active maintenance confirmed April 2026 |
-| MV3 WebSocket + 20s ping | HIGH | Verified against official Chrome developer docs (chrome.dev); Chrome 116 behavior confirmed |
-| ws 8.20.0 | HIGH | Verified: latest release March 2026, 49M weekly downloads, passes Autobahn suite |
-| Railway PORT/TLS behavior | HIGH | Multiple sources + Railway's own docs confirm proxy TLS termination and PORT injection |
-| apns2 12.2.0 | MEDIUM | Verified: last release May 2025, actively maintained. Risk: single maintainer (AndrewBarba). Monitor for Node.js compatibility as 22 LTS matures |
-| p8 over p12 | HIGH | Apple's explicit recommendation; p12 broadly discouraged in 2025 |
-| Node.js 22 LTS | HIGH | Confirmed LTS until April 2027; Railway supports it |
+| Protobuf schema | HIGH | Cross-verified from 3 independent sources (alexbakker, qistoph, zwyx.dev). All agree on field numbers and types. |
+| Protobuf wire format | HIGH | Verified against official protobuf.dev encoding spec. |
+| PBKDF2 + AES-GCM | HIGH | Both are system frameworks already in use. OWASP iteration count verified. |
+| UITextField keyboard breakage | HIGH | Confirmed via Apple Developer Forums and multiple community reports. Known limitation since iOS 8. |
+| Diffable data source | HIGH | Standard UIKit API since iOS 13. Well-documented. |
+| Account model backward compat | HIGH | Standard Codable pattern with `decodeIfPresent` + defaults. |
+| .keyauth file format | MEDIUM | Our own design. JSON wrapper approach is common (1Password, Bitwarden use similar). |
+| Smart sort algorithm | MEDIUM | Custom weighting. Will need tuning with real usage data. |
 
 ---
 
 ## Sources
 
-- Chrome WebSockets in MV3: https://developer.chrome.com/docs/extensions/how-to/web-platform/websockets
-- Chrome service worker lifecycle: https://developer.chrome.com/docs/extensions/develop/concepts/service-workers/lifecycle
-- WXT framework: https://wxt.dev/ and https://github.com/wxt-dev/wxt
-- 2025 extension framework comparison: https://redreamality.com/blog/the-2025-state-of-browser-extension-frameworks-a-comparative-analysis-of-plasmo-wxt-and-crxjs/
-- ws library: https://github.com/websockets/ws and https://www.npmjs.com/package/ws
-- apns2 library: https://github.com/AndrewBarba/apns2 and https://www.npmjs.com/package/apns2
-- APNs token-based auth: https://developer.apple.com/documentation/usernotifications/establishing-a-token-based-connection-to-apns
-- Railway Node.js WebSocket template: https://railway.com/deploy/DZV--w
-- Railway docs: https://docs.railway.com/builds/dockerfiles and https://docs.railway.com/guides/express
-- Node.js LTS schedule: https://endoflife.date/nodejs
+- [Google Auth protobuf schema -- alexbakker.me](https://alexbakker.me/post/parsing-google-auth-export-qr-code.html) -- HIGH confidence
+- [Google Auth export format -- qistoph/otp_export](https://github.com/qistoph/otp_export) -- HIGH confidence
+- [Google Auth export format -- zwyx.dev](https://zwyx.dev/blog/google-authenticator-export-format) -- HIGH confidence
+- [Protocol Buffers wire format -- protobuf.dev](https://protobuf.dev/programming-guides/encoding/) -- HIGH confidence (official)
+- [AES.GCM -- Apple Developer Documentation](https://developer.apple.com/documentation/cryptokit/aes/gcm) -- HIGH confidence
+- [CommonCrypto PBKDF2 -- Apple open source](https://opensource.apple.com/source/CommonCrypto/CommonCrypto-55010/doc/CCCommonKeyDerivation.3cc.auto.html) -- HIGH confidence
+- [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html) -- HIGH confidence
+- [PBKDF2 iterations 2025 -- dev.to](https://dev.to/securebitchat/why-you-should-use-310000-iterations-with-pbkdf2-in-2025-3o1e) -- MEDIUM confidence
+- [UITextField in keyboard extension -- Apple Developer Forums](https://developer.apple.com/forums/thread/114827) -- HIGH confidence
+- [Custom Keyboard Programming Guide -- Apple](https://developer.apple.com/library/archive/documentation/General/Conceptual/ExtensibilityPG/CustomKeyboard.html) -- HIGH confidence
+- [Keyboard extension limitations -- inFullMobile](https://medium.com/@inFullMobile/limitations-of-custom-ios-keyboards-3be88dfb694) -- MEDIUM confidence
+
+---
+*Stack research for: KeyAuth v2.0 feature additions*
+*Researched: 2026-04-16*

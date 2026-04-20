@@ -1,370 +1,320 @@
-# Domain Pitfalls
+# Pitfalls Research
 
-**Domain:** Chrome MV3 Extension + WebSocket Relay + APNs + iOS App
-**Project:** KeyAuth
-**Researched:** 2026-04-14
-
----
+**Domain:** iOS TOTP Authenticator -- v2.0 feature additions (smart keyboard, protobuf import, encrypted export, onboarding)
+**Researched:** 2026-04-16
+**Confidence:** HIGH (verified against existing codebase, Apple docs, community experience)
 
 ## Critical Pitfalls
 
-Mistakes that cause rewrites, data loss, or the core flow silently failing in production.
+### Pitfall 1: UITextField Inside Keyboard Extension Steals Text Input Proxy
 
----
+**What goes wrong:**
+Adding a search/filter UITextField inside the keyboard extension causes all typed text to route to the host app instead of the search field. When the UITextField becomes firstResponder, `textDocumentProxy.insertText()` stops working for code insertion. The keyboard appears broken -- user types a search query but characters appear in the host app's text field.
 
-### Pitfall 1: Service Worker State Loss on Every Wake
+**Why it happens:**
+iOS keyboard extensions route all input through `textDocumentProxy`, which always points to the host app's active text field. When you add a UITextField inside your keyboard view and give it focus, iOS does NOT automatically redirect the proxy. The system was designed so keyboard extensions produce text, not consume it. Standard `becomeFirstResponder()` on an embedded UITextField creates a conflict between two input targets.
 
-**What goes wrong:** The MV3 service worker is not persistent. Chrome terminates it after 30 seconds of no extension events. Any in-memory state — the WebSocket object, pending request correlation IDs, pairing metadata — is gone when it wakes up for the next event. Code written assuming the service worker is always alive will silently fail on the first cold start.
+**How to avoid:**
+Do NOT use UITextField or UISearchBar for the search field. Instead, build a custom tap-target view that collects individual key taps and assembles the search string manually:
+1. Create a custom `SearchBarView` (UIView subclass) with a display label showing current query text
+2. Add a row of alphabet buttons (A-Z) below or overlaying the account list when search is active
+3. Each button tap appends to an in-memory `searchQuery: String` and filters `accounts` array
+4. A backspace button removes the last character; a clear button resets
+5. Filter the existing `accounts` array using `searchQuery` against `issuer` and `label` fields
 
-**Why it happens:** MV3 explicitly removed persistent background pages. The service worker lifecycle matches web service workers: spin up per-event, spin down when idle. Developers familiar with MV2 background scripts assume persistence that no longer exists.
-
-**Consequences:** WebSocket is `null` when the user clicks the popup after a gap. Correlation IDs for in-flight TOTP requests are lost. The extension appears to hang with no error surfaced to the user.
-
-**Prevention:**
-- Treat the service worker as stateless. Rebuild all in-memory state from `chrome.storage.session` on every wake.
-- Use `chrome.storage.session` (persists across service worker restarts within a browser session, cleared on browser close) for transient state like active pairing and pending request IDs.
-- Use `chrome.storage.local` for durable state like the relay URL and paired device ID.
-- Never rely on a global variable surviving between events.
-
-**Warning signs:**
-- "Works first time, then stops working until extension is reloaded"
-- Code like `let ws = null` at module level with no re-init logic on startup
-- Pending request IDs stored only in a JS `Map`, not in `chrome.storage`
-
-**Phase:** Chrome Extension — service worker architecture (before writing any message-passing logic)
-
----
-
-### Pitfall 2: WebSocket Keepalive Is Required Even in Chrome 116+
-
-**What goes wrong:** Chrome 116 improved WebSocket support so an active connection resets the 30-second idle timer — but only while messages flow. A WebSocket that is connected but silent for more than 30 seconds will still cause the service worker to terminate and the connection to close. Assuming the Chrome 116 fix eliminates the need for keepalive is incorrect.
-
-**Why it happens:** The documentation improvement was real, but the underlying mechanism is "reset idle timer on WS activity." No activity = no reset = termination.
-
-**Consequences:** The relay connection drops silently any time the user is not actively requesting a code. The next request attempt hits a closed socket, has to reconnect, negotiate, and then send — easily exceeding the 30-second TOTP window.
-
-**Prevention:**
-- Send a ping message from the service worker to the relay server every 20 seconds (10-second margin before the 30-second cutoff).
-- The relay server must respond with a pong. The response message counts as WS activity and resets the timer.
-- Add `"minimum_chrome_version": "116"` to `manifest.json` to make the requirement explicit.
-- Clear the keepalive interval when the WebSocket closes to avoid orphaned timers.
+This avoids the textDocumentProxy conflict entirely. The search "keyboard" is just tappable buttons within your keyboard view -- no UITextField, no firstResponder conflict.
 
 **Warning signs:**
-- No ping/pong logic in the WebSocket client code
-- Service worker logs show it restarting frequently
-- Users report that a second code request in the same session fails to deliver
+- Characters appearing in the host app while typing in your search field
+- `textDocumentProxy.insertText()` silently stops working after search field gains focus
+- Tap on a TOTP code cell inserts nothing after interacting with search
 
-**Phase:** Chrome Extension — WebSocket client implementation
+**Phase to address:**
+Smart Keyboard phase (search/filter feature). This must be the first design decision -- the entire search UI architecture depends on avoiding UITextField.
 
 ---
 
-### Pitfall 3: Railway's 15-Minute WebSocket Timeout Forces Client Reconnection
+### Pitfall 2: Keyboard Extension Memory Crash During Search With Many Accounts
 
-**What goes wrong:** Railway terminates any WebSocket connection that has been open for more than 15 minutes, regardless of activity. This is a hard platform limit at the Cloudflare/proxy layer. An extension that connects once and never reconnects will silently drop after 15 minutes.
+**What goes wrong:**
+The keyboard extension crashes silently (jetsammed by iOS) when loading and filtering a large account list. Users with 50+ accounts trigger the ~30MB memory limit. The crash is silent -- iOS kills the extension process and the keyboard simply disappears, replaced by the default keyboard. No crash log appears in the user-visible crash reporter.
 
-**Why it happens:** Railway routes traffic through a proxy that enforces a 15-minute maximum request duration for both SSE and WebSocket connections. This is documented but easy to miss when testing locally (where no such proxy exists).
+**Why it happens:**
+iOS keyboard extensions have a hard memory ceiling of approximately 30-48MB (varies by device and system pressure). The current implementation loads ALL accounts from SharedDefaults into memory, creates UICollectionView cells for all of them, and runs a 1-second timer refreshing visible cells. Adding search UI (alphabet buttons, filtered results, animations) increases the baseline memory. On older devices (iPhone SE 2nd gen, iPad mini), the ceiling is closer to 30MB.
 
-**Consequences:** The extension and iOS app both believe they are connected, but the relay has dropped them. The next TOTP request is silently lost. The user sees a spinner with no response.
-
-**Prevention:**
-- Implement reconnection logic in both the Chrome extension service worker and the iOS app.
-- Reconnect proactively at ~14 minutes (before Railway cuts the connection) rather than reactively on error.
-- On reconnect, rejoin the relay room using the stored pairing token so the server re-associates the device.
-- Test with a 15-minute clock in CI or manually — the failure only appears in production-like environments.
+**How to avoid:**
+1. Keep the account list as `[FilterableAccount]` structs (id, issuer, label only -- NO secret, NO full Account object) for display/filtering. Load secrets on-demand only when user taps to insert.
+2. Pre-compute the filtered list when search query changes; do NOT keep multiple copies of the full account array.
+3. Use `UICollectionView` cell reuse aggressively -- the current implementation already does this, but verify no strong references to cells exist in closures.
+4. Profile with Instruments (Allocations) under the keyboard extension target, NOT the main app target. Extensions have separate memory limits.
+5. Set a practical upper bound: if user has 200+ accounts, paginate or show "showing first 100 results."
+6. Avoid loading any images/icons for accounts in the keyboard extension.
 
 **Warning signs:**
-- "Works for a while, then stops responding" reported exactly around 15-minute intervals
-- No `onclose` reconnect handler in the WebSocket client
-- Testing only against local relay (which has no timeout)
+- Keyboard disappears without warning during use (check Console.app for `jetsam` events)
+- Memory usage above 20MB in Instruments when profiling keyboard extension
+- CollectionView scroll stutter (precedes jetsam by moments)
 
-**Phase:** Relay server + both clients (design the reconnection protocol before implementing it)
+**Phase to address:**
+Smart Keyboard phase. Memory profiling must be part of the acceptance criteria for this phase.
 
 ---
 
-### Pitfall 4: iOS WebSocket Drops When App Goes to Background
+### Pitfall 3: Hand-Rolling Protobuf Parser With Off-By-One Varint Decoding
 
-**What goes wrong:** `URLSessionWebSocketTask` cannot maintain an active connection when the iOS app is backgrounded. iOS suspends the process shortly after it leaves the foreground. The socket is closed by the OS. This is by design and cannot be worked around without background modes.
+**What goes wrong:**
+The custom protobuf decoder silently produces corrupted data -- wrong secrets, truncated issuer names, or crashes on valid Google Authenticator exports. Users import their accounts and get wrong TOTP codes, which locks them out of services. This is catastrophic because the user may have already deleted Google Authenticator.
 
-**Why it happens:** iOS has strict background execution limits. The standard URL session APIs — including WebSocket tasks — are not eligible for background operation. Only background URL session (download/upload tasks), VoIP PushKit, and a small set of background modes survive suspension.
+**Why it happens:**
+Protobuf wire format parsing requires handling varint encoding (variable-length integers using 7-bit groups with continuation bits), wire types (varint=0, length-delimited=2, 32-bit=5), and nested messages. Common mistakes in hand-rolled parsers:
 
-**Consequences:** If the design assumes the iOS app maintains a persistent relay connection, it will work only when the app is in the foreground. Every use case where the phone is sitting idle (locked, home screen) will fail — which is the majority of actual usage.
+1. **Varint continuation bit mishandling:** Each byte's MSB indicates "more bytes follow." Failing to mask the MSB (byte & 0x7F) before shifting corrupts the value. Shifting in the wrong direction (big-endian vs little-endian varint) silently produces wrong field numbers.
+2. **Field number extraction error:** The tag varint encodes `(fieldNumber << 3) | wireType`. Forgetting the 3-bit shift means field 1 (tag byte 0x0A for length-delimited) gets parsed as field 0.
+3. **Nested message boundaries:** `OtpParameters` is a length-delimited field inside `MigrationPayload`. Failing to limit the sub-parser to the declared byte length causes it to read into the next OtpParameters entry, corrupting all subsequent accounts.
+4. **Missing/zero-value fields:** Proto2 optional fields may be absent. Proto3 default values (0, empty string) are not written to the wire. The parser must handle absent fields gracefully and apply defaults (algorithm=SHA1, digits=6, type=TOTP).
 
-**Prevention:**
-- Do not design around a persistent iOS WebSocket. Design around APNs wakeup.
-- The correct flow: relay server receives a code request from Chrome extension → relay calls APNs → APNs delivers an alert push notification to the iOS app → the user taps it (or it wakes the app in foreground) → the app opens, connects WebSocket, authenticates, sends code → relay forwards code to extension.
-- Keep `URLSessionWebSocketTask` as a foreground-only connection. Connect on app launch/foreground transition; disconnect cleanly on background.
-- Use `applicationDidEnterBackground` / `sceneDidEnterBackground` to close the WebSocket gracefully.
+**How to avoid:**
+1. Write the parser against the known proto definition:
+   - MigrationPayload: field 1 (repeated OtpParameters), fields 2-5 (version/batch metadata)
+   - OtpParameters: field 1 (bytes secret), field 2 (string name), field 3 (string issuer), field 4 (enum algorithm), field 5 (enum digits), field 6 (enum type), field 7 (int64 counter)
+2. Implement varint decoding as a standalone, thoroughly unit-tested function.
+3. For each length-delimited field, create a sub-Data slice and parse ONLY within those bounds.
+4. Write test cases using real Google Authenticator export data (create test accounts in GA, export, capture the base64 payload).
+5. Handle unknown field numbers by skipping them (read wire type, skip appropriate bytes) -- Google may add fields in future versions.
+6. Validate parsed secrets by generating a TOTP code and comparing with the source app before deleting the source.
 
 **Warning signs:**
-- Simulator testing works but real device testing fails when the phone is locked
-- The iOS app tries to `.resume()` a task in a background URLSession configured for WebSocket
+- Parsed account count doesn't match expected count from Google Authenticator
+- Base32-encoding of parsed secret bytes doesn't produce valid TOTP codes
+- Parser crashes on exports with many accounts (batch QR codes)
 
-**Phase:** iOS app — relay client design (must be settled before any iOS WebSocket code is written)
+**Phase to address:**
+Google Authenticator Import phase. Requires extensive test fixtures and must NOT be shipped without real-device testing against actual GA exports.
 
 ---
 
-### Pitfall 5: Silent APNs Pushes Are Throttled and Cannot Be Used for TOTP Wakeup
+### Pitfall 4: Weak Key Derivation in Encrypted Backup Export
 
-**What goes wrong:** `content-available: 1` (silent / background) push notifications are throttled by iOS at approximately 3 per hour per device. Apple's throttling logic is undocumented and based on battery state, usage patterns, and app behavior. For a TOTP flow that must wake the app reliably on demand, silent pushes are not reliable.
+**What goes wrong:**
+The encrypted backup file uses PBKDF2 with too few iterations or a weak configuration, making brute-force attacks feasible. An attacker who obtains the `.keyauth` backup file can crack the password and extract all TOTP secrets. Since TOTP secrets are long-lived (rarely rotated), a single breach compromises all the user's 2FA accounts.
 
-**Why it happens:** Silent pushes are designed for eventual consistency use cases (syncing data, prefetching content) — not real-time, user-initiated triggers. Apple intentionally limits them to prevent background battery drain.
+**Why it happens:**
+Developers copy PBKDF2 examples from Stack Overflow or tutorials that use 1,000-10,000 iterations. In 2026, GPUs can test billions of PBKDF2-SHA256 hashes per second at low iteration counts. Additionally, developers may:
+- Use a short or fixed salt (or no salt at all)
+- Derive a key shorter than 256 bits
+- Use CBC mode instead of an AEAD cipher (enabling padding oracle attacks)
+- Not include a version byte in the file format, preventing future algorithm upgrades
 
-**Consequences:** The user requests a TOTP code; the relay sends a silent push; iOS decides not to deliver it (or delays it by minutes). The extension shows no response. The code window expires. The user has no idea why it failed.
-
-**Prevention:**
-- Use **alert push notifications** (with `alert.title` and `alert.body`) for the TOTP code request. Alert pushes have higher delivery priority and are not subject to the same throttle limits.
-- The relay server sends: `{ "aps": { "alert": { "title": "KeyAuth", "body": "Code requested for [site]" }, "sound": "default" } }`.
-- The iOS app handles `userNotificationCenter(_:didReceive:withCompletionHandler:)` to present the Face ID prompt when the user taps the notification.
-- Do not use `content-available: 1` as the primary wakeup signal. If silent pushes are used at all, they must be treated as optional hints.
+**How to avoid:**
+1. Use PBKDF2-SHA512 via CommonCrypto's `CCKeyDerivationPBKDF` with at least 600,000 iterations (OWASP 2023 recommendation for SHA-256; 210,000 for SHA-512). Use `CCCalibratePBKDF` to auto-calibrate for ~500ms derivation time on the user's device, with a floor of 210,000 iterations.
+2. Generate a 16-byte (128-bit) random salt per export using `SecRandomCopyBytes`.
+3. Derive a 256-bit key.
+4. Encrypt with AES-256-GCM (available via CryptoKit's `AES.GCM.seal`) or ChaCha20-Poly1305 (already used in the relay E2E encryption). Both are AEAD ciphers providing authentication.
+5. File format: `[1-byte version][16-byte salt][4-byte iteration count (big-endian)][12-byte nonce][ciphertext+tag]`. Including the iteration count allows future increases without breaking old files.
+6. Enforce minimum password length (8 characters) and show a strength indicator. Reject empty passwords.
+7. Include a known plaintext prefix in the decrypted data (magic bytes like "KEYAUTH\x01") so decryption can verify success before attempting JSON decode.
 
 **Warning signs:**
-- APNs payload contains only `content-available: 1` with no `alert` key
-- Flow design says "app wakes in background to handle request" (not possible without VoIP / PushKit)
-- Testing in simulator passes (simulators deliver silent pushes differently than real devices)
+- Iteration count below 100,000 in the code
+- No salt, or a hardcoded salt string
+- Using AES-CBC instead of AES-GCM
+- No version byte in the file header
+- Password accepted without minimum length check
 
-**Phase:** Relay server — APNs integration; iOS app — push notification handling
+**Phase to address:**
+Encrypted Backup Export phase. Security review of the key derivation parameters must be an explicit acceptance criterion.
 
 ---
 
-### Pitfall 6: APNs JWT Provider Token Expires After One Hour
+### Pitfall 5: Recency Tracking Bloats Keychain Item Size and Breaks Sync
 
-**What goes wrong:** The relay server authenticates to APNs using a JWT signed with the `.p8` private key (token-based auth). APNs requires this JWT to be issued within the last hour. The server generates one token at startup and reuses it indefinitely. After 60 minutes, APNs returns `ExpiredProviderToken (403)` and all push deliveries silently fail.
+**What goes wrong:**
+Adding `lastUsed: Date` and `useCount: Int` fields to the `Account` struct causes frequent Keychain writes on every code insertion from the keyboard. Each write triggers an iCloud Keychain sync, creating sync storms across devices. Worse, if recency data differs between devices (user taps different codes on iPhone vs iPad), sync conflicts cause the dedup logic to fight with recency updates, potentially losing accounts.
 
-**Why it happens:** Token-based APNs authentication uses short-lived JWTs, not persistent certificates. The JWT `iat` (issued-at) claim is validated server-side by Apple. Libraries that don't auto-rotate the token leave this as developer responsibility.
+**Why it happens:**
+The current `Account` struct is stored as JSON in each Keychain item. Adding mutable fields like `lastUsed` and `useCount` means every tap-to-insert triggers: JSON encode -> Keychain SecItemUpdate -> iCloud sync push -> KVS notification on other devices -> reload on other devices. For a user inserting 5-10 codes per day, this creates 5-10x more Keychain writes than the current near-zero write frequency after initial setup.
 
-**Consequences:** TOTP code requests from the extension reach the relay. The relay tries to send an APNs push. APNs rejects it. The relay gets a 403 with no visible user-facing error. The extension times out waiting for a response. Fails silently in production.
+Additionally, iCloud Keychain sync is eventually-consistent. Two devices updating the same item's `lastUsed` timestamp create a conflict. Apple's resolution is last-write-wins, which means whichever device syncs last overwrites the other's recency data AND potentially the rest of the Account data if the JSON blob is treated as atomic.
 
-**Prevention:**
-- The relay must generate a new JWT before each APNs HTTP/2 request, or cache the token and regenerate it when it is older than 45-50 minutes (with margin before the 60-minute limit).
-- Track the token creation timestamp on the relay. If `Date.now() - tokenCreatedAt > 45 * 60 * 1000`, regenerate.
-- Use a library that handles token rotation automatically (e.g., `@parse/node-apn` with token auth configured, or `apns2`). Verify the library actually rotates — some have bugs where they do not (check their GitHub issues before choosing).
-- Ensure the relay server's system clock is NTP-synchronized. A clock drift of a few minutes causes `InvalidProviderToken` even when the token was recently generated.
+**How to avoid:**
+Store recency data SEPARATELY from TOTP secrets:
+1. Use **App Group UserDefaults** (SharedDefaults) for recency metadata: `[UUID: RecencyInfo]` where `RecencyInfo` contains `lastUsed: Date` and `useCount: Int`.
+2. NEVER add mutable high-frequency fields to the `Account` struct or Keychain items.
+3. The keyboard extension already reads from SharedDefaults -- it can read AND write recency data there without Keychain access.
+4. The main app reads recency data from SharedDefaults to sort the account list.
+5. Recency data is device-local by design -- each device has its own usage patterns. This is a feature, not a bug.
+6. If cross-device recency is desired later, use NSUbiquitousKeyValueStore (1MB limit, 1024 keys max) with coalesced/throttled writes.
 
 **Warning signs:**
-- APNs calls work in testing but fail after the server has been running for an hour
-- The relay logs show 403 responses from `api.push.apple.com`
-- No token age check in the APNs request code
-- Railway restarts fix the problem temporarily (token is regenerated on restart)
+- `Account` struct gains new mutable fields beyond the original set
+- Keychain writes happening on every code tap in the keyboard extension
+- iCloud sync conflicts appearing in Console.app logs after using codes on multiple devices
+- `coalescedReload()` firing constantly during normal use
 
-**Phase:** Relay server — APNs integration
+**Phase to address:**
+Smart Keyboard phase (recency sorting). The data model decision must happen BEFORE implementing sort logic.
 
 ---
 
-### Pitfall 7: APNs Device Token Goes Stale After App Reinstall or iOS Upgrade
+### Pitfall 6: Onboarding Flow Blocks Existing Users Who Just Updated
 
-**What goes wrong:** The APNs device token stored on the relay server becomes invalid when the iOS app is reinstalled, restored from backup, or after certain iOS updates. APNs eventually returns `BadDeviceToken (400)` or `Unregistered (410)`, but the timing of this feedback is undocumented and may be delayed by hours or days. Meanwhile, all pushes to that device fail silently.
+**What goes wrong:**
+After a v2.0 update, existing users with configured accounts are forced through a multi-screen onboarding flow designed for fresh installs. They must swipe through "Welcome to KeyAuth" screens, re-enable the keyboard, and re-pair their Chrome extension -- even though everything is already set up. Users perceive this as the app "forgetting" their setup and may panic-delete and reinstall.
 
-**Why it happens:** Device tokens are not permanent. APNs rotates them under conditions that Apple does not publish. The relay server has no way to know a token has changed unless the app sends a fresh token after re-registration.
+**Why it happens:**
+The onboarding state is tracked by a simple boolean like `hasCompletedOnboarding` in UserDefaults. On a fresh v2.0 install, this flag doesn't exist, so onboarding shows. But the flag also doesn't exist for users upgrading from v1.0 (which had no onboarding flow). The code treats "no flag" as "new user" when it should also check for existing data.
 
-**Consequences:** After the user reinstalls the KeyAuth iOS app (or gets a new device), push notifications stop working. The relay keeps sending to the old token. No error is surfaced. The extension hangs on every code request.
-
-**Prevention:**
-- The iOS app must call `UIApplication.shared.registerForRemoteNotifications()` on every app launch (not just first launch) and send the resulting token to the relay whenever it changes.
-- Use `UserDefaults` or Keychain to cache the last-sent token. Only call the relay's "register device" endpoint when the token is new or different from the cached value.
-- The relay must handle `410 Unregistered` from APNs by treating the stored token as invalid and returning an error to the Chrome extension so the user can re-pair.
-- When APNs returns `BadDeviceToken (400)`, log it and surface a re-pairing prompt in the extension popup.
+**How to avoid:**
+1. Check for existing state BEFORE showing onboarding: `KeychainManager.shared.loadAll().isEmpty` and `PairingStore` emptiness and keyboard extension enabled status.
+2. Use a versioned onboarding key: `onboarding_completed_v2` rather than a generic boolean. This allows showing v2.0-specific screens (new features tour) to v1.0 upgraders while skipping the basic setup screens.
+3. Implement three onboarding paths:
+   - **Fresh install (no accounts, no pairing):** Full onboarding -- welcome, keyboard enable guide, add first account, optional pairing
+   - **Upgrade with data (accounts exist):** Abbreviated -- "What's new in v2.0" (1-2 screens), skip keyboard/pairing setup if already done
+   - **Upgrade without data (accounts empty, but app was installed):** Treat as fresh but skip the "Welcome to KeyAuth" brand introduction
+4. Gate each onboarding screen independently: keyboard setup screen only shows if `UIInputViewController` self-check fails; pairing screen only shows if PairingStore is empty.
+5. Store the onboarding version completed, not just a boolean: `UserDefaults.set(2, forKey: "onboarding_version_completed")`. Future v3.0 can show delta onboarding.
 
 **Warning signs:**
-- Users who reinstall the app report the extension stops working
-- The relay has no endpoint for updating the device token after initial pairing
-- APNs error responses are ignored or not logged
+- Single boolean `hasCompletedOnboarding` in the code
+- No conditional checks for existing Keychain data before showing onboarding
+- Onboarding flow has no "Skip" option
+- No differentiation between fresh install and app update
 
-**Phase:** iOS app — device token registration; relay server — token storage and error handling
+**Phase to address:**
+Onboarding phase. The state detection logic must be implemented and tested before building any onboarding UI screens.
 
 ---
 
-### Pitfall 8: The 30-Second TOTP Window Can Expire During the Relay Round-Trip
+### Pitfall 7: Protobuf Batch QR Codes Silently Dropped
 
-**What goes wrong:** The full flow is: user clicks extension → extension sends WS message to relay → relay calls APNs → APNs delivers push → user sees notification, taps, Face ID prompt → Face ID auth → iOS app connects WebSocket → iOS app generates TOTP → sends to relay → relay forwards to extension → extension fills field. If any leg of this chain introduces latency (slow APNs delivery, slow Face ID, slow reconnect), the generated code can be near-expiration or already expired by the time it is filled.
+**What goes wrong:**
+Google Authenticator splits large account lists across multiple QR codes (batched export). The app scans the first QR code, imports those accounts, and presents a success screen. The user closes the import flow without scanning the remaining QR codes, losing half their accounts. They only discover this days later when a missing account's code is needed.
 
-**Why it happens:** TOTP codes have a 30-second step (RFC 6238 default). Codes are valid at generation time but continue aging in transit. A round trip that takes 20+ seconds hands the user a code with 10 seconds left — often not enough to fill and submit it.
+**Why it happens:**
+The `MigrationPayload` protobuf includes `batch_size`, `batch_index`, and `batch_id` fields. If the parser ignores batch metadata, it treats each QR code as a complete, independent import. The UI shows "Imported 10 accounts" after the first scan, and the user reasonably assumes they're done.
 
-**Consequences:** The autofilled code is rejected by the target site. The user does not understand why and retries, creating a confusing loop.
-
-**Prevention:**
-- Generate the TOTP code on the iOS app as **late as possible** — only after Face ID has succeeded and the relay WebSocket is connected. Do not generate eagerly on push receipt.
-- Implement ±1 step acceptance (accept the previous step's code) on the server side of the target site — but this is out of scope for KeyAuth. Instead, optimize the flow to complete within 10 seconds.
-- Display the TOTP code's remaining lifetime in the extension popup so the user can see if they need to retry.
-- Log timestamps at each step in development to identify slow legs. APNs delivery is typically <2 seconds. Face ID is ~1 second. The slow leg is usually iOS reconnect on a cold start.
+**How to avoid:**
+1. Parse `batch_size` and `batch_index` from every `MigrationPayload`.
+2. If `batch_size > 1`, show a progress indicator: "Scanned QR code 1 of 3 -- scan next code to continue."
+3. Keep the camera scanner open between batch scans. Do NOT dismiss it after the first successful scan.
+4. Track scanned batches by `batch_id` and `batch_index`. Warn if the user tries to dismiss with unscanned batches: "You've scanned 1 of 3 export codes. X accounts may not be imported. Continue anyway?"
+5. Allow re-scanning the same batch (idempotent -- dedup by secret content, not by batch metadata).
+6. Store partially-imported batch state so the user can resume later.
 
 **Warning signs:**
-- Round-trip time is not measured during development
-- The code is generated at push receipt time (on the iOS side) before Face ID
-- No visual countdown shown to the user in the extension
+- Import flow immediately shows "Done" without checking batch metadata
+- No multi-QR-code scanning UI
+- Camera dismisses after first successful scan
+- No "X of Y" progress indicator during import
 
-**Phase:** iOS app — TOTP delivery flow; Chrome extension — popup UI design
-
----
-
-## Moderate Pitfalls
-
-Mistakes that cause user-facing failures or significant rework, but not a full rewrite.
+**Phase to address:**
+Google Authenticator Import phase. Batch handling is not optional -- Google Auth uses batches for any user with more than ~10 accounts.
 
 ---
 
-### Pitfall 9: Relay Room Pairing Has No Expiry — Stale Rooms Accumulate
+## Technical Debt Patterns
 
-**What goes wrong:** The relay server creates a room when a device pair is established. If rooms are never cleaned up, the server accumulates stale room state from old pairings, test devices, and disconnected clients. On Railway's memory-constrained environment, this will eventually cause OOM restarts.
+| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
+|----------|-------------------|----------------|-----------------|
+| Store recency in Account struct | Simpler data model, single source of truth | Sync storms, Keychain write amplification, conflict hell | Never -- the write frequency difference is too great |
+| Skip protobuf varint edge cases (>5 byte varints) | Faster initial implementation | Crash on accounts with high counter values (HOTP) or future proto changes | Never -- varints up to 10 bytes must be handled per spec |
+| Hardcode PBKDF2 iteration count | Simpler code, predictable performance | Becomes weak as hardware improves, no way to upgrade without breaking old files | Only if version byte allows future upgrade path |
+| Use UserDefaults for all search state in keyboard | Avoids memory management complexity | UserDefaults.synchronize() is expensive, 30MB limit includes serialization overhead | Early prototype only, must optimize before release |
+| Single onboarding boolean | Simple conditional logic | Cannot do incremental onboarding for future versions | Never -- use versioned integer from day one |
 
-**Prevention:**
-- Assign a TTL to each room. Expire rooms where no client has connected within 24 hours.
-- On Railway restart, all in-memory room state is lost anyway — design the client to re-announce its presence on connect rather than assuming the relay remembers it.
-- Use a heartbeat from each connected client; remove a client from the room map when their heartbeat stops for >60 seconds.
+## Integration Gotchas
 
-**Warning signs:**
-- Room map grows monotonically in server memory
-- No room cleanup code exists
-- Memory usage on Railway climbs over days
+| Integration | Common Mistake | Correct Approach |
+|-------------|----------------|------------------|
+| Google Authenticator export | Assuming URL-decoded base64 is standard base64 | The `data` parameter is URL-encoded, then base64-encoded. Must URL-decode first, then handle base64 padding (`+` as `%2B`, `/` as `%2F`, `=` as `%3D`). Also handle both standard and URL-safe base64 variants. |
+| SharedDefaults (App Group) | Writing recency data synchronously on every code tap | Batch/debounce writes. `UserDefaults.synchronize()` is blocking I/O. In the keyboard extension, defer writes by 2 seconds after last tap using a debounce timer. |
+| Keychain + iCloud sync | Adding new fields to Account struct without Codable migration | Old Keychain items encoded with v1 Account struct will fail to decode if new required fields are added. All new fields MUST have defaults or be Optional. Test by encoding with old struct, decoding with new struct. |
+| CryptoKit / CommonCrypto | Using CryptoKit's AES.GCM in the keyboard extension | CryptoKit should be available in extensions, but verify the entitlements. The keyboard extension does NOT have network access, so encryption/decryption for backup must happen in the main app only. |
 
-**Phase:** Relay server — room lifecycle design
+## Performance Traps
 
----
+| Trap | Symptoms | Prevention | When It Breaks |
+|------|----------|------------|----------------|
+| Filtering accounts with String.contains() on every keystroke | Visible lag after 3rd character typed in search, keyboard feels frozen | Pre-compute lowercased issuer+label once at load time, filter against pre-computed values | 100+ accounts with complex Unicode issuers |
+| Reloading entire CollectionView on filter change | Flash/flicker on each keystroke, scroll position lost | Use `performBatchUpdates` with calculated insertions/deletions, or maintain two arrays (full + filtered) and diff | 50+ accounts visible |
+| Timer-based TOTP refresh in keyboard (1-second interval) | CPU usage stays elevated, battery drain reported by users | Only refresh visible cells, pause timer when keyboard is not visible (`viewDidDisappear` already handles this -- verify it fires reliably) | Always -- even with 10 accounts, unnecessary 1s polling wastes cycles |
+| JSON encoding full Account array to SharedDefaults on every reload | Blocking main thread in keyboard extension, dropped frames | Only write to SharedDefaults when accounts actually change (compare hash/count), not on every `reload()` call | 30+ accounts, ~50KB+ JSON payload |
 
-### Pitfall 10: QR Pairing Code Is Not Time-Limited or Single-Use
+## Security Mistakes
 
-**What goes wrong:** The QR code displayed by the Chrome extension encodes a pairing token. If that token has no expiry and can be used multiple times, an attacker who photographs the QR code (shoulder surfing, screen recording) can pair their own device to the user's relay room at any point in the future.
+| Mistake | Risk | Prevention |
+|---------|------|------------|
+| Including TOTP secrets in the backup filename or metadata | Secrets visible to anyone with file system access, iCloud Drive, or AirDrop preview | Filename should be generic: `keyauth-backup-2026-04-16.keyauth`. Never include account names or secrets in unencrypted metadata. |
+| Using ECB mode or CBC without authentication for backup encryption | Ciphertext manipulation goes undetected; padding oracle attacks reveal plaintext | Use AEAD cipher only: AES-256-GCM or ChaCha20-Poly1305. Both authenticate and encrypt in one operation. |
+| Allowing backup export without biometric/passcode gate | Any app with file access can trigger export and intercept the file | Gate backup export behind FaceID/TouchID. The `BiometricAuthManager` already exists -- reuse it. |
+| Not zeroing derived key material after use | Key material persists in memory, accessible via memory dump | Use `Data` with immediate overwrite after encryption completes. Swift's ARC doesn't guarantee immediate deallocation. Call `resetBytes(in:)` on mutable Data. In practice, Swift makes true zeroing difficult -- at minimum avoid storing keys in String (which copies freely). |
+| Protobuf parser accepting malformed field lengths | Buffer over-read if length-delimited field declares a length larger than remaining data | Validate: `declaredLength <= remainingBytes` before reading any length-delimited field. Reject the entire payload on violation. |
 
-**Prevention:**
-- Generate a pairing token with a short TTL (60-120 seconds). The QR code should expire if not scanned within that window.
-- Mark the token as consumed on first successful pairing. Reject second-use attempts.
-- Show a countdown timer in the extension popup so the user knows the QR is expiring.
+## UX Pitfalls
 
-**Warning signs:**
-- Pairing token is a static UUID derived from a stable device identifier
-- No expiry field on the token
-- The relay accepts pairing requests for a room that already has two clients connected
+| Pitfall | User Impact | Better Approach |
+|---------|-------------|-----------------|
+| Search bar always visible in keyboard, reducing code list space | Only 1-2 codes visible when search is shown; defeats purpose of quick access | Show search only when tapped (toggle via magnifying glass icon). Default view shows sorted codes without search chrome. |
+| Importing duplicates from Google Auth without warning | User ends up with doubled accounts, confused which is which | Before import, check existing accounts by DedupKey (issuer+label+secret). Show "5 new, 3 already exist -- import new only?" dialog. |
+| Backup export produces file with no clear way to restore | User exports backup "just in case" but never tests restore. When they need it, they can't figure out how to import. | Include a "Test your backup" prompt after export. The import flow should handle `.keyauth` files via iOS share sheet / file picker. |
+| Onboarding keyboard activation guide shows wrong Settings path | iOS versions change the path to enable third-party keyboards. Hardcoded screenshots become wrong. | Use text-based instructions with the current iOS version's path. Better: deep-link to Settings if possible (`UIApplication.openSettingsURL` goes to app settings, not keyboard settings -- be honest about the limitation). |
+| Recency sort feels wrong after importing many accounts | User imports 30 accounts from Google Auth; all have the same "last used" timestamp (never); sort order is arbitrary | For newly imported accounts, use `sortOrder` as tiebreaker when `lastUsed` is nil/never. Preserve the import order as the initial sort. |
 
-**Phase:** Chrome extension — pairing UI; relay server — pairing endpoint
+## "Looks Done But Isn't" Checklist
 
----
+- [ ] **Protobuf parser:** Often missing handling for unknown field numbers -- verify the parser skips unrecognized fields without crashing (Google may add fields in future GA versions)
+- [ ] **Protobuf parser:** Often missing batch QR code support -- verify `batch_size > 1` is handled with multi-scan UI
+- [ ] **Protobuf parser:** Often missing URL decoding of the base64 data parameter -- verify `%2B`, `%2F`, `%3D` are decoded before base64 decode
+- [ ] **Encrypted backup:** Often missing version byte in file header -- verify first byte is a version identifier for future format upgrades
+- [ ] **Encrypted backup:** Often missing import/restore flow -- verify the `.keyauth` file can be opened from Files app, AirDrop, and share sheet
+- [ ] **Keyboard search:** Often missing memory profiling under extension constraints -- verify with Instruments against keyboard extension target (not main app)
+- [ ] **Keyboard search:** Often missing fallback for textDocumentProxy conflict -- verify typing into search does NOT insert characters into host app
+- [ ] **Onboarding:** Often missing upgrade path detection -- verify existing v1.0 users see abbreviated flow, not full onboarding
+- [ ] **Onboarding:** Often missing keyboard-already-enabled detection -- verify the "enable keyboard" screen is skipped if keyboard is already active
+- [ ] **Recency tracking:** Often missing separation from Keychain data -- verify recency writes go to SharedDefaults, NOT Keychain items
+- [ ] **Account struct:** Often missing Codable backward compatibility -- verify v1.0 encoded Account JSON decodes correctly with v2.0 struct (new fields must be Optional or have CodingKeys defaults)
 
-### Pitfall 11: Content Script Cannot Detect TOTP Fields in Shadow DOM or iframes
+## Recovery Strategies
 
-**What goes wrong:** The content script scans the DOM for `<input type="text">` fields that look like TOTP inputs (pattern matching on `maxlength=6`, `autocomplete="one-time-code"`, etc.). Sites using Web Components with Shadow DOM, or sites that render the 2FA field in a cross-origin iframe, will not be detected.
+| Pitfall | Recovery Cost | Recovery Steps |
+|---------|---------------|----------------|
+| Protobuf parser corrupts imported secrets | HIGH | Users locked out of services. Must re-scan original QR codes from each service. Implement pre-import validation: generate TOTP code from parsed secret and display alongside GA's current code for user to visually verify before committing. |
+| Weak backup encryption discovered post-release | MEDIUM | Bump file format version. New exports use stronger parameters. Old files still decrypt with old parameters (version byte dispatches). Cannot retroactively fix already-exported files -- notify users to re-export. |
+| Recency data stored in Keychain causing sync storms | MEDIUM | Migrate recency fields out of Account struct into SharedDefaults. Requires Codable migration (add `recencyMigratedV2` flag). Old struct decodes with Optional recency fields that get ignored. |
+| Onboarding shown to existing users | LOW | Add upgrade detection retroactively. Check for existing Keychain accounts on launch. Set `onboarding_version_completed = 2` silently if accounts exist and onboarding hasn't been completed. |
+| Keyboard extension jetsammed during search | LOW | Reduce memory footprint: load only filterable metadata, lazy-load full Account on tap. Profile and iterate. No data loss -- extension restarts on next keyboard switch. |
 
-**Prevention:**
-- Use `autocomplete="one-time-code"` as the primary detection signal — this is the standard attribute and more reliable than `maxlength` heuristics.
-- For Shadow DOM: `document.querySelectorAll('*')` does not pierce shadow roots. You need to walk shadow roots explicitly or use `TreeWalker` with shadow traversal.
-- Cross-origin iframes cannot be accessed from a content script at all — this is a hard browser security constraint. For these sites, the user must manually paste the code from the popup.
-- Document which sites will not be auto-fillable and surface a fallback copy-to-clipboard button in the popup.
+## Pitfall-to-Phase Mapping
 
-**Warning signs:**
-- Auto-fill tested only on simple HTML pages, not on React/Angular/Web Components sites
-- No fallback copy button in the extension popup
-- Content script uses only `document.querySelector('input[maxlength="6"]')`
-
-**Phase:** Chrome extension — content script detection
-
----
-
-### Pitfall 12: Chrome Extension Review Rejection for Overbroad Permissions
-
-**What goes wrong:** Requesting `<all_urls>` or `*://*/*` host permissions when the extension only needs to inject a content script for autofill causes immediate reviewer scrutiny and often rejection. Approximately 45% of submissions with issues are rejected due to improperly scoped permissions.
-
-**Prevention:**
-- Use `activeTab` permission instead of `<all_urls>` if the autofill only triggers on the currently active tab at the user's explicit request.
-- Use `"optional_host_permissions": ["<all_urls>"]` with `chrome.permissions.request()` at runtime if broader access is truly needed — optional permissions require explicit user consent and are viewed more favorably.
-- In the "Notes for reviewers" field, explain that the WebSocket connection goes to a user-owned relay server. Provide a test account or setup instructions. Reviewers who cannot reproduce the core flow will reject.
-- Do not obfuscate code. Minification (whitespace removal) is fine. Variable renaming that obscures intent is not.
-
-**Warning signs:**
-- `manifest.json` has `"host_permissions": ["<all_urls>"]` with no explanation of why
-- Extension submitted without "Notes for reviewers" instructions
-- Minification tool has obfuscation mode enabled
-
-**Phase:** Chrome extension — manifest configuration and store submission
-
----
-
-### Pitfall 13: `.p8` Key Committed to Source Control or Included in Extension Bundle
-
-**What goes wrong:** The APNs `.p8` private key file is used on the relay server to sign JWTs. If it is committed to the Git repository or accidentally bundled into the Chrome extension ZIP during build, it is exposed.
-
-**Prevention:**
-- Add `*.p8` to `.gitignore` immediately when the relay server directory is created.
-- Load the `.p8` contents from a Railway environment variable (`APNS_PRIVATE_KEY`), not from a file path on disk.
-- Never store key material in the Chrome extension — the extension has no reason to hold APNs credentials.
-- Audit the extension ZIP before submission to ensure it contains no `.p8`, `.env`, or credential files.
-
-**Warning signs:**
-- `.p8` file lives in the repo root alongside `package.json`
-- Build script uses `cp .env dist/` or similar
-- Railway service uses a file mount for the key instead of an environment variable
-
-**Phase:** Relay server — initial setup (before first commit)
-
----
-
-## Minor Pitfalls
-
-Friction points that can be fixed without architectural changes.
-
----
-
-### Pitfall 14: Using `ws://` Instead of `wss://` Causes Browser Rejection
-
-The Chrome extension popup and service worker run in a secure context. Browsers block mixed-content WebSocket connections (`ws://`) from secure contexts. The relay must be served over `wss://`. Railway provides TLS termination automatically — the Node.js server binds to HTTP internally and Railway's Cloudflare proxy provides the TLS layer. Do not configure the Node.js server to handle TLS itself; that creates double-TLS which breaks the connection.
-
-**Phase:** Relay server — initial Railway deployment
-
----
-
-### Pitfall 15: APNs Sandbox vs. Production Endpoint Mismatch
-
-Development builds (Xcode debug scheme) register with the APNs sandbox endpoint (`api.sandbox.push.apple.com`). Production builds (App Store / TestFlight) register with the production endpoint (`api.push.apple.com`). A relay server using only one endpoint will fail for the other environment. This is a common source of "push notifications work in dev, fail in production" bugs.
-
-**Prevention:**
-- The relay server must accept an `environment` field when a device registers its token (or derive it from the build type).
-- Use separate APNs endpoint URLs per environment on the relay side.
-- Test on a production-signed build (TestFlight) before considering push notifications complete.
-
-**Phase:** Relay server — APNs integration; iOS app — token registration endpoint
-
----
-
-### Pitfall 16: Service Worker Update Race Condition Corrupts storage
-
-When the Chrome extension auto-updates, the old service worker is unregistered and a new one is registered. There is a documented race condition where the old service worker's async storage purge can run after the new service worker has already written fresh data, destroying it. This is a Chromium bug (tracked) but not fixed as of Chrome 116.
-
-**Prevention:**
-- Use `chrome.runtime.onInstalled` with `reason === "update"` to re-initialize all storage keys explicitly on update, overwriting whatever state exists.
-- Keep stored values small and re-derivable (e.g., store the relay URL and pairing token, not derived state that can be recomputed).
-
-**Phase:** Chrome extension — update handling
-
----
-
-## Phase-Specific Warnings
-
-| Phase Topic | Likely Pitfall | Mitigation |
-|-------------|---------------|------------|
-| Service worker architecture | State loss on wake (Pitfall 1) | Design stateless from day one; use `chrome.storage.session` |
-| WebSocket client in SW | No keepalive → connection drops (Pitfall 2) | Implement 20-second ping before writing other WS logic |
-| Relay server deployment to Railway | 15-minute timeout (Pitfall 3) | Write reconnection protocol spec before implementation |
-| iOS relay client design | Background socket drops (Pitfall 4) | Decide on APNs-wakeup-then-connect flow before any iOS WS code |
-| APNs integration on relay | Silent push throttling (Pitfall 5), JWT expiry (Pitfall 6) | Use alert pushes; implement token rotation from day one |
-| iOS device token registration | Stale tokens (Pitfall 7) | Register token on every launch; handle 410 on relay |
-| End-to-end flow timing | TOTP window expiry (Pitfall 8) | Measure each leg; generate code post-Face ID, not post-push |
-| Pairing flow design | No token expiry (Pitfall 10) | TTL + single-use tokens before pairing UI is built |
-| Content script detection | Shadow DOM / iframe gaps (Pitfall 11) | Add copy-to-clipboard fallback from the start |
-| Chrome Web Store submission | Overbroad permissions → rejection (Pitfall 12) | Audit manifest permissions; write reviewer notes before submitting |
-| Initial relay server commit | `.p8` key in source control (Pitfall 13) | Add `.p8` to `.gitignore` before creating any key files |
-
----
+| Pitfall | Prevention Phase | Verification |
+|---------|------------------|--------------|
+| UITextField proxy conflict in keyboard | Smart Keyboard | Manual test: type in search, then tap code cell -- text must insert into host app, not search field |
+| Keyboard memory crash | Smart Keyboard | Instruments profile showing peak memory under 25MB with 100 accounts loaded and search active |
+| Protobuf varint/parsing errors | Google Auth Import | Unit tests with real GA export payloads (1 account, 10 accounts, batch export, SHA256/512 accounts) |
+| Batch QR codes dropped | Google Auth Import | Manual test: export 15+ accounts from GA (forces batching), verify all imported |
+| Weak key derivation | Encrypted Backup Export | Code review: iteration count >= 210,000, random salt, AEAD cipher, version byte present |
+| Recency in Keychain | Smart Keyboard | Code review: no new mutable fields added to Account struct, recency in SharedDefaults only |
+| Onboarding blocks upgraders | Onboarding | Manual test: install v1.0, add accounts, upgrade to v2.0 -- verify abbreviated onboarding |
+| Account struct Codable break | All phases adding fields | Unit test: encode Account with v1.0 fields, decode with v2.0 struct, verify no data loss |
 
 ## Sources
 
-- [Chrome Extensions: WebSockets in Service Workers (official)](https://developer.chrome.com/docs/extensions/how-to/web-platform/websockets) — HIGH confidence
-- [Chrome Extensions: Service Worker Lifecycle (official)](https://developer.chrome.com/docs/extensions/develop/concepts/service-workers/lifecycle) — HIGH confidence
-- [Railway Guides: SSE vs WebSockets — 15-minute timeout documentation](https://docs.railway.com/guides/sse-vs-websockets) — HIGH confidence
-- [Apple: Establishing token-based connection to APNs](https://developer.apple.com/documentation/usernotifications/establishing-a-token-based-connection-to-apns) — HIGH confidence
-- [Apple: URLSessionWebSocketTask](https://developer.apple.com/documentation/foundation/urlsessionwebsockettask) — HIGH confidence
-- [Chrome 116: WebSocket improvements for extension service workers](https://developer.chrome.google.cn/blog/chrome-116-beta-whats-new-for-extensions) — HIGH confidence
-- [APNs Auth Error Troubleshooting Guide (MagicBell)](https://www.magicbell.com/blog/auth-error-from-apns-or-web-push-service-troubleshoot-guide) — MEDIUM confidence
-- [iOS Silent Push Limits (Medium)](https://medium.com/@shobhakartiwari/ios-silent-push-limits-7d0c65b642f4) — MEDIUM confidence
-- [APNs in 2025: Certificate and Token Updates (Simform)](https://medium.com/simform-engineering/apns-in-2025-apples-major-certificate-shift-must-know-token-updates-df4587582b4c) — MEDIUM confidence
-- [Chrome Web Store Pre-Submission Checklist 2026 (AppBooster)](https://appbooster.net/blog/chrome-extension-pre-submission-checklist/) — MEDIUM confidence
-- [Chrome Web Store Review Process (official)](https://developer.chrome.com/docs/webstore/review-process) — HIGH confidence
-- [Chromium bug: ServiceWorker shutdown every 5 minutes](https://issues.chromium.org/issues/40733525) — HIGH confidence
-- [Silent Push Notifications: Opportunities, Not Guarantees (Medium)](https://mohsinkhan845.medium.com/silent-push-notifications-in-ios-opportunities-not-guarantees-2f18f645b5d5) — MEDIUM confidence
-- [TOTP Common Mistakes (Authgear, 2026)](https://www.authgear.com/post/5-common-totp-mistakes) — MEDIUM confidence
+- [Apple Developer Forums: Keyboard Extension Memory Issue](https://developer.apple.com/forums/thread/85478) -- HIGH confidence
+- [KeyboardKit: How to type into a text input within a keyboard extension](https://keyboardkit.com/blog/2023/11/13/how-to-type-within-a-keyboard-extension) -- HIGH confidence
+- [Apple Developer Forums: Keyboard Extension Crashes](https://developer.apple.com/forums/thread/105815) -- HIGH confidence
+- [Fleksy: Limitations of Custom Keyboards on iOS](https://www.fleksy.com/blog/limitations-of-custom-keyboards-on-ios/) -- MEDIUM confidence
+- [Igor Kulman: Dealing with memory limits in iOS app extensions](https://blog.kulman.sk/dealing-with-memory-limits-in-app-extensions/) -- MEDIUM confidence
+- [Protocol Buffers Encoding Guide](https://protobuf.dev/programming-guides/encoding/) -- HIGH confidence
+- [Kreya: Demystifying the protobuf wire format](https://kreya.app/blog/protocolbuffers-wire-format/) -- HIGH confidence
+- [Alex Bakker: Parsing Google Authenticator export QR codes](https://alexbakker.me/post/parsing-google-auth-export-qr-code.html) -- MEDIUM confidence
+- [qistoph/otp_export: Google Authenticator export format](https://github.com/qistoph/otp_export) -- HIGH confidence
+- [Jimmy0w0: Google Authenticator Deep Dive into Exported Data](https://jimmy0w0.me/posts/google-authenticator-a-deep-dive-into-exported-data-en/) -- MEDIUM confidence
+- [OWASP/NIST PBKDF2 Iteration Recommendations](https://jp-east.mas.scc.lac.co.jp/iOS/en/build/html/subPage/Cryptography_Requirements.html) -- HIGH confidence
+- [Andy Ibanez: When CryptoKit is not Enough](https://www.andyibanez.com/posts/cryptokit-not-enough/) -- MEDIUM confidence
+- [Apple: kSecAttrSynchronizable Documentation](https://developer.apple.com/documentation/security/ksecattrsynchronizable) -- HIGH confidence
+- [Apple: Onboarding HIG](https://developer.apple.com/design/human-interface-guidelines/onboarding) -- HIGH confidence
+- [Apple Developer Forums: Keychain Storage Size](https://developer.apple.com/forums/thread/73314) -- MEDIUM confidence
+
+---
+*Pitfalls research for: KeyAuth v2.0 feature additions*
+*Researched: 2026-04-16*
