@@ -1,42 +1,23 @@
-# Requirements: KeyAuth Chrome Extension
+# Requirements: KeyAuth v2.0 — Beautiful, Seamless, Untouchable
 
-**Defined:** 2026-04-15
-**Core Value:** One-click TOTP code delivery from phone to browser — secrets never leave the phone
+**Defined:** 2026-04-20
+**Core Value:** 2FA codes appear exactly where you need them with zero friction. Secrets never leave the phone.
 
-## v1 Requirements
+## v2.0 Requirements
 
-### Relay Infrastructure
+### v1.0 Carry-Forward: Code Request & Delivery
 
-- [x] **RELAY-01**: WebSocket relay server accepts connections and routes messages between paired devices via room IDs
-- [x] **RELAY-02**: Relay sends APNs alert push to wake iOS app when code is requested and iOS client is absent
-- [x] **RELAY-03**: Relay server runs on Railway with automatic TLS termination
-- [x] **RELAY-04**: Relay exposes /health endpoint for uptime monitoring
-- [x] **RELAY-05**: Relay manages APNs JWT token rotation (refresh at 45-minute intervals)
-- [x] **RELAY-06**: Relay enforces max 2 clients per room
-
-### Pairing
-
-- [x] **PAIR-01**: Chrome extension generates a QR code containing roomId and relay URL for one-time pairing
-- [x] **PAIR-02**: iOS app scans pairing QR code and joins the relay room
-- [x] **PAIR-03**: Pairing tokens are single-use and expire after a TTL (e.g., 5 minutes)
-- [x] **PAIR-04**: iOS app sends APNs device token to relay during pairing handshake
-- [x] **PAIR-05**: Extension popup shows pairing status indicator (connected/disconnected/paired)
-
-### Code Request & Delivery
-
-- [x] **CODE-01**: User clicks extension popup, selects an account, and initiates a code request
-- [x] **CODE-02**: iOS app receives code request and prompts Face ID/Touch ID before generating code
 - [ ] **CODE-03**: TOTP code is generated on the phone after biometric approval, then sent via relay to extension
 - [ ] **CODE-04**: Extension popup displays the received code with an expiry countdown timer
 - [ ] **CODE-05**: Extension surfaces relevant accounts based on the current website domain
 
-### Browser Integration
+### v1.0 Carry-Forward: Browser Integration
 
 - [ ] **FILL-01**: Content script detects TOTP input fields using autocomplete attribute and heuristic fallbacks
 - [ ] **FILL-02**: Extension auto-fills the detected TOTP field with the received code
 - [ ] **FILL-03**: Extension provides clipboard copy with automatic 30-second clear as fallback
 
-### Resilience
+### v1.0 Carry-Forward: Resilience
 
 - [ ] **RESIL-01**: Chrome extension service worker sends 20-second WebSocket keepalive pings
 - [ ] **RESIL-02**: Both clients proactively reconnect before Railway's 15-minute WebSocket timeout
@@ -44,157 +25,134 @@
 - [ ] **RESIL-04**: iOS app registers APNs device token on every launch (handles token refresh)
 - [ ] **RESIL-05**: Extension reconnects and rejoins room automatically on WebSocket drop
 
-### iOS App Additions
+### v1.0 Carry-Forward: iOS App
 
-- [x] **IOS-01**: iOS app includes a WebSocket relay client (URLSessionWebSocketTask, foreground-only)
-- [x] **IOS-02**: iOS app registers for and handles APNs alert push notifications
-- [ ] **IOS-03**: iOS app presents a TOTP approval sheet (account name, site, approve/deny + Face ID)
-- [x] **IOS-04**: iOS app includes a pairing management screen (view paired devices, unpair)
+- [ ] **IOS-03**: iOS app presents TOTP approval sheet (account name, site, approve/deny + Face ID)
 
-### iCloud Keychain Sync
+### Extension Account Management (NEW)
 
-- [x] **ICLOUD-01**: `KeychainManager.save` accepts a `synchronizable: Bool` parameter and sets `kSecAttrSynchronizable` accordingly on SecItemAdd
-- [x] **ICLOUD-02**: All Keychain read queries (`loadAll`, `load`) include `kSecAttrSynchronizable: kSecAttrSynchronizableAny` so both synced and non-synced items are matched
-- [x] **ICLOUD-03**: `KeychainManager.delete(id:)` removes both the synced and non-synced copies of the specified account
-- [x] **ICLOUD-04**: A Settings screen is accessible from the main toolbar via a gear button and contains a "Sync with iCloud Keychain" toggle with the D-03 disclosure footer verbatim
-- [x] **ICLOUD-05**: New users (with no prior `hasSeenSyncFirstLaunchCard` flag) see a first-launch card above the accounts empty state with the D-03 copy and a "Got it" dismiss action
-- [x] **ICLOUD-06**: Turning the sync toggle OFF opens a confirmation with two explicit options: "Stop syncing this device" (default) and "Remove from iCloud on all devices" (destructive, `role: .destructive`)
-- [x] **ICLOUD-07**: Flipping the toggle OFF→ON migrates all local-only accounts to synced storage by re-saving each with `synchronizable=true` and deleting the original non-sync copy, continuing on partial failure and surfacing the final count
-- [x] **ICLOUD-08**: After migration or fresh-sync, accounts with identical `(normalized issuer, normalized label, canonicalized secret)` are deduplicated to the one with the earliest `createdAt`; a toast shows "Merged N duplicate accounts" when N > 0
-- [x] **ICLOUD-09**: The "Remove from iCloud on all devices" action executes `SecItemDelete` with `kSecAttrSynchronizable: true` (not `SynchronizableAny`), preserving any non-synchronizable copies on the current device
-- [ ] **ICLOUD-10**: When the app's `scenePhase` becomes `.active`, `AccountStore.reload()` is invoked and `NSUbiquitousKeyValueStore.synchronize()` is called
-- [x] **ICLOUD-11**: On every `KeychainManager.save` or `.delete` with sync enabled, an `accounts-version` Int64 counter in `NSUbiquitousKeyValueStore` is incremented; an observer on `didChangeExternallyNotification` triggers a coalesced (300ms debounce) `AccountStore.reload()` on `ServerChange` or `InitialSyncChange` reasons
-- [x] **ICLOUD-12**: After `AccountStore.reload()` completes, the updated account list is written to `SharedDefaults` so the keyboard extension's next activation reads fresh data
-- [x] **ICLOUD-13**: `PairingStore`, `CryptoBoxManager`, APNs device token storage, and any other per-device state do NOT set `kSecAttrSynchronizable=true` on their Keychain items; these items remain local to each device
-- [x] **ICLOUD-14**: When `FileManager.default.ubiquityIdentityToken` is nil, the sync toggle is disabled and shows the D-11 inline copy with a functional "Open iOS Settings" deep-link button
-- [x] **ICLOUD-15**: On `NSUbiquityIdentityDidChangeNotification` when the token becomes nil, the sync toggle flips to OFF and the D-12 inline copy is shown; when the token changes to a different non-nil value, the app treats this as a new iCloud account (clears SyncPreference, shows D-12 copy)
-- [ ] **ICLOUD-16**: Fresh install with `syncPreference.enabled=true` AND empty accounts list shows "Restoring your accounts from iCloud…" state for up to a configurable timeout (default 30 seconds, overridable for tests via `RestoringFromCloudView.restoringTimeoutSeconds`); if `accounts-version` changes or accounts arrive within the window, transition to normal state; otherwise fall through to normal empty state
+- [ ] **EXT-01**: Phone sends encrypted account metadata (issuer, label, account ID — NOT secrets) to extension during pairing and whenever accounts are added/removed/edited on the phone
+- [ ] **EXT-02**: Extension caches the account list locally in chrome.storage.local and displays it in the popup with full search/filter capability
+- [ ] **EXT-03**: Extension popup includes a search bar that filters accounts by issuer or label as the user types, with instant results
+- [ ] **EXT-04**: User selects a specific account in the extension, which sends a targeted "generate code for [account ID]" request — phone only needs to FaceID approve and respond
+- [ ] **EXT-05**: Domain matching auto-highlights and sorts accounts matching the current tab's domain to the top of the list, reducing to one-click for the common case
 
-### FaceID Capability Tokens
+### Smart Keyboard (NEW)
 
-- [ ] **FIDO-01**: `TrustWindowManager.shared` is an `@MainActor` ObservableObject singleton exposing `isInWindow: Bool` derived from `windowExpiresAt: Date?`. State is transient — not persisted to Keychain or UserDefaults, reset to `isInWindow == false` on app launch.
-- [ ] **FIDO-02**: `TrustWindowManager.mint()` sets `windowExpiresAt = Date().addingTimeInterval(120)` when `TrustWindowPreference.isEnabled == true`.
-- [ ] **FIDO-03**: When `TrustWindowPreference.isEnabled == false`, `TrustWindowManager.mint()` is a no-op and `isInWindow` remains `false` (D-17 enforcement).
-- [ ] **FIDO-04**: TTL is fixed-from-mint: calling `mint()` twice within 2 minutes replaces the expiry with `t2 + 120s` (fresh 2 min), not extended beyond a single mint (D-03, D-04).
-- [ ] **FIDO-05**: `TrustWindowManager.isInWindow` returns `false` automatically after `windowExpiresAt` passes, via a lazy `now() < exp` check on every access (belt-and-suspenders for Pitfall 7 — D-07).
-- [ ] **FIDO-06**: Receiving `UIApplication.didEnterBackgroundNotification` revokes the window: `windowExpiresAt = nil` (D-05).
-- [ ] **FIDO-07**: Observing `ICloudStateObserver.shared.$didAccountChange == true` revokes the window (D-06).
-- [ ] **FIDO-08**: `CodeApprovalView.approveAndSend` calls `TrustWindowManager.shared.mint()` after `BiometricAuthManager.authenticate` returns `true` AND before the `Task.sleep` that dismisses the sheet (D-01).
-- [ ] **FIDO-09**: `RelayClient.handleMessage` silent-send branch: when `TrustWindowManager.shared.isInWindow == true` AND `accountResolver` returns a non-nil account, it generates a TOTP code, calls `sendEncryptedCode`, fires the toast via `TrustWindowManager.shared.showToast(for:)`, and does NOT set `pendingCodeRequest` (D-11, D-09).
-- [ ] **FIDO-10**: Silent-send falls back to FaceID (normal `pendingCodeRequest = request` flow) when `accountResolver` returns `nil` (ambiguous multi-match or no-match).
-- [ ] **FIDO-11**: Toast emits `"Code sent for <issuer>"` when `account.issuer` is non-empty; falls back to `"Code sent"` when issuer is empty (D-09, UI-SPEC Copywriting Contract).
-- [ ] **FIDO-12**: Toast self-dismisses after exactly 2.0 seconds (D-09, UI-SPEC Interaction Patterns toast lifecycle).
-- [ ] **FIDO-13**: `CodeApprovalView.startAutoRefresh(account:)` is deleted and no caller remains. A grep of `App/` and `Shared/` returns zero matches for `startAutoRefresh` (D-12).
-- [ ] **FIDO-14**: `TrustWindowPreference` (Shared/TrustWindowPreference.swift) mirrors `SyncPreference` shape: UserDefaults-backed `Bool` with `isEnabled`, `setEnabled`, and `bootstrap()` (no parameter) using separate `trust_window_enabled` and `hasLaunchedBeforeTrustWindow` keys.
-- [ ] **FIDO-15**: `SettingsView` exposes a Toggle with the exact label `"Allow 2-minute trust window after FaceID"` bound to `TrustWindowPreference.isEnabled`, with footer helper text verbatim from UI-SPEC Copywriting Contract (D-16).
-- [ ] **FIDO-16**: On fresh install, `TrustWindowPreference.bootstrap()` defaults `isEnabled == true` (D-16 — default ON for both new and existing users).
-- [ ] **FIDO-17**: `TrustWindowManager.windowExpiresAt` is NOT persisted; after a force-quit or relaunch, `isInWindow == false` (Claude's Discretion — not persisted).
-- [ ] **FIDO-18**: Toast overlay remains visible above `ContentView` after the `CodeApprovalView` sheet is dismissed from the mint moment (manual QA per UI-SPEC Interaction Patterns sheet/overlay invariant).
-- [ ] **FIDO-19**: The Chrome extension (`extension/`) source is NOT modified. Origin continues to travel in `CodeRequest.domain` only; no new envelope fields added (D-15).
+- [ ] **KEYB-01**: User's most recently used accounts appear first in the keyboard auth bar, sorted by a weighted score of recency (70%) and frequency (30%)
+- [ ] **KEYB-02**: Usage data (lastUsed timestamp, useCount) is tracked in SharedDefaults when user taps a code in the keyboard, and persisted to Keychain by the companion app on foreground
+- [ ] **KEYB-03**: Keyboard displays a filter bar (UIButton-based chips, not UITextField) that lets users narrow accounts by tapping issuer buttons
+- [ ] **KEYB-04**: Filter bar shows top 5 issuer names as quick-filter chips; tapping one shows only that issuer's accounts
+- [ ] **KEYB-05**: Accounts are grouped by issuer with visual section headers when more than 8 accounts exist
+- [ ] **KEYB-06**: Base32.swift gains an `encode(Data) -> String` function (prerequisite for protobuf import)
 
-## v2 Requirements
+### Google Authenticator Import (NEW)
 
-### Security
+- [ ] **IMPORT-01**: User can scan Google Authenticator export QR codes (otpauth-migration:// protobuf format) via camera, with support for multi-QR batch exports (progress indicator showing "QR 2 of 3")
+- [ ] **IMPORT-02**: Protobuf decoder handles the Google Auth MigrationPayload schema (OtpParameters with secret, name, issuer, algorithm, digits, type fields) in pure Swift with no external dependencies
+- [ ] **IMPORT-03**: Decoded protobuf secrets (raw bytes) are Base32-encoded and converted to Account objects via the existing Account.from(otpauthURL:) pipeline
+- [ ] **IMPORT-04**: User can paste an otpauth:// URI directly to add an account (for power users with secrets in text/notes)
+- [ ] **IMPORT-05**: After import completes, a summary screen shows count of imported, skipped (duplicate), and failed accounts
 
-- **SEC-01**: E2E encryption layer (X25519 key exchange) on top of TLS
-- **SEC-02**: Room ID rotation/revocation mechanism
+### Onboarding (NEW)
+
+- [ ] **ONBOARD-01**: First launch shows a keyboard activation guide with step-by-step instructions to enable KeyAuth keyboard in iOS Settings (with illustrations per step)
+- [ ] **ONBOARD-02**: Onboarding includes an import wizard offering "Import from Google Authenticator", "Scan QR Code", or "Enter Manually" as entry points
+- [ ] **ONBOARD-03**: Onboarding includes a pairing walkthrough explaining how to connect the Chrome extension (Install extension → Scan QR → Done)
+- [ ] **ONBOARD-04**: Onboarding state is versioned (integer, not boolean) in SharedDefaults so both app and keyboard extension can read it, and future onboarding additions don't reset completed steps
+- [ ] **ONBOARD-05**: Existing users upgrading with accounts already present see an abbreviated onboarding (keyboard activation + import wizard only, skip intro)
+
+### Encrypted Backup (NEW)
+
+- [ ] **BACKUP-01**: User can export all TOTP accounts to a password-protected .keyauth file using AES-256-GCM encryption with PBKDF2-SHA256 key derivation (600,000+ iterations)
+- [ ] **BACKUP-02**: Export file format includes a cleartext header (magic bytes, version, salt, iteration count) followed by encrypted JSON payload, enabling future format upgrades
+- [ ] **BACKUP-03**: User can import a previously exported .keyauth file by entering the password, with duplicate detection against existing accounts
+- [ ] **BACKUP-04**: Settings shows a "Last exported" date and a periodic reminder nudge if user has 3+ accounts but hasn't exported in 30+ days
+- [ ] **BACKUP-05**: Export/import uses only system frameworks (CryptoKit AES.GCM + CommonCrypto CCKeyDerivationPBKDF) with no external dependencies
+
+## v3.0+ Requirements
+
+### Passkeys
+
+- **PASS-01**: Passkey credential provider (ASCredentialProviderViewController)
+- **PASS-02**: Account model supports both TOTP and passkey credential types
 
 ### Platform Expansion
 
 - **PLAT-01**: Firefox extension (WXT supports cross-browser)
 - **PLAT-02**: Safari extension
 - **PLAT-03**: Self-hosted relay option with Docker image
+- **WATCH-01**: watchOS companion app
+- **STORE-01**: App Store submission and listing
 
 ### Enhanced UX
 
-- **UX-01**: Multi-account search/filter in extension popup
-- **UX-02**: Countdown-aware delivery (wait for next period if <5s remaining)
-- **UX-03**: Auto-detect TOTP field and prompt without clicking extension icon
+- **UX-01**: Countdown-aware delivery (wait for next period if <5s remaining)
+- **UX-02**: Auto-detect TOTP field and prompt without clicking extension icon
+- **UX-03**: Usage analytics dashboard in companion app
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| TOTP seed storage in browser | Core security model — seeds never leave the phone |
-| Auto-fill on page load | Security risk (confirmed anti-pattern by 1Password, Bitwarden) |
+| Passkey support | TOTP still dominant; defer to v3.0+ |
+| Welcome intro screens | Get to value faster — keyboard activation is more actionable |
+| Authy encrypted import | Complex proprietary format, low ROI vs Google Auth |
+| watchOS companion | Separate milestone |
+| Usage analytics dashboard | Nice-to-have, not core to "seamless" goal |
+| CSV/JSON plain-text import | Security risk — plaintext secrets in files |
+| TOTP seed storage in browser | Core security model — secrets never leave the phone |
 | Bluetooth/local transport | Chrome extensions can't use Web Bluetooth API |
-| Account sync across browsers | Each browser must pair independently |
-| Persistent iOS WebSocket | iOS kills background WebSocket; APNs wakeup is the correct pattern |
-| Silent APNs push | Throttled at ~3/hour by Apple; alert push is mandatory |
+| Auto-fill on page load (no user action) | Security anti-pattern (confirmed by 1Password, Bitwarden) |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| RELAY-01 | Phase 1 | Complete |
-| RELAY-02 | Phase 1 | Complete |
-| RELAY-03 | Phase 1 | Complete |
-| RELAY-04 | Phase 1 | Complete |
-| RELAY-05 | Phase 1 | Complete |
-| RELAY-06 | Phase 1 | Complete |
-| IOS-01 | Phase 2 | Complete |
-| IOS-02 | Phase 2 | Complete |
-| IOS-03 | Phase 2 | Pending |
-| IOS-04 | Phase 2 | Complete |
-| PAIR-01 | Phase 3 | Complete |
-| PAIR-02 | Phase 2 | Complete |
-| PAIR-03 | Phase 3 | Complete |
-| PAIR-04 | Phase 2 | Complete |
-| PAIR-05 | Phase 3 | Complete |
-| CODE-01 | Phase 3 | Complete |
-| CODE-02 | Phase 2 | Complete |
-| CODE-03 | Phase 3 | Pending |
-| CODE-04 | Phase 3 | Pending |
-| CODE-05 | Phase 4 | Pending |
-| FILL-01 | Phase 4 | Pending |
-| FILL-02 | Phase 4 | Pending |
-| FILL-03 | Phase 3 | Pending |
-| RESIL-01 | Phase 5 | Pending |
-| RESIL-02 | Phase 5 | Pending |
-| RESIL-03 | Phase 5 | Pending |
-| RESIL-04 | Phase 5 | Pending |
-| RESIL-05 | Phase 5 | Pending |
-| ICLOUD-01 | Phase 6 | Complete (automated) |
-| ICLOUD-02 | Phase 6 | Complete (automated) |
-| ICLOUD-03 | Phase 6 | Complete (automated) |
-| ICLOUD-04 | Phase 6 | Complete (automated) |
-| ICLOUD-05 | Phase 6 | Complete (automated) |
-| ICLOUD-06 | Phase 6 | Complete (automated) |
-| ICLOUD-07 | Phase 6 | Complete (automated) |
-| ICLOUD-08 | Phase 6 | Complete (automated) |
-| ICLOUD-09 | Phase 6 | Complete (automated) |
-| ICLOUD-10 | Phase 6 | Complete (unit) / Manual QA pending 2-DEV-06 |
-| ICLOUD-11 | Phase 6 | Complete (automated) |
-| ICLOUD-12 | Phase 6 | Complete (automated) |
-| ICLOUD-13 | Phase 6 | Complete (automated) |
-| ICLOUD-14 | Phase 6 | Complete (automated) |
-| ICLOUD-15 | Phase 6 | Complete (automated) |
-| ICLOUD-16 | Phase 6 | Complete (unit: RestoringStateTests.testTimeoutTransition) / Manual QA pending 2-DEV-05 |
-| FIDO-01 | Phase 7 | Complete (automated) |
-| FIDO-02 | Phase 7 | Complete (automated) |
-| FIDO-03 | Phase 7 | Complete (automated) |
-| FIDO-04 | Phase 7 | Complete (automated) |
-| FIDO-05 | Phase 7 | Complete (automated) |
-| FIDO-06 | Phase 7 | Complete (automated) |
-| FIDO-07 | Phase 7 | Complete (automated) |
-| FIDO-08 | Phase 7 | Complete (automated) |
-| FIDO-09 | Phase 7 | Complete (automated) |
-| FIDO-10 | Phase 7 | Complete (automated) |
-| FIDO-11 | Phase 7 | Complete (automated) |
-| FIDO-12 | Phase 7 | Complete (automated) |
-| FIDO-13 | Phase 7 | Complete (automated) |
-| FIDO-14 | Phase 7 | Complete (automated) |
-| FIDO-15 | Phase 7 | Complete (automated) |
-| FIDO-16 | Phase 7 | Complete (automated) |
-| FIDO-17 | Phase 7 | Complete (automated) |
-| FIDO-18 | Phase 7 | Manual QA pending 2-DEV-TW-01 |
-| FIDO-19 | Phase 7 | Manual QA pending 2-DEV-TW-02 |
+| CODE-03 | TBD | Pending |
+| CODE-04 | TBD | Pending |
+| CODE-05 | TBD | Pending |
+| FILL-01 | TBD | Pending |
+| FILL-02 | TBD | Pending |
+| FILL-03 | TBD | Pending |
+| RESIL-01 | TBD | Pending |
+| RESIL-02 | TBD | Pending |
+| RESIL-03 | TBD | Pending |
+| RESIL-04 | TBD | Pending |
+| RESIL-05 | TBD | Pending |
+| IOS-03 | TBD | Pending |
+| EXT-01 | TBD | Pending |
+| EXT-02 | TBD | Pending |
+| EXT-03 | TBD | Pending |
+| EXT-04 | TBD | Pending |
+| EXT-05 | TBD | Pending |
+| KEYB-01 | TBD | Pending |
+| KEYB-02 | TBD | Pending |
+| KEYB-03 | TBD | Pending |
+| KEYB-04 | TBD | Pending |
+| KEYB-05 | TBD | Pending |
+| KEYB-06 | TBD | Pending |
+| IMPORT-01 | TBD | Pending |
+| IMPORT-02 | TBD | Pending |
+| IMPORT-03 | TBD | Pending |
+| IMPORT-04 | TBD | Pending |
+| IMPORT-05 | TBD | Pending |
+| ONBOARD-01 | TBD | Pending |
+| ONBOARD-02 | TBD | Pending |
+| ONBOARD-03 | TBD | Pending |
+| ONBOARD-04 | TBD | Pending |
+| ONBOARD-05 | TBD | Pending |
+| BACKUP-01 | TBD | Pending |
+| BACKUP-02 | TBD | Pending |
+| BACKUP-03 | TBD | Pending |
+| BACKUP-04 | TBD | Pending |
+| BACKUP-05 | TBD | Pending |
 
 **Coverage:**
-- v1 requirements: 63 total
-- Mapped to phases: 63
-- Unmapped: 0 ✓
+- v2.0 requirements: 37 total
+- Mapped to phases: 0 (pending roadmap)
+- Unmapped: 37
 
 ---
-*Requirements defined: 2026-04-15*
-*Last updated: 2026-04-19 — Phase 7 automated coverage complete (17 of 19 FIDO-NN `Complete (automated)`; FIDO-18 and FIDO-19 remain `Manual QA pending` for 2-DEV-TW-01 and 2-DEV-TW-02 respectively).*
+*Requirements defined: 2026-04-20*
+*Last updated: 2026-04-20 after milestone v2.0 definition*
