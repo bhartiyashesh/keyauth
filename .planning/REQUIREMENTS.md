@@ -109,50 +109,50 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CODE-03 | TBD | Pending |
-| CODE-04 | TBD | Pending |
-| CODE-05 | TBD | Pending |
-| FILL-01 | TBD | Pending |
-| FILL-02 | TBD | Pending |
-| FILL-03 | TBD | Pending |
-| RESIL-01 | TBD | Pending |
-| RESIL-02 | TBD | Pending |
-| RESIL-03 | TBD | Pending |
-| RESIL-04 | TBD | Pending |
-| RESIL-05 | TBD | Pending |
-| IOS-03 | TBD | Pending |
-| EXT-01 | TBD | Pending |
-| EXT-02 | TBD | Pending |
-| EXT-03 | TBD | Pending |
-| EXT-04 | TBD | Pending |
-| EXT-05 | TBD | Pending |
-| KEYB-01 | TBD | Pending |
-| KEYB-02 | TBD | Pending |
-| KEYB-03 | TBD | Pending |
-| KEYB-04 | TBD | Pending |
-| KEYB-05 | TBD | Pending |
-| KEYB-06 | TBD | Pending |
-| IMPORT-01 | TBD | Pending |
-| IMPORT-02 | TBD | Pending |
-| IMPORT-03 | TBD | Pending |
-| IMPORT-04 | TBD | Pending |
-| IMPORT-05 | TBD | Pending |
-| ONBOARD-01 | TBD | Pending |
-| ONBOARD-02 | TBD | Pending |
-| ONBOARD-03 | TBD | Pending |
-| ONBOARD-04 | TBD | Pending |
-| ONBOARD-05 | TBD | Pending |
-| BACKUP-01 | TBD | Pending |
-| BACKUP-02 | TBD | Pending |
-| BACKUP-03 | TBD | Pending |
-| BACKUP-04 | TBD | Pending |
-| BACKUP-05 | TBD | Pending |
+| CODE-03 | Phase 8 | Pending |
+| CODE-04 | Phase 8 | Pending |
+| CODE-05 | Phase 8 | Pending |
+| FILL-01 | Phase 8 | Pending |
+| FILL-02 | Phase 8 | Pending |
+| FILL-03 | Phase 8 | Pending |
+| RESIL-01 | Phase 8 | Pending |
+| RESIL-02 | Phase 8 | Pending |
+| RESIL-03 | Phase 8 | Pending |
+| RESIL-04 | Phase 8 | Pending |
+| RESIL-05 | Phase 8 | Pending |
+| IOS-03 | Phase 8 | Pending |
+| EXT-01 | Phase 9 | Pending |
+| EXT-02 | Phase 9 | Pending |
+| EXT-03 | Phase 9 | Pending |
+| EXT-04 | Phase 9 | Pending |
+| EXT-05 | Phase 9 | Pending |
+| KEYB-01 | Phase 9 | Pending |
+| KEYB-02 | Phase 9 | Pending |
+| KEYB-06 | Phase 9 | Pending |
+| KEYB-03 | Phase 10 | Pending |
+| KEYB-04 | Phase 10 | Pending |
+| KEYB-05 | Phase 10 | Pending |
+| IMPORT-01 | Phase 11 | Pending |
+| IMPORT-02 | Phase 11 | Pending |
+| IMPORT-03 | Phase 11 | Pending |
+| IMPORT-04 | Phase 11 | Pending |
+| IMPORT-05 | Phase 11 | Pending |
+| ONBOARD-01 | Phase 13 | Pending |
+| ONBOARD-02 | Phase 13 | Pending |
+| ONBOARD-03 | Phase 13 | Pending |
+| ONBOARD-04 | Phase 13 | Pending |
+| ONBOARD-05 | Phase 13 | Pending |
+| BACKUP-01 | Phase 12 | Pending |
+| BACKUP-02 | Phase 12 | Pending |
+| BACKUP-03 | Phase 12 | Pending |
+| BACKUP-04 | Phase 12 | Pending |
+| BACKUP-05 | Phase 12 | Pending |
 
 **Coverage:**
-- v2.0 requirements: 37 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 37
+- v2.0 requirements: 38 total
+- Mapped to phases: 38
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-20*
-*Last updated: 2026-04-20 after milestone v2.0 definition*
+*Last updated: 2026-04-16 after v2.0 roadmap creation*
