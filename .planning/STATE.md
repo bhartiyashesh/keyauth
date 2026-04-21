@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: MVP
-status: planning
+status: executing
 stopped_at: Phase 8 UI-SPEC approved
-last_updated: "2026-04-21T03:45:31.140Z"
-last_activity: 2026-04-16 -- v2.0 roadmap created (Phases 8-13)
+last_updated: "2026-04-21T13:04:44.969Z"
+last_activity: 2026-04-21 -- Phase 08 execution started
 progress:
   total_phases: 6
   completed_phases: 0
-  total_plans: 0
+  total_plans: 6
   completed_plans: 0
   percent: 0
 ---
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-20)
 
 **Core value:** 2FA codes appear exactly where you need them -- in the keyboard, in the browser -- with zero friction, zero clipboard, zero app-switching. Secrets never leave the phone.
-**Current focus:** Phase 8 - Core Extension Flow (v2.0)
+**Current focus:** Phase 08 — core-extension-flow
 
 ## Current Position
 
-Phase: 8 of 13 (Core Extension Flow)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-04-16 -- v2.0 roadmap created (Phases 8-13)
+Phase: 08 (core-extension-flow) — EXECUTING
+Plan: 1 of 6
+Status: Executing Phase 08
+Last activity: 2026-04-21 -- Phase 08 execution started
 
 Progress: [..........] 0% (v2.0 milestone)
 

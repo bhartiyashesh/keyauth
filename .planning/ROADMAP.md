@@ -134,7 +134,7 @@ Plans:
 **Plans:** 6 plans
 
 Plans:
-- [ ] 08-01-PLAN.md -- Types, domain-match utility, storage helpers (foundation contracts)
+- [x] 08-01-PLAN.md -- Types, domain-match utility, storage helpers (foundation contracts)
 - [ ] 08-02-PLAN.md -- Account list popup UI (AccountList, AccountItem, ReconnectingBanner)
 - [ ] 08-03-PLAN.md -- Service worker extensions (account_list, proactive reconnect, fill dispatch)
 - [ ] 08-04-PLAN.md -- iOS RelayClient (sendAccountList, proactive reconnect, accountId resolve)
