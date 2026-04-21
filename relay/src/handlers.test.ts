@@ -33,6 +33,8 @@ function createMockRoomManager(overrides: Partial<Record<keyof RoomManager, unkn
     })),
     clientCount: mock.fn(() => 1),
     hasIosClient: mock.fn(() => false),
+    queueForIos: mock.fn(),
+    flushPendingForIos: mock.fn(() => false),
     evict: mock.fn(),
     shutdown: mock.fn(),
     get roomCount() { return 1; },

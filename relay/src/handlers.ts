@@ -49,6 +49,12 @@ export function handleMessage(
       const deviceToken = msg.payload.deviceToken as string | undefined;
       roomManager.join(roomId, clientId, ws, deviceToken);
       sendResponse(ws, 'joined', msg.id, { roomId });
+      // If this is the iOS client waking from APNs, flush any message that
+      // was forwarded while it was absent so it can present the approval sheet.
+      if (deviceToken) {
+        const flushed = roomManager.flushPendingForIos(roomId, ws);
+        if (flushed) log.info('Flushed pending message to iOS on join');
+      }
       break;
     }
 
@@ -81,10 +87,14 @@ export function handleMessage(
       roomManager.forward(roomId, clientId, raw);
       log.debug({ type: msg.type }, 'Message forwarded');
 
-      // If no iOS client is connected, send APNs push (D-10)
+      // If no iOS client is connected, send APNs push (D-10) AND buffer the
+      // forwarded message so it can be delivered when iOS wakes and joins.
+      // Without the buffer, iOS gets the push but the actual CodeRequest is
+      // gone (forward is stateless), so the approval sheet never shows.
       if (!roomManager.hasIosClient(roomId)) {
         const room = roomManager.getRoom(roomId);
         if (room?.deviceToken) {
+          roomManager.queueForIos(roomId, raw);
           const requestId = msg.id;
           sendWakeupPush(room.deviceToken, roomId, requestId).catch((err) => {
             log.error({ err }, 'Failed to send wakeup push');

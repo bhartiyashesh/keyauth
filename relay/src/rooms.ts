@@ -2,6 +2,8 @@ import { WebSocket } from 'ws';
 import type { Room, Client } from './types.js';
 import logger from './logger.js';
 
+const PENDING_FOR_IOS_TTL_MS = 60 * 1000;
+
 export class RoomManager {
   private rooms = new Map<string, Room>();
   private ttlMs: number;
@@ -10,6 +12,36 @@ export class RoomManager {
   constructor(ttlMinutes: number = 30) {
     this.ttlMs = ttlMinutes * 60 * 1000;
     this.timer = setInterval(() => this.evict(), 5 * 60 * 1000);
+  }
+
+  /**
+   * Buffer a forwarded message that couldn't reach iOS because it was absent.
+   * Single-slot: new message replaces any existing pending one (latest wins).
+   * Consumed on next iOS join via flushPendingForIos().
+   */
+  queueForIos(roomId: string, raw: string): void {
+    const room = this.rooms.get(roomId);
+    if (!room) return;
+    room.pendingForIos = raw;
+    room.pendingForIosAt = Date.now();
+  }
+
+  /**
+   * Deliver any buffered message to the iOS client that just joined. Returns
+   * true if a message was flushed. Expired messages (> TTL) are discarded.
+   */
+  flushPendingForIos(roomId: string, iosWs: WebSocket): boolean {
+    const room = this.rooms.get(roomId);
+    if (!room || !room.pendingForIos || !room.pendingForIosAt) return false;
+    const fresh = Date.now() - room.pendingForIosAt <= PENDING_FOR_IOS_TTL_MS;
+    const msg = room.pendingForIos;
+    room.pendingForIos = undefined;
+    room.pendingForIosAt = undefined;
+    if (fresh && iosWs.readyState === WebSocket.OPEN) {
+      iosWs.send(msg);
+      return true;
+    }
+    return false;
   }
 
   join(roomId: string, clientId: string, ws: WebSocket, deviceToken?: string): Room {
