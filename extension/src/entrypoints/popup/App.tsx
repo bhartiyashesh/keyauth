@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import PairingView from '../../components/PairingView';
 import ConnectedView from '../../components/ConnectedView';
 import CodeView from '../../components/CodeView';
+import type { AccountMetadata } from '../../lib/types';
 import './style.css';
 
 type ConnectionState = 'unpaired' | 'connecting' | 'connected' | 'disconnected' | 'code_received';
@@ -18,6 +19,8 @@ interface AppState {
   paired: boolean;
   connectionState: ConnectionState;
   activeCodes: ActiveCode[];
+  accounts: AccountMetadata[];
+  domain: string;
   loading: boolean;
 }
 
@@ -26,6 +29,8 @@ export default function App() {
     paired: false,
     connectionState: 'unpaired',
     activeCodes: [],
+    accounts: [],
+    domain: '',
     loading: true,
   });
 
@@ -37,6 +42,8 @@ export default function App() {
           paired: response.paired,
           connectionState: response.connectionState ?? 'unpaired',
           activeCodes: response.activeCodes ?? [],
+          accounts: response.accounts ?? [],
+          domain: response.domain ?? '',
           loading: false,
         });
       } else {
@@ -53,15 +60,24 @@ export default function App() {
     ) => {
       if (areaName === 'session') {
         if (changes.connectionState) {
+          const newConnState = changes.connectionState.newValue as ConnectionState;
           setState((prev) => ({
             ...prev,
-            connectionState: changes.connectionState.newValue as ConnectionState,
+            connectionState: newConnState,
+            // D-01: clear accounts when connection is lost
+            accounts: newConnState === 'disconnected' ? [] : prev.accounts,
           }));
         }
         if (changes.activeCodes) {
           setState((prev) => ({
             ...prev,
             activeCodes: (changes.activeCodes.newValue as ActiveCode[]) ?? [],
+          }));
+        }
+        if (changes.accounts) {
+          setState((prev) => ({
+            ...prev,
+            accounts: (changes.accounts.newValue as AccountMetadata[]) ?? [],
           }));
         }
       }
@@ -129,10 +145,6 @@ export default function App() {
           <PairingView />
         )}
 
-        {state.paired && !hasCodes && state.connectionState === 'connected' && (
-          <ConnectedView connectionState="connected" />
-        )}
-
         {state.paired && hasCodes && (
           <div className="codes-list">
             {state.activeCodes.map((c) => (
@@ -151,12 +163,16 @@ export default function App() {
           </div>
         )}
 
-        {state.paired && !hasCodes && state.connectionState === 'disconnected' && (
-          <ConnectedView connectionState="disconnected" />
-        )}
-
-        {state.paired && !hasCodes && state.connectionState === 'connecting' && (
-          <ConnectedView connectionState="connecting" />
+        {state.paired && !hasCodes && (
+          state.connectionState === 'connected' ||
+          state.connectionState === 'disconnected' ||
+          state.connectionState === 'connecting'
+        ) && (
+          <ConnectedView
+            connectionState={state.connectionState as 'connected' | 'disconnected' | 'connecting'}
+            accounts={state.accounts}
+            domain={state.domain}
+          />
         )}
       </div>
     </div>
