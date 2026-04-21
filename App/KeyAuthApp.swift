@@ -97,6 +97,10 @@ struct KeyAuthApp: App {
         RelayClient.shared.accountResolver = { [weak store] request in
             return store?.resolve(for: request)
         }
+        // D-01: Send account list to extension on every WebSocket connect
+        RelayClient.shared.accountListProvider = { [weak store] in
+            return store?.accounts ?? []
+        }
     }
 
     private func setupAppDelegate() {
