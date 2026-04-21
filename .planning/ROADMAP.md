@@ -131,7 +131,15 @@ Plans:
   3. Accounts matching the current website domain appear at the top of the extension popup, reducing the common case to one click
   4. If the WebSocket drops or the Chrome service worker restarts, both clients reconnect and rejoin the room automatically -- the next code request succeeds without re-pairing
   5. The iOS app presents a TOTP approval sheet with account name and site info, requiring biometric approval before generating and sending the code
-**Plans**: TBD
+**Plans:** 6 plans
+
+Plans:
+- [ ] 08-01-PLAN.md -- Types, domain-match utility, storage helpers (foundation contracts)
+- [ ] 08-02-PLAN.md -- Account list popup UI (AccountList, AccountItem, ReconnectingBanner)
+- [ ] 08-03-PLAN.md -- Service worker extensions (account_list, proactive reconnect, fill dispatch)
+- [ ] 08-04-PLAN.md -- iOS RelayClient (sendAccountList, proactive reconnect, accountId resolve)
+- [ ] 08-05-PLAN.md -- Content script (TOTP detection, auto-fill, split-input)
+- [ ] 08-06-PLAN.md -- Service worker wake robustness (RESIL-03, RESIL-05)
 
 ### Phase 9: Smart Sort + Extension Accounts
 **Goal**: The keyboard sorts accounts by how often and recently they are used, and the Chrome extension maintains a synced, searchable copy of account metadata for instant account selection
