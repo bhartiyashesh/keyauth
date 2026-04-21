@@ -3,8 +3,9 @@ phase: 8
 slug: core-extension-flow
 status: active
 nyquist_compliant: true
-wave_0_complete: false
+wave_0_complete: true
 created: 2026-04-20
+audited: 2026-04-21
 ---
 
 # Phase 8 — Validation Strategy
@@ -38,23 +39,23 @@ created: 2026-04-20
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 08-01-02 | 01 | 1 | CODE-05 | T-08-01 | Domain matching uses only public metadata | unit | `npx vitest run src/lib/__tests__/domain-match.test.ts` | Wave 0 | pending |
-| 08-02-01 | 02 | 2 | CODE-05 | T-08-03 | Account list request stays within extension ID | manual | Build check: `npx wxt build` | N/A | pending |
-| 08-02-02 | 02 | 2 | CODE-04 | — | CodeView renders when activeCodes populated | manual | Build check: `npx wxt build` | N/A | pending |
-| 08-03-01 | 03 | 2 | CODE-03 | T-08-06 | account_list decrypted with authenticated cipher | unit | `npx vitest run --filter "code request"` | Wave 0 | pending |
-| 08-03-01 | 03 | 2 | RESIL-01 | — | 20s keepalive prevents worker termination | unit | `npx vitest run --filter "keepalive"` | Wave 0 | pending |
-| 08-03-01 | 03 | 2 | RESIL-02 | — | Proactive reconnect at 13min | unit | `npx vitest run --filter "proactive"` | Wave 0 | pending |
-| 08-03-01 | 03 | 2 | RESIL-05 | — | Auto-reconnect on WebSocket drop | unit | `npx vitest run --filter "reconnect"` | Wave 0 | pending |
-| 08-04-01 | 04 | 2 | CODE-03 | T-08-09 | accountId validated against UUID store | manual | Xcode build succeeds | N/A | pending |
-| 08-04-01 | 04 | 2 | IOS-03 | — | handleDecodedRequest sets pendingCodeRequest | manual | Xcode build succeeds | N/A | pending |
-| 08-04-02 | 04 | 2 | RESIL-02 | T-08-10 | 13-min proactive reconnect | manual | Xcode build succeeds | N/A | pending |
-| 08-04-02 | 04 | 2 | RESIL-04 | — | APNs token registered on every launch | manual | Xcode build succeeds | N/A | pending |
-| 08-05-01 | 05 | 3 | FILL-01 | T-08-11 | Content script in ISOLATED world | unit | `npx vitest run src/entrypoints/__tests__/content.test.ts` | Wave 0 | pending |
-| 08-05-01 | 05 | 3 | FILL-02 | T-08-12 | Fill dispatches events for framework compat | unit | `npx vitest run src/entrypoints/__tests__/content.test.ts` | Wave 0 | pending |
-| 08-06-01 | 06 | 3 | RESIL-03 | T-08-15 | shouldBeConnected flag in session storage | unit | `npx vitest run src/entrypoints/__tests__/background-resilience.test.ts` | Wave 0 | pending |
-| 08-06-02 | 06 | 3 | RESIL-05 | T-08-14 | Exponential backoff caps at 30s | unit | `npx vitest run src/entrypoints/__tests__/background-resilience.test.ts` | Wave 0 | pending |
+| 08-01-02 | 01 | 1 | CODE-05 | T-08-01 | Domain matching uses only public metadata | unit | `npx vitest run src/lib/__tests__/domain-match.test.ts` | Yes (11 tests) | COVERED |
+| 08-02-01 | 02 | 2 | CODE-05 | T-08-03 | Account list request stays within extension ID | manual | Build check: `npx wxt build` | N/A | manual-only |
+| 08-02-02 | 02 | 2 | CODE-04 | — | CodeView renders when activeCodes populated | manual | Build check: `npx wxt build` | N/A | manual-only |
+| 08-03-01 | 03 | 2 | CODE-03 | T-08-06 | account_list decrypted with authenticated cipher | unit | `npx vitest run src/entrypoints/__tests__/account-list-decryption.test.ts` | Yes (5 tests) | COVERED |
+| 08-03-01 | 03 | 2 | RESIL-01 | — | 20s keepalive prevents worker termination | unit | `npx vitest run src/entrypoints/__tests__/background-resilience.test.ts` | Yes | COVERED |
+| 08-03-01 | 03 | 2 | RESIL-02 | — | Proactive reconnect at 13min | unit | `npx vitest run src/entrypoints/__tests__/background-resilience.test.ts` | Yes | COVERED |
+| 08-03-01 | 03 | 2 | RESIL-05 | — | Auto-reconnect on WebSocket drop | unit | `npx vitest run src/entrypoints/__tests__/background-resilience.test.ts` | Yes | COVERED |
+| 08-04-01 | 04 | 2 | CODE-03 | T-08-09 | accountId validated against UUID store | manual | Xcode build succeeds | N/A | manual-only |
+| 08-04-01 | 04 | 2 | IOS-03 | — | handleDecodedRequest sets pendingCodeRequest | manual | Xcode build succeeds | N/A | manual-only |
+| 08-04-02 | 04 | 2 | RESIL-02 | T-08-10 | 13-min proactive reconnect | manual | Xcode build succeeds | N/A | manual-only |
+| 08-04-02 | 04 | 2 | RESIL-04 | — | APNs token registered on every launch | manual | Xcode build succeeds | N/A | manual-only |
+| 08-05-01 | 05 | 3 | FILL-01 | T-08-11 | Content script in ISOLATED world | unit | `npx vitest run src/entrypoints/__tests__/content.test.ts` | Yes (14 tests) | COVERED |
+| 08-05-01 | 05 | 3 | FILL-02 | T-08-12 | Fill dispatches events for framework compat | unit | `npx vitest run src/entrypoints/__tests__/content.test.ts` | Yes | COVERED |
+| 08-06-01 | 06 | 3 | RESIL-03 | T-08-15 | shouldBeConnected flag in session storage | unit | `npx vitest run src/entrypoints/__tests__/background-resilience.test.ts` | Yes (5 tests) | COVERED |
+| 08-06-02 | 06 | 3 | RESIL-05 | T-08-14 | Exponential backoff caps at 30s | unit | `npx vitest run src/entrypoints/__tests__/background-resilience.test.ts` | Yes | COVERED |
 
-*Status: pending -- all tasks awaiting execution*
+*Status: 9 COVERED, 6 manual-only — all automated requirements verified*
 
 ---
 
@@ -89,3 +90,17 @@ created: 2026-04-20
 - [x] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** ready
+
+---
+
+## Validation Audit 2026-04-21
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 1 |
+| Resolved | 1 |
+| Escalated | 0 |
+
+**New test file:** `extension/src/entrypoints/__tests__/account-list-decryption.test.ts` (5 tests)
+**Total automated tests:** 47 (42 existing + 5 new)
+**All passing:** Yes
