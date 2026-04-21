@@ -6,11 +6,14 @@ import {
   uint8ArrayToBase64,
 } from '../lib/crypto';
 import { createEnvelope } from '../lib/types';
-import type { MessageEnvelope, PairingData } from '../lib/types';
+import type { MessageEnvelope, PairingData, AccountMetadata } from '../lib/types';
 import {
   savePairingData,
   loadPairingData,
   clearPairingData,
+  saveAccounts,
+  loadAccounts,
+  clearAccounts,
   setSessionState,
   getSessionState,
 } from '../lib/storage';
@@ -27,6 +30,8 @@ let reconnectAttempts = 0;
 let lastPongAt = 0;
 let healthCheckInterval: ReturnType<typeof setInterval> | null = null;
 let intentionalDisconnect = false;
+const PROACTIVE_RECONNECT_MS = 13 * 60 * 1000; // 13 minutes (D-08: 2-min buffer before Railway's 15-min timeout)
+let proactiveReconnectTimeout: ReturnType<typeof setTimeout> | null = null;
 
 interface ActiveCode {
   code: string;
@@ -84,6 +89,13 @@ function connect(roomId: string, relayURL: string): void {
     }, KEEPALIVE_MS * 2);
 
     setConnectionState('connected');
+
+    // Proactive reconnect at 13 minutes (D-08: before Railway's 15-min timeout)
+    proactiveReconnectTimeout = setTimeout(async () => {
+      console.log('[BetterAuth] Proactive reconnect (13min timer)');
+      ws?.close(1000, 'proactive');
+      // onclose will trigger scheduleReconnect with delay since intentionalDisconnect is false
+    }, PROACTIVE_RECONNECT_MS);
   };
 
   ws.onmessage = (event: MessageEvent) => {
@@ -93,6 +105,9 @@ function connect(roomId: string, relayURL: string): void {
   ws.onclose = (event: CloseEvent) => {
     console.log('[BetterAuth] WebSocket closed, code:', event.code, 'reason:', event.reason || '(none)');
     stopTimers();
+
+    // D-01: accounts only shown while connected; clear on disconnect
+    clearAccounts();
 
     if (intentionalDisconnect) {
       // User-initiated disconnect (unpair) -- don't reconnect
@@ -126,6 +141,10 @@ function stopTimers(): void {
   if (healthCheckInterval !== null) {
     clearInterval(healthCheckInterval);
     healthCheckInterval = null;
+  }
+  if (proactiveReconnectTimeout !== null) {
+    clearTimeout(proactiveReconnectTimeout);
+    proactiveReconnectTimeout = null;
   }
 }
 
@@ -210,6 +229,10 @@ async function handleRelayMessage(raw: string): Promise<void> {
       await handleCodeResponse(msg);
       break;
 
+    case 'account_list':
+      await handleAccountList(msg);
+      break;
+
     default:
       await handleForwardedMessage(msg);
       break;
@@ -253,8 +276,46 @@ async function handleCodeResponse(msg: MessageEnvelope): Promise<void> {
     const fresh = activeCodes.filter(c => Date.now() - c.receivedAt < 5 * 60 * 1000);
     await setSessionState({ activeCodes: fresh });
     await setConnectionState('code_received');
+
+    // Attempt auto-fill on active tab (D-05: immediate fill, no confirmation)
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tab?.id && tab.url?.startsWith('http')) {
+        chrome.tabs.sendMessage(tab.id, { type: 'fill_code', code }, (response) => {
+          if (chrome.runtime.lastError) {
+            // Content script not injected on this page -- fallback to popup display
+            console.log('[BetterAuth] Content script not available, popup-only display');
+          } else if (response?.filled) {
+            console.log('[BetterAuth] Auto-filled TOTP field on page');
+          }
+        });
+      }
+    } catch {
+      // chrome.tabs.query may fail -- popup display is the fallback
+    }
   } catch (err) {
     console.error('[BetterAuth] Failed to decrypt code_response:', err);
+  }
+}
+
+async function handleAccountList(msg: MessageEnvelope): Promise<void> {
+  const pairing = await loadPairingData();
+  if (!pairing) return;
+
+  const encryptedBase64 = msg.payload.data as string | undefined;
+  if (!encryptedBase64) return;
+
+  try {
+    const encrypted = base64ToUint8Array(encryptedBase64);
+    const sharedKey = base64ToUint8Array(pairing.sharedKey);
+    const decrypted = open(encrypted, sharedKey);
+    const decoded = new TextDecoder().decode(decrypted);
+    const { accounts } = JSON.parse(decoded) as { accounts: AccountMetadata[] };
+
+    console.log('[BetterAuth] Received account list:', accounts.length, 'accounts');
+    await saveAccounts(accounts);
+  } catch (err) {
+    console.error('[BetterAuth] Failed to decrypt account_list:', err);
   }
 }
 
@@ -337,7 +398,6 @@ async function handlePopupMessage(
         break;
       }
 
-      // If WebSocket is closed, try a quick reconnect
       if (!ws || ws.readyState !== WebSocket.OPEN) {
         console.log('[BetterAuth] WebSocket not open for code request, reconnecting...');
         connect(pairing.roomId, pairing.relayURL);
@@ -345,22 +405,33 @@ async function handlePopupMessage(
         break;
       }
 
-      // Get current tab domain for account matching on the phone
-      let domain = '';
-      try {
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        if (tab?.url) {
-          domain = new URL(tab.url).hostname.replace(/^www\./, '');
+      // Get accountId and domain from popup (D-02)
+      const accountId = (message.accountId as string) || '';
+      const requestDomain = (message.domain as string) || '';
+
+      // If domain not provided by popup, detect from active tab
+      let domain = requestDomain;
+      if (!domain) {
+        try {
+          const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+          if (tab?.url) {
+            domain = new URL(tab.url).hostname.replace(/^www\./, '');
+          }
+        } catch {
+          // Tabs API may fail on chrome:// pages
         }
-      } catch {
-        // Tabs API may fail on chrome:// pages
       }
+
+      // Find account metadata to include issuer/label for iOS display
+      const accounts = await loadAccounts();
+      const account = accounts.find(a => a.id === accountId);
 
       const codeRequest = {
         id: crypto.randomUUID(),
-        issuer: '',
-        label: '',
+        issuer: account?.issuer || '',
+        label: account?.label || '',
         domain,
+        accountId,
       };
 
       try {
@@ -392,13 +463,27 @@ async function handlePopupMessage(
       const pairing = await loadPairingData();
       const connectionState = await getSessionState<ConnectionState>('connectionState');
       const activeCodes = (await getSessionState<ActiveCode[]>('activeCodes')) || [];
-      // Filter stale codes (>5 min)
       const fresh = activeCodes.filter(c => Date.now() - c.receivedAt < 5 * 60 * 1000);
       const roomError = await getSessionState<string>('roomError');
+      const accounts = await loadAccounts();
+
+      // Get current tab domain for account sorting
+      let domain = '';
+      try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (tab?.url?.startsWith('http')) {
+          domain = new URL(tab.url).hostname.replace(/^www\./, '');
+        }
+      } catch {
+        // May fail on restricted pages
+      }
+
       sendResponse({
         paired: !!pairing,
         connectionState: connectionState ?? (pairing ? 'disconnected' : 'unpaired'),
         activeCodes: fresh,
+        accounts,
+        domain,
         roomError,
       });
       break;
