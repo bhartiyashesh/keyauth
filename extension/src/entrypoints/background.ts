@@ -90,6 +90,9 @@ function connect(roomId: string, relayURL: string): void {
 
     setConnectionState('connected');
 
+    // D-09: Mark that we should be connected for service worker wake recovery
+    setSessionState({ shouldBeConnected: true });
+
     // Proactive reconnect at 13 minutes (D-08: before Railway's 15-min timeout)
     proactiveReconnectTimeout = setTimeout(async () => {
       console.log('[BetterAuth] Proactive reconnect (13min timer)');
@@ -131,6 +134,8 @@ function disconnect(): void {
     ws.close();
     ws = null;
   }
+  // Clear shouldBeConnected so wake doesn't auto-reconnect after unpair
+  setSessionState({ shouldBeConnected: false });
 }
 
 function stopTimers(): void {
@@ -514,19 +519,32 @@ export default defineBackground(() => {
     },
   );
 
-  // Auto-reconnect if already paired or mid-pairing
-  loadPairingData().then(async (pairing) => {
-    if (pairing) {
-      console.log('[BetterAuth] Found existing pairing, reconnecting...');
+  // D-09: Service worker wake recovery
+  // Read pairing from chrome.storage.local and shouldBeConnected from session
+  // If shouldBeConnected is true, reconnect immediately (zero-delay)
+  // This handles: service worker kill + restart, Chrome update restart, system wake
+  Promise.all([
+    loadPairingData(),
+    getSessionState<boolean>('shouldBeConnected'),
+    getSessionState<{ roomId: string; privateKey: string }>('pendingPairing'),
+  ]).then(async ([pairing, shouldBeConnected, pending]) => {
+    if (pairing && shouldBeConnected) {
+      console.log('[BetterAuth] Service worker wake: reconnecting (shouldBeConnected=true)');
       connect(pairing.roomId, pairing.relayURL);
+    } else if (pairing && shouldBeConnected === null) {
+      // Session storage was cleared (browser restart) but pairing exists
+      // Conservative: attempt reconnect since user hasn't explicitly unpaired
+      console.log('[BetterAuth] Service worker wake: session cleared, attempting reconnect');
+      connect(pairing.roomId, pairing.relayURL);
+    } else if (pending) {
+      console.log('[BetterAuth] Found pending pairing, reconnecting to room:', pending.roomId);
+      connect(pending.roomId, RELAY_URL);
+    } else if (pairing) {
+      // Paired but shouldBeConnected=false (user unpaired then re-paired?)
+      // Set state but don't connect -- user will trigger from popup
+      setConnectionState('disconnected');
     } else {
-      const pending = await getSessionState<{ roomId: string; privateKey: string }>('pendingPairing');
-      if (pending) {
-        console.log('[BetterAuth] Found pending pairing, reconnecting to room:', pending.roomId);
-        connect(pending.roomId, RELAY_URL);
-      } else {
-        setConnectionState('unpaired');
-      }
+      setConnectionState('unpaired');
     }
   });
 });
