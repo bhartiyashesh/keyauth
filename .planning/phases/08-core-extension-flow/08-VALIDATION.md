@@ -1,8 +1,8 @@
 ---
 phase: 8
 slug: core-extension-flow
-status: draft
-nyquist_compliant: false
+status: active
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-04-20
 ---
@@ -17,20 +17,20 @@ created: 2026-04-20
 
 | Property | Value |
 |----------|-------|
-| **Framework** | {pytest 7.x / jest 29.x / vitest / go test / other} |
-| **Config file** | {path or "none — Wave 0 installs"} |
-| **Quick run command** | `{quick command}` |
-| **Full suite command** | `{full command}` |
-| **Estimated runtime** | ~{N} seconds |
+| **Framework** | vitest ^3.1.0 |
+| **Config file** | extension/vitest.config.ts (or WXT default) |
+| **Quick run command** | `cd extension && npx vitest run` |
+| **Full suite command** | `cd extension && npx vitest run` |
+| **Estimated runtime** | ~5 seconds |
 
 ---
 
 ## Sampling Rate
 
-- **After every task commit:** Run `{quick run command}`
-- **After every plan wave:** Run `{full suite command}`
+- **After every task commit:** Run `cd extension && npx vitest run`
+- **After every plan wave:** Run `cd extension && npx vitest run`
 - **Before `/gsd-verify-work`:** Full suite must be green
-- **Max feedback latency:** {N} seconds
+- **Max feedback latency:** 10 seconds
 
 ---
 
@@ -38,19 +38,34 @@ created: 2026-04-20
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| {N}-01-01 | 01 | 1 | REQ-{XX} | T-{N}-01 / — | {expected secure behavior or "N/A"} | unit | `{command}` | ✅ / ❌ W0 | ⬜ pending |
+| 08-01-02 | 01 | 1 | CODE-05 | T-08-01 | Domain matching uses only public metadata | unit | `npx vitest run src/lib/__tests__/domain-match.test.ts` | Wave 0 | pending |
+| 08-02-01 | 02 | 2 | CODE-05 | T-08-03 | Account list request stays within extension ID | manual | Build check: `npx wxt build` | N/A | pending |
+| 08-02-02 | 02 | 2 | CODE-04 | — | CodeView renders when activeCodes populated | manual | Build check: `npx wxt build` | N/A | pending |
+| 08-03-01 | 03 | 2 | CODE-03 | T-08-06 | account_list decrypted with authenticated cipher | unit | `npx vitest run --filter "code request"` | Wave 0 | pending |
+| 08-03-01 | 03 | 2 | RESIL-01 | — | 20s keepalive prevents worker termination | unit | `npx vitest run --filter "keepalive"` | Wave 0 | pending |
+| 08-03-01 | 03 | 2 | RESIL-02 | — | Proactive reconnect at 13min | unit | `npx vitest run --filter "proactive"` | Wave 0 | pending |
+| 08-03-01 | 03 | 2 | RESIL-05 | — | Auto-reconnect on WebSocket drop | unit | `npx vitest run --filter "reconnect"` | Wave 0 | pending |
+| 08-04-01 | 04 | 2 | CODE-03 | T-08-09 | accountId validated against UUID store | manual | Xcode build succeeds | N/A | pending |
+| 08-04-01 | 04 | 2 | IOS-03 | — | handleDecodedRequest sets pendingCodeRequest | manual | Xcode build succeeds | N/A | pending |
+| 08-04-02 | 04 | 2 | RESIL-02 | T-08-10 | 13-min proactive reconnect | manual | Xcode build succeeds | N/A | pending |
+| 08-04-02 | 04 | 2 | RESIL-04 | — | APNs token registered on every launch | manual | Xcode build succeeds | N/A | pending |
+| 08-05-01 | 05 | 3 | FILL-01 | T-08-11 | Content script in ISOLATED world | unit | `npx vitest run src/entrypoints/__tests__/content.test.ts` | Wave 0 | pending |
+| 08-05-01 | 05 | 3 | FILL-02 | T-08-12 | Fill dispatches events for framework compat | unit | `npx vitest run src/entrypoints/__tests__/content.test.ts` | Wave 0 | pending |
+| 08-06-01 | 06 | 3 | RESIL-03 | T-08-15 | shouldBeConnected flag in session storage | unit | `npx vitest run src/entrypoints/__tests__/background-resilience.test.ts` | Wave 0 | pending |
+| 08-06-02 | 06 | 3 | RESIL-05 | T-08-14 | Exponential backoff caps at 30s | unit | `npx vitest run src/entrypoints/__tests__/background-resilience.test.ts` | Wave 0 | pending |
 
-*Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
+*Status: pending -- all tasks awaiting execution*
 
 ---
 
 ## Wave 0 Requirements
 
-- [ ] `{tests/test_file.py}` — stubs for REQ-{XX}
-- [ ] `{tests/conftest.py}` — shared fixtures
-- [ ] `{framework install}` — if no framework detected
+- [ ] `extension/src/lib/__tests__/domain-match.test.ts` -- covers CODE-05
+- [ ] `extension/src/entrypoints/__tests__/content.test.ts` -- covers FILL-01, FILL-02
+- [ ] `extension/src/entrypoints/__tests__/background-resilience.test.ts` -- covers RESIL-02, RESIL-03, RESIL-05
+- [ ] `jsdom` + `@types/jsdom` dev dependencies for content script testing
 
-*If none: "Existing infrastructure covers all phase requirements."*
+*Wave 0 tests are created inline with their respective plan tasks (TDD approach).*
 
 ---
 
@@ -58,19 +73,19 @@ created: 2026-04-20
 
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
-| {behavior} | REQ-{XX} | {reason} | {steps} |
-
-*If none: "All phase behaviors have automated verification."*
+| iOS presents TOTP approval sheet on relay message | IOS-03 | Requires physical iOS device with FaceID | 1. Open extension, click account. 2. On phone, verify CodeApprovalView appears with correct account name and domain. 3. Approve with FaceID. 4. Verify code appears in extension. |
+| APNs token registration on every launch | RESIL-04 | Requires iOS device with push notification entitlement | 1. Kill app and relaunch. 2. Check Xcode console for "[RelayClient] registerToken" log. 3. Verify token sent to relay (check relay logs). |
+| End-to-end happy path (click account -> approve -> auto-fill) | CODE-03 + CODE-04 + FILL-02 | Integration across 3 systems | 1. Open extension on a site with TOTP field. 2. Click matching account. 3. Approve on phone. 4. Verify code auto-fills in page field AND shows in popup with countdown. |
 
 ---
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < {N}s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
+- [x] No watch-mode flags
+- [x] Feedback latency < 10s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** ready
