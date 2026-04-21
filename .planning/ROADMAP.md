@@ -135,11 +135,11 @@ Plans:
 
 Plans:
 - [x] 08-01-PLAN.md -- Types, domain-match utility, storage helpers (foundation contracts)
-- [ ] 08-02-PLAN.md -- Account list popup UI (AccountList, AccountItem, ReconnectingBanner)
-- [ ] 08-03-PLAN.md -- Service worker extensions (account_list, proactive reconnect, fill dispatch)
-- [ ] 08-04-PLAN.md -- iOS RelayClient (sendAccountList, proactive reconnect, accountId resolve)
-- [ ] 08-05-PLAN.md -- Content script (TOTP detection, auto-fill, split-input)
-- [ ] 08-06-PLAN.md -- Service worker wake robustness (RESIL-03, RESIL-05)
+- [x] 08-02-PLAN.md -- Account list popup UI (AccountList, AccountItem, ReconnectingBanner)
+- [x] 08-03-PLAN.md -- Service worker extensions (account_list, proactive reconnect, fill dispatch)
+- [x] 08-04-PLAN.md -- iOS RelayClient (sendAccountList, proactive reconnect, accountId resolve)
+- [x] 08-05-PLAN.md -- Content script (TOTP detection, auto-fill, split-input)
+- [x] 08-06-PLAN.md -- Service worker wake robustness (RESIL-03, RESIL-05)
 
 ### Phase 9: Smart Sort + Extension Accounts
 **Goal**: The keyboard sorts accounts by how often and recently they are used, and the Chrome extension maintains a synced, searchable copy of account metadata for instant account selection
