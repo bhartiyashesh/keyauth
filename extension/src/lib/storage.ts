@@ -1,4 +1,4 @@
-import type { PairingData } from './types';
+import type { PairingData, AccountMetadata } from './types';
 
 // chrome.storage.local -- persists across sessions
 
@@ -24,4 +24,19 @@ export async function setSessionState(state: Record<string, unknown>): Promise<v
 export async function getSessionState<T>(key: string): Promise<T | null> {
   const result = await chrome.storage.session.get(key);
   return (result[key] as T) ?? null;
+}
+
+// Account list -- session storage only (D-01: no persistent cache)
+
+export async function saveAccounts(accounts: AccountMetadata[]): Promise<void> {
+  await chrome.storage.session.set({ accounts });
+}
+
+export async function loadAccounts(): Promise<AccountMetadata[]> {
+  const result = await chrome.storage.session.get('accounts');
+  return (result.accounts as AccountMetadata[]) ?? [];
+}
+
+export async function clearAccounts(): Promise<void> {
+  await chrome.storage.session.remove('accounts');
 }

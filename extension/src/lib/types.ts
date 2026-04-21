@@ -19,6 +19,14 @@ export interface CodeRequest {
   id: string;           // correlation ID echoed in response
   issuer: string;       // e.g., "GitHub" -- shown on iOS approval sheet
   label: string;        // e.g., "user@email.com"
+  domain: string;       // current tab hostname for domain matching
+}
+
+/** Account metadata received from phone (never contains secrets) */
+export interface AccountMetadata {
+  id: string;       // UUID string from Account.id
+  issuer: string;   // e.g., "GitHub"
+  label: string;    // e.g., "user@email.com"
 }
 
 /** Encrypted response from iOS (inside payload.data as base64) */
