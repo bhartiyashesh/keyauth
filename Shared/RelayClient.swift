@@ -22,6 +22,10 @@ final class RelayClient: ObservableObject {
     /// call sites through `AccountStore.resolve(for:)`.
     var accountResolver: ((CodeRequest) -> Account?)?
 
+    /// Provides current account list for sending to extension on connect.
+    /// Set once in KeyAuthApp.onAppear. Called on every WebSocket connection.
+    var accountListProvider: (() -> [Account])?
+
     private var webSocketTask: URLSessionWebSocketTask?
     private var session: URLSession?
     private(set) var roomId: String?
@@ -38,6 +42,10 @@ final class RelayClient: ObservableObject {
     // Keepalive
     private var keepaliveTimer: Timer?
     private let keepaliveInterval: TimeInterval = 20.0
+
+    // Proactive reconnect (D-08: 13-min timer avoids Railway's 15-min WebSocket timeout)
+    private var proactiveReconnectTimer: Timer?
+    private let proactiveReconnectInterval: TimeInterval = 13 * 60 // 13 minutes
 
     private init() {}
 
@@ -120,6 +128,26 @@ final class RelayClient: ObservableObject {
             payload: ["data": encrypted.base64EncodedString()]
         )
         send(envelope)
+    }
+
+    /// Send account metadata list to paired Chrome extension (D-01).
+    /// Called on every WebSocket connect so extension has fresh data.
+    /// Only sends id, issuer, label — secrets NEVER leave the phone.
+    func sendAccountListPayload(_ accounts: [Account]) {
+        guard let sharedKey = PairingStore.shared.sharedKey else { return }
+        let metadata: [[String: String]] = accounts.map {
+            ["id": $0.id.uuidString, "issuer": $0.issuer, "label": $0.label]
+        }
+        let payload: [String: Any] = ["accounts": metadata]
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: payload),
+              let encrypted = try? CryptoBoxManager.seal(jsonData, using: sharedKey)
+        else { return }
+        let envelope = MessageEnvelope(
+            type: "account_list",
+            payload: ["data": encrypted.base64EncodedString()]
+        )
+        send(envelope)
+        print("[RelayClient] Sent account list (\(metadata.count) accounts)")
     }
 
     // MARK: - Receiving
@@ -246,6 +274,30 @@ final class RelayClient: ObservableObject {
         }
     }
 
+    // MARK: - Proactive Reconnect
+
+    fileprivate func startProactiveReconnect() {
+        proactiveReconnectTimer?.invalidate()
+        proactiveReconnectTimer = Timer.scheduledTimer(
+            withTimeInterval: proactiveReconnectInterval,
+            repeats: false
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self, let roomId = self.roomId, let relayURL = self.relayURL else { return }
+                print("[RelayClient] Proactive reconnect (13min timer)")
+                // Graceful close — handleDisconnect will trigger scheduleReconnect
+                self.webSocketTask?.cancel(with: .normalClosure, reason: "proactive".data(using: .utf8))
+                self.webSocketTask = nil
+                self.session?.invalidateAndCancel()
+                self.session = nil
+                self.stopTimers()
+                self.state = .disconnected
+                self.reconnectAttempts = 0 // Proactive reconnect = immediate retry, no backoff
+                self.connect(roomId: roomId, relayURL: relayURL, deviceToken: self.deviceToken)
+            }
+        }
+    }
+
     // MARK: - Cleanup
 
     private func stopTimers() {
@@ -253,6 +305,8 @@ final class RelayClient: ObservableObject {
         keepaliveTimer = nil
         reconnectTimer?.invalidate()
         reconnectTimer = nil
+        proactiveReconnectTimer?.invalidate()
+        proactiveReconnectTimer = nil
     }
 
     private func cleanup() {
@@ -290,6 +344,14 @@ private final class WebSocketDelegate: NSObject, URLSessionWebSocketDelegate {
 
             // Start keepalive pings
             relay.startKeepalive()
+
+            // D-08/RESIL-02: Proactive reconnect before Railway 15-min timeout
+            relay.startProactiveReconnect()
+
+            // D-01: Send account list to extension on every connect
+            if let accounts = relay.accountListProvider?() {
+                relay.sendAccountListPayload(accounts)
+            }
 
             // Fire one-shot connected callback (used by pairing flow)
             relay.onConnected?()

@@ -237,6 +237,13 @@ extension AccountStore {
     ///
     /// Returning `nil` is the sanctioned "defer to FaceID" signal — it is NOT an error.
     func resolve(for request: CodeRequest) -> Account? {
+        // D-02: Direct lookup by accountId (most reliable — extension sends specific account UUID)
+        if let accountIdStr = request.accountId,
+           let uuid = UUID(uuidString: accountIdStr),
+           let account = accounts.first(where: { $0.id == uuid }) {
+            return account
+        }
+
         // 1. Exact issuer+label
         if !request.issuer.isEmpty || !request.label.isEmpty {
             return accounts.first { $0.issuer == request.issuer && $0.label == request.label }

@@ -22,6 +22,7 @@ struct CodeRequest: Codable, Identifiable {
     let issuer: String
     let label: String
     let domain: String?
+    let accountId: String?  // UUID string from Account.id; used for targeted code generation (D-02)
 }
 
 struct PairingQRPayload: Codable {
