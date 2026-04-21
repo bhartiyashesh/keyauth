@@ -1,7 +1,7 @@
 ---
 phase: 8
 slug: core-extension-flow
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-04-20
@@ -32,13 +32,12 @@ Declared values (must be multiples of 4):
 | Token | Value | Usage |
 |-------|-------|-------|
 | xs | 4px | Icon gaps, inline padding |
-| sm | 8px | Compact element spacing, QR container padding |
-| md | 12px | Card internal padding, list gaps |
-| lg | 16px | Section padding, popup body padding |
+| sm | 8px | Compact element spacing, QR container padding, card internal padding |
+| lg | 16px | Section padding, popup body padding, list item padding |
 | xl | 24px | Major section breaks |
 | 2xl | 32px | Not used this phase |
 
-Exceptions: 6px gap for status-row (existing pattern, keep for icon alignment); 10px card padding (existing code-card pattern, keep for consistency).
+No exceptions — all values from standard set {4, 8, 16, 24, 32, 48, 64}. Existing code patterns using non-standard values will be migrated to nearest standard token during implementation.
 
 ---
 
@@ -46,8 +45,7 @@ Exceptions: 6px gap for status-row (existing pattern, keep for icon alignment); 
 
 | Role | Size | Weight | Line Height | Font |
 |------|------|--------|-------------|------|
-| Body | 14px | 400 | 1.4 | system-ui |
-| Label | 13px | 400 | 1.3 | system-ui |
+| Body / Label | 13px | 400 | 1.4 | system-ui |
 | Small | 11px | 400 | 1.3 | system-ui |
 | Heading | 16px | 600 | 1.3 | system-ui |
 | Code | 28px | 600 | 1.0 | SF Mono, Menlo, Consolas, monospace |
@@ -132,7 +130,7 @@ The content script has no persistent visual UI. It operates invisibly to detect 
 | Error: disconnected | Connection lost. Reconnecting... |
 | Error: request timeout | Request timed out. Make sure your iPhone is nearby and unlocked. |
 | Error: no phone response | No response from phone. Open KeyAuth on your iPhone and try again. |
-| Destructive: Unpair | Unpair this device? You will need to scan the QR code again to reconnect. |
+| Destructive: Unpair | Unpair this device? You will need to scan the QR code again to reconnect. Confirmation: browser `confirm()` dialog. |
 | Domain match hint | Suggested for this site |
 | Reconnecting inline | Reconnecting... |
 | Code requesting state | Waiting for approval... |
@@ -155,7 +153,7 @@ The content script has no persistent visual UI. It operates invisibly to detect 
 | Property | Value |
 |----------|-------|
 | Height | 48px (touch-friendly) |
-| Padding | 10px 12px |
+| Padding | 8px 16px |
 | Border radius | 10px (matches code-card) |
 | Badge size | 28px x 28px (matches existing code-account-badge) |
 | Badge radius | 7px |
@@ -182,7 +180,7 @@ The content script has no persistent visual UI. It operates invisibly to detect 
 ```
 unpaired → PairingView (QR code)
 connecting → AccountList + ReconnectingBanner
-connected → AccountList (full functionality)
+connected → AccountList (full functionality) — focal point: first domain-matched account item; if no match, top account item
 requesting → AccountList with selected item in loading state
 code_received → CodeView (existing)
 disconnected → AccountList (disabled clicks) + ReconnectingBanner
@@ -211,11 +209,11 @@ No new iOS UI components required for this phase.
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved (2026-04-20)
