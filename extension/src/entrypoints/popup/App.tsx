@@ -124,7 +124,7 @@ export default function App() {
     return (
       <div className="popup">
         <header className="popup-header">
-          <h1>Better Authenticator</h1>
+          <h1>Much Better Authenticator</h1>
         </header>
         <div className="popup-body">
           <p className="loading-text">Loading...</p>
@@ -138,7 +138,7 @@ export default function App() {
   return (
     <div className="popup">
       <header className="popup-header">
-        <h1>Better Authenticator</h1>
+        <h1>Much Better Authenticator</h1>
       </header>
       <div className="popup-body">
         {!state.paired && (

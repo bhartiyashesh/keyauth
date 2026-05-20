@@ -4,7 +4,7 @@ export default defineConfig({
   srcDir: 'src',
   modules: ['@wxt-dev/module-react'],
   manifest: {
-    name: 'Better Authenticator',
+    name: 'Much Better Authenticator',
     description: 'One-click TOTP codes from your phone',
     minimum_chrome_version: '116',
     permissions: ['storage', 'clipboardWrite', 'tabs'],
