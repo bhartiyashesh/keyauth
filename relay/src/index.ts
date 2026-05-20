@@ -21,15 +21,13 @@ try {
   logger.warn({ err }, 'APNs client not initialized -- push notifications disabled');
 }
 
-// Resolve the landing dist directory. The relay/ directory ships next to landing/
-// in the repo, so candidate paths cover the relevant deploy layouts:
-//   1. relay/src/../../landing/dist (running via tsx from relay/)
-//   2. process.cwd()/../landing/dist (cwd === relay/)
-//   3. process.cwd()/landing/dist (cwd === KeyAuth/ repo root)
+// Resolve the landing dist directory. landing/ lives inside relay/ so the deploy
+// archive is self-contained. Candidate paths cover the common cwd layouts:
+//   1. relay/src/../landing/dist (running via tsx from relay/)
+//   2. process.cwd()/landing/dist (cwd === relay/)
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const landingDirCandidates = [
-  resolve(__dirname, '..', '..', 'landing', 'dist'),
-  resolve(process.cwd(), '..', 'landing', 'dist'),
+  resolve(__dirname, '..', 'landing', 'dist'),
   resolve(process.cwd(), 'landing', 'dist'),
 ];
 const landingDir = landingDirCandidates.find((p) => existsSync(p)) ?? null;
