@@ -70,15 +70,7 @@ function cacheHeaderFor(filePath: string): string {
     : 'public, max-age=300';
 }
 
-function serveLandingFile(req: IncomingMessage, res: ServerResponse): boolean {
-  if (req.method !== 'GET' || !landingDir) return false;
-  const rawPath = (req.url ?? '/').split('?')[0];
-  const requestedPath = rawPath === '/' || rawPath === '' ? '/index.html' : rawPath;
-  // Defense in depth against path traversal: normalize then verify the resolved
-  // absolute path still lives under landingDir.
-  const normalizedRel = normalize(decodeURIComponent(requestedPath)).replace(/^[/\\]+/, '');
-  const absolute = resolve(landingDir, normalizedRel);
-  if (!absolute.startsWith(landingDir + '/') && absolute !== landingDir) return false;
+function tryServe(absolute: string, res: ServerResponse): boolean {
   try {
     const stat = statSync(absolute);
     if (!stat.isFile()) return false;
@@ -93,6 +85,21 @@ function serveLandingFile(req: IncomingMessage, res: ServerResponse): boolean {
   } catch {
     return false;
   }
+}
+
+function serveLandingFile(req: IncomingMessage, res: ServerResponse): boolean {
+  if (req.method !== 'GET' || !landingDir) return false;
+  const rawPath = (req.url ?? '/').split('?')[0];
+  const requestedPath = rawPath === '/' || rawPath === '' ? '/index.html' : rawPath;
+  // Defense in depth against path traversal: normalize then verify the resolved
+  // absolute path still lives under landingDir.
+  const normalizedRel = normalize(decodeURIComponent(requestedPath)).replace(/^[/\\]+/, '');
+  const absolute = resolve(landingDir, normalizedRel);
+  if (!absolute.startsWith(landingDir + '/') && absolute !== landingDir) return false;
+  if (tryServe(absolute, res)) return true;
+  // Pretty URL fallback: /privacy -> /privacy.html, /support -> /support.html
+  if (!absolute.includes('.') && tryServe(absolute + '.html', res)) return true;
+  return false;
 }
 
 const server = createServer((req: IncomingMessage, res: ServerResponse) => {

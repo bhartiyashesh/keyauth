@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Support and help for Much Better Authenticator. Quick start, troubleshooting, and contact." />
+    <meta name="theme-color" content="#0a0a0a" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect x='32' y='32' width='448' height='448' rx='92' fill='%23000'/%3E%3Crect x='78' y='176' width='356' height='160' rx='36' fill='%23fff'/%3E%3Crect x='108' y='241' width='30' height='30' rx='7' fill='%23000'/%3E%3Crect x='154' y='241' width='30' height='30' rx='7' fill='%23000'/%3E%3Crect x='200' y='241' width='30' height='30' rx='7' fill='%23000'/%3E%3Crect x='246' y='241' width='30' height='30' rx='7' fill='%23000'/%3E%3Crect x='292' y='241' width='30' height='30' rx='7' fill='%23000'/%3E%3Crect x='338' y='241' width='30' height='30' rx='7' fill='%23000'/%3E%3Crect x='377' y='205' width='8' height='100' rx='4' fill='%23000'/%3E%3Crect x='367' y='204' width='28' height='8' rx='4' fill='%23000'/%3E%3Crect x='367' y='298' width='28' height='8' rx='4' fill='%23000'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+    <title>Support — Much Better Authenticator</title>
+    <style>
+      :root {
+        --bg: #f7f7f2;
+        --ink: #0a0a0a;
+        --muted: rgba(10, 10, 10, 0.62);
+        --line: rgba(10, 10, 10, 0.1);
+        --panel: #ffffff;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Sora", "Inter", system-ui, -apple-system, sans-serif;
+        font-feature-settings: "kern", "ss01";
+        -webkit-font-smoothing: antialiased;
+        line-height: 1.6;
+      }
+      .container { max-width: 720px; margin: 0 auto; padding: 24px 20px 80px; }
+      nav.top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 56px;
+        padding: 14px 18px;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(14px);
+        border: 1px solid var(--line);
+        border-radius: 28px;
+      }
+      .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); }
+      .brand svg { width: 36px; height: 36px; border-radius: 11px; }
+      .brand .name { font-weight: 900; font-size: 16px; letter-spacing: -0.005em; }
+      nav.top a.back { text-decoration: none; color: var(--ink); font-weight: 700; font-size: 14px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; transition: background 0.15s; }
+      nav.top a.back:hover { background: rgba(0, 0, 0, 0.04); }
+      h1 { font-size: clamp(36px, 6vw, 56px); font-weight: 900; letter-spacing: -0.02em; line-height: 1.05; margin: 0 0 16px; }
+      .intro { color: var(--muted); font-size: 16px; font-weight: 600; margin-bottom: 40px; }
+      h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.015em; margin: 48px 0 12px; }
+      h3 { font-size: 17px; font-weight: 700; margin: 28px 0 6px; }
+      p { margin: 10px 0; color: rgba(10, 10, 10, 0.78); }
+      ol, ul { padding-left: 22px; margin: 12px 0; color: rgba(10, 10, 10, 0.78); }
+      ol { counter-reset: step; list-style: none; padding-left: 0; }
+      ol li { counter-increment: step; padding-left: 44px; position: relative; margin: 14px 0; }
+      ol li::before {
+        content: counter(step);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 28px;
+        height: 28px;
+        background: var(--ink);
+        color: #fff;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        font-size: 13px;
+      }
+      a { color: var(--ink); text-decoration: underline; text-decoration-color: rgba(10, 10, 10, 0.25); text-underline-offset: 3px; }
+      a:hover { text-decoration-color: var(--ink); }
+      .panel {
+        margin: 20px 0;
+        padding: 18px 20px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+      }
+      .panel p:first-child { margin-top: 0; }
+      .panel p:last-child { margin-bottom: 0; }
+      .panel h3 { margin-top: 0; }
+      .contact {
+        margin-top: 24px;
+        padding: 22px;
+        background: var(--ink);
+        color: #fff;
+        border-radius: 22px;
+      }
+      .contact h2 { margin-top: 0; color: #fff; }
+      .contact p { color: rgba(255, 255, 255, 0.78); }
+      .contact a { color: #fff; text-decoration-color: rgba(255, 255, 255, 0.45); }
+      .contact a:hover { text-decoration-color: #fff; }
+      footer { margin-top: 80px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 16px 24px; justify-content: space-between; align-items: center; color: var(--muted); font-size: 13px; font-weight: 600; }
+      footer a { font-weight: 700; }
+      .footer-links { display: flex; gap: 18px; flex-wrap: wrap; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <nav class="top">
+        <a class="brand" href="/">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <rect x="32" y="32" width="448" height="448" rx="92" fill="#000" />
+            <rect x="78" y="176" width="356" height="160" rx="36" fill="#fff" />
+            <rect x="108" y="241" width="30" height="30" rx="7" fill="#000" />
+            <rect x="154" y="241" width="30" height="30" rx="7" fill="#000" />
+            <rect x="200" y="241" width="30" height="30" rx="7" fill="#000" />
+            <rect x="246" y="241" width="30" height="30" rx="7" fill="#000" />
+            <rect x="292" y="241" width="30" height="30" rx="7" fill="#000" />
+            <rect x="338" y="241" width="30" height="30" rx="7" fill="#000" />
+            <rect x="377" y="205" width="8" height="100" rx="4" fill="#000" />
+            <rect x="367" y="204" width="28" height="8" rx="4" fill="#000" />
+            <rect x="367" y="298" width="28" height="8" rx="4" fill="#000" />
+          </svg>
+          <span class="name">Much Better Authenticator</span>
+        </a>
+        <a class="back" href="/">Back</a>
+      </nav>
+
+      <h1>Support</h1>
+      <p class="intro">Quick answers and troubleshooting. If you don't find what you need, email below and you'll hear back from a real person.</p>
+
+      <h2>Quick start</h2>
+      <ol>
+        <li>Install Much Better Authenticator on your iPhone and allow notifications when prompted.</li>
+        <li>Open the gear in the top right, then "How to enable the keyboard." Follow the four steps to add the keyboard in iOS Settings.</li>
+        <li>Add 2FA accounts by tapping the plus button. Scan a QR code from the service that's giving it to you, or enter the secret manually.</li>
+        <li>Install the Chrome extension from the Chrome Web Store, then pair it with your phone using the QR code shown in the extension.</li>
+      </ol>
+
+      <h2>How the keyboard works</h2>
+      <p>The keyboard sits above any iOS keyboard and shows your active 2FA codes. Tap a code to insert it at the cursor. The keyboard reads codes from the iPhone's secure storage and never accesses the network.</p>
+      <p>Full Access is <strong>not required</strong>. The keyboard works without it.</p>
+
+      <h2>Troubleshooting</h2>
+
+      <div class="panel">
+        <h3>The keyboard does not appear on iOS</h3>
+        <p>Go to <strong>Settings &gt; General &gt; Keyboard &gt; Keyboards</strong> and confirm "Much Better Authenticator" is listed. If not, tap "Add New Keyboard" and select it. Then, when typing anywhere, long-press the globe icon at the bottom of the keyboard and switch to Much Better Authenticator.</p>
+      </div>
+
+      <div class="panel">
+        <h3>The Chrome extension says "waiting for approval"</h3>
+        <p>Open the Much Better Authenticator iPhone app. Check the dot next to the link icon in the top-left of the home screen:</p>
+        <ul>
+          <li><strong>Green</strong>: connected, you should see the approval sheet appear.</li>
+          <li><strong>Orange</strong>: connecting. Wait a few seconds.</li>
+          <li><strong>Red</strong>: disconnected. Force-quit and reopen the app.</li>
+        </ul>
+        <p>Also check that notifications are allowed in <strong>Settings &gt; Notifications &gt; Much Better Authenticator</strong>. Without notification permission, the relay cannot wake the app when your phone is locked.</p>
+      </div>
+
+      <div class="panel">
+        <h3>Codes don't match what the site expects</h3>
+        <p>2FA codes are tied to a precise secret. If you re-scanned the QR or migrated from a different authenticator, make sure the secret matches what the service has on file. The clock on your iPhone also matters: if it drifts from the real time, codes will be wrong. Confirm <strong>Settings &gt; General &gt; Date &amp; Time &gt; Set Automatically</strong> is on.</p>
+      </div>
+
+      <div class="panel">
+        <h3>I lost my phone</h3>
+        <p>If you had iCloud Keychain sync turned on in the app (Settings &gt; Sync with iCloud Keychain), your accounts restore automatically when you sign into iCloud on a new device and reinstall Much Better Authenticator.</p>
+        <p>If sync was off, you'll need to re-add each account manually using its recovery codes or by re-pairing in each service's security settings.</p>
+      </div>
+
+      <div class="panel">
+        <h3>I want to move from Google Authenticator</h3>
+        <p>Open Google Authenticator and tap the menu, then "Transfer accounts." Generate a QR code (or several, for large libraries). In Much Better Authenticator, tap the plus button and scan each QR. The import sheet lets you confirm which accounts to bring over.</p>
+      </div>
+
+      <div class="contact">
+        <h2>Still stuck?</h2>
+        <p>Email <a href="mailto:bhartiyashesh@gmail.com">bhartiyashesh@gmail.com</a> with what you tried and what happened. A real human reads every message.</p>
+      </div>
+
+      <footer>
+        <div>Made by <a href="https://yasheshbharti.com" target="_blank" rel="noopener noreferrer">Yashesh Bharti</a></div>
+        <div class="footer-links">
+          <a href="/">Home</a>
+          <a href="/privacy">Privacy</a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
