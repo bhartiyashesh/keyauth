@@ -2,6 +2,9 @@ import crypto from 'crypto';
 import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
 import { URL } from 'url';
+import { readFileSync, existsSync, statSync } from 'fs';
+import { resolve, dirname, join, extname, normalize } from 'path';
+import { fileURLToPath } from 'url';
 import { RoomManager } from './rooms.js';
 import { handleMessage } from './handlers.js';
 import { createApnsClient } from './apns.js';
@@ -18,15 +21,81 @@ try {
   logger.warn({ err }, 'APNs client not initialized -- push notifications disabled');
 }
 
-import { landingHTML } from './landing.js';
-import { readFileSync } from 'fs';
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
-
+// Resolve the landing dist directory. The relay/ directory ships next to landing/
+// in the repo, so candidate paths cover the relevant deploy layouts:
+//   1. relay/src/../../landing/dist (running via tsx from relay/)
+//   2. process.cwd()/../landing/dist (cwd === relay/)
+//   3. process.cwd()/landing/dist (cwd === KeyAuth/ repo root)
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const publicDir = resolve(__dirname, '..', 'public');
-// Fallback for Railway where cwd may differ from source dir
-const publicDirAlt = resolve(process.cwd(), 'public');
+const landingDirCandidates = [
+  resolve(__dirname, '..', '..', 'landing', 'dist'),
+  resolve(process.cwd(), '..', 'landing', 'dist'),
+  resolve(process.cwd(), 'landing', 'dist'),
+];
+const landingDir = landingDirCandidates.find((p) => existsSync(p)) ?? null;
+if (landingDir) {
+  logger.info({ landingDir }, 'Serving landing from built dist');
+} else {
+  logger.warn({ candidates: landingDirCandidates }, 'landing/dist not found -- root URL will return 503');
+}
+
+const MIME_TYPES: Record<string, string> = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'application/javascript; charset=utf-8',
+  '.mjs': 'application/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.svg': 'image/svg+xml',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif',
+  '.webp': 'image/webp',
+  '.ico': 'image/x-icon',
+  '.json': 'application/json; charset=utf-8',
+  '.txt': 'text/plain; charset=utf-8',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
+  '.otf': 'font/otf',
+  '.ttf': 'font/ttf',
+};
+
+function contentTypeFor(filePath: string): string {
+  return MIME_TYPES[extname(filePath).toLowerCase()] ?? 'application/octet-stream';
+}
+
+// Vite emits hashed asset filenames like `popup-TNyvvao.js` -- those are safe to
+// cache forever. index.html and unhashed files get a short cache for fast updates.
+const HASHED_ASSET_RE = /[-.][a-zA-Z0-9]{8,}\.[a-zA-Z0-9]+$/;
+function cacheHeaderFor(filePath: string): string {
+  return HASHED_ASSET_RE.test(filePath)
+    ? 'public, max-age=31536000, immutable'
+    : 'public, max-age=300';
+}
+
+function serveLandingFile(req: IncomingMessage, res: ServerResponse): boolean {
+  if (req.method !== 'GET' || !landingDir) return false;
+  const rawPath = (req.url ?? '/').split('?')[0];
+  const requestedPath = rawPath === '/' || rawPath === '' ? '/index.html' : rawPath;
+  // Defense in depth against path traversal: normalize then verify the resolved
+  // absolute path still lives under landingDir.
+  const normalizedRel = normalize(decodeURIComponent(requestedPath)).replace(/^[/\\]+/, '');
+  const absolute = resolve(landingDir, normalizedRel);
+  if (!absolute.startsWith(landingDir + '/') && absolute !== landingDir) return false;
+  try {
+    const stat = statSync(absolute);
+    if (!stat.isFile()) return false;
+    const data = readFileSync(absolute);
+    res.writeHead(200, {
+      'Content-Type': contentTypeFor(absolute),
+      'Cache-Control': cacheHeaderFor(absolute),
+      'Content-Length': data.length,
+    });
+    res.end(data);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 const server = createServer((req: IncomingMessage, res: ServerResponse) => {
   if (req.url === '/health' && req.method === 'GET') {
@@ -38,26 +107,11 @@ const server = createServer((req: IncomingMessage, res: ServerResponse) => {
     }));
     return;
   }
-  if ((req.url === '/' || req.url === '') && req.method === 'GET') {
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    res.end(landingHTML);
-    return;
-  }
-  if (req.url === '/fonts/DxBurst-Regular.otf' && req.method === 'GET') {
-    let font: Buffer | null = null;
-    for (const dir of [publicDir, publicDirAlt]) {
-      try { font = readFileSync(resolve(dir, 'DxBurst-Regular.otf')); break; } catch {}
-    }
-    if (font) {
-      res.writeHead(200, {
-        'Content-Type': 'font/otf',
-        'Cache-Control': 'public, max-age=31536000, immutable',
-      });
-      res.end(font);
-    } else {
-      res.writeHead(404);
-      res.end();
-    }
+  if (serveLandingFile(req, res)) return;
+  if ((req.url === '/' || req.url === '') && req.method === 'GET' && !landingDir) {
+    // Landing not built yet: surface this loudly rather than hand back an empty 404.
+    res.writeHead(503, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Landing site not built. Run `npm run build` in the relay directory.');
     return;
   }
   res.writeHead(404);
@@ -110,7 +164,7 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage, roomId: string, clien
 });
 
 server.listen(port, () => {
-  logger.info({ port, roomTtlMinutes }, 'Better Authenticator relay server listening');
+  logger.info({ port, roomTtlMinutes }, 'Much Better Authenticator relay server listening');
 });
 
 // Graceful shutdown
