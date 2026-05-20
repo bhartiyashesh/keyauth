@@ -64,20 +64,14 @@ export default function App() {
           setState((prev) => ({
             ...prev,
             connectionState: newConnState,
-            // D-01: clear accounts when connection is lost
-            accounts: newConnState === 'disconnected' ? [] : prev.accounts,
+            // Keep cached accounts visible on disconnect — iOS will re-push
+            // on reconnect. Disconnected banner signals the state to the user.
           }));
         }
         if (changes.activeCodes) {
           setState((prev) => ({
             ...prev,
             activeCodes: (changes.activeCodes.newValue as ActiveCode[]) ?? [],
-          }));
-        }
-        if (changes.accounts) {
-          setState((prev) => ({
-            ...prev,
-            accounts: (changes.accounts.newValue as AccountMetadata[]) ?? [],
           }));
         }
       }
@@ -89,6 +83,12 @@ export default function App() {
             ...prev,
             paired: hasPairing,
             connectionState: hasPairing ? prev.connectionState : 'unpaired',
+          }));
+        }
+        if (changes.accounts) {
+          setState((prev) => ({
+            ...prev,
+            accounts: (changes.accounts.newValue as AccountMetadata[]) ?? [],
           }));
         }
       }
