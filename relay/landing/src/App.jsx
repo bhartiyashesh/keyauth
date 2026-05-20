@@ -121,7 +121,7 @@ function LogoLockup() {
   return (
     <div className="flex min-w-0 items-center gap-3">
       <LogoMark className="h-12 w-12 shrink-0 rounded-2xl" />
-      <div className="truncate text-lg font-black tracking-[-0.045em] text-black sm:text-xl">Much Better Authenticator</div>
+      <div className="truncate text-lg font-black tracking-[-0.005em] text-black sm:text-xl">Much Better Authenticator</div>
     </div>
   );
 }
@@ -311,7 +311,7 @@ export default function MuchBetterAuthenticatorLandingPage() {
           <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
             <Badge icon="puzzle">Authenticator codes, right where you type</Badge>
 
-            <h1 className="mt-8 max-w-4xl text-6xl font-black leading-[0.84] tracking-[-0.085em] sm:text-7xl lg:text-[6.4rem]">
+            <h1 className="mt-8 max-w-4xl text-6xl font-black leading-[0.95] tracking-[-0.025em] sm:text-7xl lg:text-[6.4rem]">
               2FA without the scramble.
             </h1>
 
@@ -346,7 +346,7 @@ export default function MuchBetterAuthenticatorLandingPage() {
         <div className="mb-6 flex items-end justify-between gap-6">
           <div>
             <div className="mb-3 text-sm font-black uppercase tracking-[0.22em] text-black/35">What changes</div>
-            <h2 className="text-4xl font-black tracking-[-0.065em] sm:text-5xl">The code comes to you.</h2>
+            <h2 className="text-4xl font-black tracking-[-0.015em] sm:text-5xl">The code comes to you.</h2>
           </div>
         </div>
 
@@ -363,7 +363,7 @@ export default function MuchBetterAuthenticatorLandingPage() {
               <div className="mb-6 grid h-12 w-12 place-items-center rounded-2xl bg-black text-white transition group-hover:rotate-3 group-hover:scale-105">
                 <Icon name={feature.icon} className="h-6 w-6" />
               </div>
-              <h3 className="text-xl font-black tracking-[-0.045em]">{feature.title}</h3>
+              <h3 className="text-xl font-black tracking-[-0.005em]">{feature.title}</h3>
               <p className="mt-3 leading-7 text-black/62">{feature.body}</p>
             </motion.div>
           ))}
@@ -373,7 +373,7 @@ export default function MuchBetterAuthenticatorLandingPage() {
       <section id="flow" className="relative mx-auto grid max-w-7xl gap-8 px-5 py-16 sm:px-8 md:grid-cols-[0.82fr_1.18fr] lg:px-10">
         <div>
           <div className="mb-5 inline-flex rounded-full bg-black px-4 py-2 text-sm font-black text-white">The flow</div>
-          <h2 className="text-5xl font-black leading-[0.9] tracking-[-0.075em] sm:text-6xl">
+          <h2 className="text-5xl font-black leading-[1.02] tracking-[-0.02em] sm:text-6xl">
             Security stays. Friction leaves.
           </h2>
           <p className="mt-6 text-lg leading-8 text-black/65">
@@ -402,7 +402,7 @@ export default function MuchBetterAuthenticatorLandingPage() {
               >
                 <span className="flex items-center gap-4">
                   <span className="grid h-10 w-10 place-items-center rounded-full bg-white text-sm font-black text-black">{index + 1}</span>
-                  <span className="text-xl font-black tracking-[-0.045em]">{step}</span>
+                  <span className="text-xl font-black tracking-[-0.005em]">{step}</span>
                 </span>
                 {activeStep === index ? <Icon name="zap" className="h-5 w-5" /> : null}
               </button>
@@ -415,7 +415,7 @@ export default function MuchBetterAuthenticatorLandingPage() {
         <div className="grid overflow-hidden rounded-[2.8rem] bg-black text-white shadow-2xl shadow-black/15 md:grid-cols-2">
           <div className="p-8 sm:p-12">
             <div className="mb-8 inline-flex rounded-full bg-white px-4 py-2 text-sm font-black text-black">Before / After</div>
-            <h2 className="max-w-md text-5xl font-black leading-[0.9] tracking-[-0.075em]">Same security. Less chaos.</h2>
+            <h2 className="max-w-md text-5xl font-black leading-[1.02] tracking-[-0.02em]">Same security. Less chaos.</h2>
           </div>
           <div className="grid gap-px bg-white/10 p-px md:grid-cols-2">
             <div className="bg-black p-8">
@@ -445,7 +445,7 @@ export default function MuchBetterAuthenticatorLandingPage() {
           <div className="absolute -right-24 -top-24 h-56 w-56 rounded-full bg-black" />
           <div className="absolute -right-10 top-20 h-28 w-28 rounded-full bg-[#f7f7f2]" />
           <LogoMark className="mb-8 h-24 w-24 rounded-[2rem]" />
-          <h2 className="relative max-w-3xl text-5xl font-black leading-[0.9] tracking-[-0.075em] sm:text-7xl">
+          <h2 className="relative max-w-3xl text-5xl font-black leading-[1.02] tracking-[-0.02em] sm:text-7xl">
             Get the authenticator that keeps up with your typing.
           </h2>
           <form
