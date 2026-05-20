@@ -112,11 +112,13 @@ struct SettingsView: View {
 
     private var syncSection: some View {
         Section {
-            Toggle("Sync with iCloud Keychain", isOn: $syncEnabled)
-                .disabled(!icloud.isICloudSignedIn || isInCooldown || migration.isRunning)
-                .onChange(of: syncEnabled) { newValue in
-                    handleToggleChange(newValue: newValue)
-                }
+            Toggle(isOn: $syncEnabled) {
+                Label("Sync with iCloud Keychain", systemImage: "icloud")
+            }
+            .disabled(!icloud.isICloudSignedIn || isInCooldown || migration.isRunning)
+            .onChange(of: syncEnabled) { newValue in
+                handleToggleChange(newValue: newValue)
+            }
         } header: {
             Text("Sync")
         } footer: {
@@ -132,10 +134,12 @@ struct SettingsView: View {
     /// SettingsViewTests.swift grep-asserts each string.
     private var trustWindowSection: some View {
         Section {
-            Toggle("Allow 2-minute trust window after FaceID", isOn: $trustWindowEnabled)
-                .onChange(of: trustWindowEnabled) { newValue in
-                    TrustWindowPreference.setEnabled(newValue)
-                }
+            Toggle(isOn: $trustWindowEnabled) {
+                Label("Allow 2-minute trust window after FaceID", systemImage: "faceid")
+            }
+            .onChange(of: trustWindowEnabled) { newValue in
+                TrustWindowPreference.setEnabled(newValue)
+            }
         } header: {
             Text("Security")
         } footer: {
@@ -167,10 +171,13 @@ struct SettingsView: View {
 
     private var openSettingsSection: some View {
         Section {
-            Button("Open iOS Settings") {
+            Button {
                 if let url = URL(string: UIApplication.openSettingsURLString) {
                     UIApplication.shared.open(url)
                 }
+            } label: {
+                Label("Open iOS Settings", systemImage: "arrow.up.right.square")
+                    .foregroundStyle(.primary)
             }
             .accessibilityHint("Opens the iOS Settings app")
         }
@@ -178,11 +185,14 @@ struct SettingsView: View {
 
     private var securedSection: some View {
         Section {
-            DisclosureGroup("How is this secured?") {
+            DisclosureGroup {
                 Text(howSecuredCopy)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .padding(.vertical, 4)
+            } label: {
+                Label("How is this secured?", systemImage: "lock.shield")
+                    .foregroundStyle(.primary)
             }
         }
     }

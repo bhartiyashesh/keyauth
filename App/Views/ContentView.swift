@@ -66,6 +66,15 @@ struct ContentView: View {
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Much Better Authenticator")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Much Better Authenticator")
+                        .font(.system(size: 16, weight: .semibold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
+                }
+            }
             .searchable(text: $searchText, prompt: "Search accounts")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

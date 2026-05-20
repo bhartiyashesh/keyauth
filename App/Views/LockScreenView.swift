@@ -31,7 +31,10 @@ struct LockScreenView: View {
 
                 VStack(spacing: 6) {
                     Text("Much Better Authenticator")
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .font(.system(size: 22, weight: .bold, design: .rounded))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                        .padding(.horizontal, 24)
 
                     Text("Authenticate to view your codes")
                         .font(.subheadline)
