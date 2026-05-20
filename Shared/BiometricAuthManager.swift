@@ -23,7 +23,7 @@ final class BiometricAuthManager {
         }
     }
 
-    func authenticate(reason: String = "Unlock KeyAuth") async -> Bool {
+    func authenticate(reason: String = "Unlock Much Better Authenticator") async -> Bool {
         let context = LAContext()
         context.localizedFallbackTitle = "Use Passcode"
 

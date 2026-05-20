@@ -20,8 +20,9 @@ targets:
       path: App/Info.plist
       properties:
         UILaunchScreen: {}
-        NSFaceIDUsageDescription: "KeyAuth uses Face ID to protect your authentication codes."
-        NSCameraUsageDescription: "KeyAuth uses the camera to scan QR codes for adding accounts."
+        CFBundleDisplayName: "Much Better Authenticator"
+        NSFaceIDUsageDescription: "Much Better Authenticator uses Face ID to protect your authentication codes."
+        NSCameraUsageDescription: "Much Better Authenticator uses the camera to scan QR codes for adding accounts."
     entitlements:
       path: App/KeyAuth.entitlements
       properties:
@@ -47,7 +48,7 @@ targets:
     info:
       path: KeyboardExtension/Info.plist
       properties:
-        CFBundleDisplayName: KeyAuth
+        CFBundleDisplayName: "Much Better Authenticator"
         NSExtension:
           NSExtensionPointIdentifier: com.apple.keyboard-service
           NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).KeyboardViewController

@@ -27,7 +27,7 @@ class KeyboardViewController: UIInputViewController {
 
     private lazy var emptyLabel: UILabel = {
         let l = UILabel()
-        l.text = "No accounts — add codes in the KeyAuth app"
+        l.text = "No accounts yet. Add codes in the Much Better Authenticator app."
         l.font = .systemFont(ofSize: 13, weight: .medium)
         l.textColor = .secondaryLabel
         l.textAlignment = .center
@@ -49,7 +49,7 @@ class KeyboardViewController: UIInputViewController {
 
     private lazy var titleLabel: UILabel = {
         let l = UILabel()
-        l.text = "KeyAuth"
+        l.text = "Much Better Authenticator"
         l.font = .systemFont(ofSize: 13, weight: .bold)
         l.textColor = .label
         l.translatesAutoresizingMaskIntoConstraints = false

@@ -19,6 +19,7 @@ struct SettingsView: View {
     @State private var syncEnabled: Bool = SyncPreference.isEnabled
     @State private var trustWindowEnabled: Bool = TrustWindowPreference.isEnabled
     @State private var showingDisableDialog = false
+    @State private var showingKeyboardTutorial = false
 
     // UI-SPEC Copywriting Contract — VERBATIM strings. Do not alter without updating UI-SPEC.
     private let disclosureD03 = "Your 2FA accounts sync to your other Apple devices using iCloud Keychain. Protected by your Apple ID and device passcode. Apple can't read them."
@@ -35,6 +36,7 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            keyboardSection
             syncSection
             trustWindowSection
 
@@ -47,6 +49,9 @@ struct SettingsView: View {
             }
 
             securedSection
+        }
+        .sheet(isPresented: $showingKeyboardTutorial) {
+            KeyboardSetupView()
         }
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
@@ -85,6 +90,23 @@ struct SettingsView: View {
 
             \(removeFromICloudDescription)
             """)
+        }
+    }
+
+    private var keyboardSection: some View {
+        Section {
+            Button {
+                showingKeyboardTutorial = true
+            } label: {
+                Label("How to enable the keyboard", systemImage: "keyboard")
+                    .foregroundStyle(.primary)
+            }
+        } header: {
+            Text("Keyboard")
+        } footer: {
+            Text("Walks you through enabling the Much Better Authenticator keyboard in iOS Settings.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
         }
     }
 

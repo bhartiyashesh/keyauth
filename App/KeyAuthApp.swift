@@ -13,6 +13,7 @@ struct KeyAuthApp: App {
     @State private var deviceToken: String?
     @State private var didBootstrapSyncPreference = false
     @State private var didBootstrapTrustWindowPreference = false
+    @State private var showingKeyboardTutorial = false
     // MigrationCoordinator is constructed lazily in `.onAppear` because its init requires
     // AccountStore; @StateObject init cannot reference other @StateObjects (SwiftUI prohibits
     // that access during View init). Once created, we inject it via .environmentObject so
@@ -30,9 +31,15 @@ struct KeyAuthApp: App {
                             .environmentObject(icloudState)
                             .environmentObject(migration)
                             .environmentObject(trustWindow)
+                            .sheet(isPresented: $showingKeyboardTutorial) {
+                                KeyboardSetupView()
+                            }
                     } else {
                         LockScreenView {
                             isUnlocked = true
+                            if !KeyboardTutorialPreference.hasSeen {
+                                showingKeyboardTutorial = true
+                            }
                         }
                     }
                 } else {

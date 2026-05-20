@@ -41,7 +41,7 @@ struct PairingView: View {
                 Text("No browser paired")
                     .font(.title3)
                     .fontWeight(.semibold)
-                Text("Scan the QR code shown in the\nBetter Authenticator Chrome extension to pair.")
+                Text("Scan the QR code shown in the\nMuch Better Authenticator Chrome extension to pair.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)

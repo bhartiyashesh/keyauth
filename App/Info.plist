@@ -4,6 +4,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Much Better Authenticator</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -19,9 +21,9 @@
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Better Authenticator uses the camera to scan QR codes for adding accounts.</string>
+	<string>Much Better Authenticator uses the camera to scan QR codes for adding accounts.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Better Authenticator uses Face ID to protect your authentication codes.</string>
+	<string>Much Better Authenticator uses Face ID to protect your authentication codes.</string>
 	<key>UILaunchScreen</key>
 	<dict/>
 </dict>
